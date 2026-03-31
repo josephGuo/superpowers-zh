@@ -1,8 +1,27 @@
 #!/usr/bin/env node
 
-import { existsSync, mkdirSync, cpSync, readdirSync, readFileSync, writeFileSync } from 'fs';
-import { resolve, dirname } from 'path';
+import { existsSync, mkdirSync, cpSync, readdirSync, readFileSync, writeFileSync, copyFileSync, statSync } from 'fs';
+import { resolve, dirname, join } from 'path';
 import { fileURLToPath } from 'url';
+
+// Node 14/16 兼容：cpSync 在 Node 16.7+ 才可用
+function copyDirSync(src, dest) {
+  if (typeof cpSync === 'function') {
+    cpSync(src, dest, { recursive: true });
+    return;
+  }
+  // 手动递归复制（兼容 Node 14+）
+  mkdirSync(dest, { recursive: true });
+  for (const entry of readdirSync(src, { withFileTypes: true })) {
+    const srcPath = join(src, entry.name);
+    const destPath = join(dest, entry.name);
+    if (entry.isDirectory()) {
+      copyDirSync(srcPath, destPath);
+    } else {
+      copyFileSync(srcPath, destPath);
+    }
+  }
+}
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const PKG = JSON.parse(readFileSync(resolve(__dirname, '..', 'package.json'), 'utf8'));
@@ -252,7 +271,7 @@ function install() {
 
     if (existsSync(detectPath)) {
       mkdirSync(dest, { recursive: true });
-      cpSync(SKILLS_SRC, dest, { recursive: true });
+      copyDirSync(SKILLS_SRC, dest);
       const count = countDirs(dest);
       console.log(`  ✅ ${target.name}: ${count} 个 skills -> ${dest}`);
       installed++;
@@ -276,7 +295,7 @@ function install() {
       if (target.name === 'Claude Code' && existsSync(AGENTS_SRC)) {
         const agentsDest = resolve(PROJECT_DIR, '.claude', 'agents');
         mkdirSync(agentsDest, { recursive: true });
-        cpSync(AGENTS_SRC, agentsDest, { recursive: true });
+        copyDirSync(AGENTS_SRC, agentsDest);
       }
     }
   }
@@ -284,13 +303,13 @@ function install() {
   if (installed === 0) {
     const dest = resolve(PROJECT_DIR, '.claude', 'skills');
     mkdirSync(dest, { recursive: true });
-    cpSync(SKILLS_SRC, dest, { recursive: true });
+    copyDirSync(SKILLS_SRC, dest);
     console.log(`  ✅ 默认安装: ${countDirs(dest)} 个 skills -> ${dest}`);
 
     if (existsSync(AGENTS_SRC)) {
       const agentsDest = resolve(PROJECT_DIR, '.claude', 'agents');
       mkdirSync(agentsDest, { recursive: true });
-      cpSync(AGENTS_SRC, agentsDest, { recursive: true });
+      copyDirSync(AGENTS_SRC, agentsDest);
       console.log(`  ✅ 默认安装: agents -> ${agentsDest}`);
     }
   }
