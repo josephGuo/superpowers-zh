@@ -37,7 +37,7 @@ AI：在开始实现之前，我需要了解几个关键问题：
 [![npm version](https://img.shields.io/npm/v/superpowers-zh)](https://www.npmjs.com/package/superpowers-zh)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://makeapullrequest.com)
-[![QQ群](https://img.shields.io/badge/QQ群-1071280067-blue?logo=tencentqq)](https://qm.qq.com/q/EeNQA9xCxy)
+
 
 ### 📊 项目规模
 
@@ -173,7 +173,7 @@ cp -r superpowers-zh/skills /your/project/.qwen/skills       # Qwen Code
 | Git 提交规范 | 无 | Conventional Commits 中文适配 |
 | 文档规范 | 英文 | 中文排版规范 + 中英混排 |
 | MCP 构建 | 无 | MCP 服务器构建方法论 |
-| 社区 | Discord | QQ 群 |
+| 社区 | Discord | 微信公众号 + 微信群 |
 
 ---
 
@@ -193,11 +193,12 @@ cp -r superpowers-zh/skills /your/project/.qwen/skills       # Qwen Code
 
 ---
 
-## 社区交流
+## 交流 · Community
 
-| 群名 | 群号 | 加入方式 |
-|------|------|---------|
-| AI 编程 & Agent 中文实践群 | **1071280067** | [点击加入](https://qm.qq.com/q/EeNQA9xCxy) |
+微信公众号 **「AI不止语」**（微信搜索 `AI_BuZhiYu`）
+技术问答 · 项目更新 · 实战文章
+
+微信群：关注公众号后回复「群」获取入群方式
 
 ---
 

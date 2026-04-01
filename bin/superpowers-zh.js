@@ -230,28 +230,84 @@ ${skillList}
   }
 }
 
+// 工具名称别名映射（用户输入 -> TARGETS.name）
+const TOOL_ALIASES = {
+  'claude':       'Claude Code',
+  'claude-code':  'Claude Code',
+  'claudecode':   'Claude Code',
+  'cursor':       'Cursor',
+  'codex':        'Codex CLI',
+  'kiro':         'Kiro',
+  'deerflow':     'DeerFlow',
+  'trae':         'Trae',
+  'antigravity':  'Antigravity',
+  'vscode':       'VS Code',
+  'vs-code':      'VS Code',
+  'openclaw':     'OpenClaw',
+  'windsurf':     'Windsurf',
+  'gemini':       'Gemini CLI',
+  'gemini-cli':   'Gemini CLI',
+  'aider':        'Aider',
+  'opencode':     'OpenCode',
+  'qwen':         'Qwen Code',
+  'qwen-code':    'Qwen Code',
+};
+
 function showHelp() {
+  const toolNames = [...new Set(Object.values(TOOL_ALIASES))];
   console.log(`
   superpowers-zh v${PKG.version} — AI 编程超能力中文版
 
   用法：
-    npx superpowers-zh          安装 skills（及 agents）到当前项目
-    npx superpowers-zh --help   显示帮助
-    npx superpowers-zh --version 显示版本
+    npx superpowers-zh                   自动检测工具并安装
+    npx superpowers-zh --tool cursor     指定工具安装（检测不到时使用）
+    npx superpowers-zh --help            显示帮助
+    npx superpowers-zh --version         显示版本
+
+  支持的工具名：
+    ${Object.keys(TOOL_ALIASES).join(', ')}
 
   说明：
-    自动检测当前项目使用的 AI 编程工具：
-    Claude Code / Cursor / Codex / Kiro / DeerFlow / Trae / Antigravity / VS Code / OpenClaw
-    Windsurf / Gemini CLI / Aider / OpenCode / Qwen Code
-    将 ${countDirs(SKILLS_SRC)} 个 skills 安装到对应目录。
-    Claude Code 还会额外安装 agents 到 .claude/agents/。
-    如果未检测到任何工具，默认安装到 .claude/skills/ 和 .claude/agents/。
+    自动检测当前项目使用的 AI 编程工具，将 ${countDirs(SKILLS_SRC)} 个 skills 安装到对应目录。
+    如果自动检测不到，请用 --tool 指定你的工具，例如：
+      npx superpowers-zh --tool cursor
+      npx superpowers-zh --tool trae
 
   项目：https://github.com/jnMetaCode/superpowers-zh
 `);
 }
 
-function install() {
+function installForTarget(target) {
+  const dest = resolve(PROJECT_DIR, target.dir);
+  mkdirSync(dest, { recursive: true });
+  copyDirSync(SKILLS_SRC, dest);
+  const count = countDirs(dest);
+  console.log(`  ✅ ${target.name}: ${count} 个 skills -> ${dest}`);
+
+  if (target.name === 'Trae') {
+    generateTraeBootstrapRule(PROJECT_DIR);
+  }
+
+  if (target.name === 'Antigravity') {
+    generateAntigravityBootstrap(PROJECT_DIR);
+  }
+
+  if (target.name === 'Aider') {
+    generateAiderBootstrap(PROJECT_DIR);
+  }
+
+  if (target.name === 'Gemini CLI') {
+    generateGeminiBootstrap(PROJECT_DIR);
+  }
+
+  if (target.name === 'Claude Code' && existsSync(AGENTS_SRC)) {
+    const agentsDest = resolve(PROJECT_DIR, '.claude', 'agents');
+    mkdirSync(agentsDest, { recursive: true });
+    copyDirSync(AGENTS_SRC, agentsDest);
+  }
+}
+
+function install(forceToolName) {
  try {
   console.log(`\n  superpowers-zh v${PKG.version} — AI 编程超能力中文版\n`);
 
@@ -263,44 +319,36 @@ function install() {
   console.log(`  源: ${countDirs(SKILLS_SRC)} 个 skills`);
   console.log(`  目标项目: ${PROJECT_DIR}\n`);
 
+  // --tool 指定安装
+  if (forceToolName) {
+    const target = TARGETS.find(t => t.name === forceToolName);
+    if (!target) {
+      console.error(`  ❌ 未知工具: ${forceToolName}`);
+      process.exit(1);
+    }
+    installForTarget(target);
+    console.log('\n  安装完成！重启你的 AI 编程工具即可生效。\n');
+    return;
+  }
+
+  // 自动检测
   let installed = 0;
 
   for (const target of TARGETS) {
     const detectPath = resolve(PROJECT_DIR, target.detect);
-    const dest = resolve(PROJECT_DIR, target.dir);
-
     if (existsSync(detectPath)) {
-      mkdirSync(dest, { recursive: true });
-      copyDirSync(SKILLS_SRC, dest);
-      const count = countDirs(dest);
-      console.log(`  ✅ ${target.name}: ${count} 个 skills -> ${dest}`);
+      installForTarget(target);
       installed++;
-
-      if (target.name === 'Trae') {
-        generateTraeBootstrapRule(PROJECT_DIR);
-      }
-
-      if (target.name === 'Antigravity') {
-        generateAntigravityBootstrap(PROJECT_DIR);
-      }
-
-      if (target.name === 'Aider') {
-        generateAiderBootstrap(PROJECT_DIR);
-      }
-
-      if (target.name === 'Gemini CLI') {
-        generateGeminiBootstrap(PROJECT_DIR);
-      }
-
-      if (target.name === 'Claude Code' && existsSync(AGENTS_SRC)) {
-        const agentsDest = resolve(PROJECT_DIR, '.claude', 'agents');
-        mkdirSync(agentsDest, { recursive: true });
-        copyDirSync(AGENTS_SRC, agentsDest);
-      }
     }
   }
 
   if (installed === 0) {
+    console.log('  ⚠️  未检测到任何已知的 AI 编程工具。\n');
+    console.log('  如果你使用的是 Cursor、Trae 等工具，请用 --tool 指定：');
+    console.log('    npx superpowers-zh --tool cursor');
+    console.log('    npx superpowers-zh --tool trae\n');
+    console.log('  现在将默认安装到 .claude/skills/（兼容 Claude Code / OpenClaw）\n');
+
     const dest = resolve(PROJECT_DIR, '.claude', 'skills');
     mkdirSync(dest, { recursive: true });
     copyDirSync(SKILLS_SRC, dest);
@@ -321,13 +369,31 @@ function install() {
  }
 }
 
-const arg = process.argv[2];
-if (arg === '--help' || arg === '-h') {
+const args = process.argv.slice(2);
+const helpIdx = args.findIndex(a => a === '--help' || a === '-h');
+const versionIdx = args.findIndex(a => a === '--version' || a === '-v');
+const toolIdx = args.findIndex(a => a === '--tool' || a === '-t');
+
+if (helpIdx !== -1) {
   showHelp();
-} else if (arg === '--version' || arg === '-v') {
+} else if (versionIdx !== -1) {
   console.log(PKG.version);
-} else if (arg && arg.startsWith('-')) {
-  console.warn(`  未知参数: ${arg}\n`);
+} else if (toolIdx !== -1) {
+  const toolArg = args[toolIdx + 1];
+  if (!toolArg) {
+    console.error('  ❌ --tool 需要指定工具名，例如: --tool cursor\n');
+    showHelp();
+    process.exit(1);
+  }
+  const toolName = TOOL_ALIASES[toolArg.toLowerCase()];
+  if (!toolName) {
+    console.error(`  ❌ 未知工具: ${toolArg}`);
+    console.error(`  支持的工具: ${Object.keys(TOOL_ALIASES).join(', ')}\n`);
+    process.exit(1);
+  }
+  install(toolName);
+} else if (args.length > 0 && args[0].startsWith('-')) {
+  console.warn(`  未知参数: ${args[0]}\n`);
   showHelp();
   process.exit(1);
 } else {
