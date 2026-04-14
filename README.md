@@ -2,9 +2,9 @@
 
 🌐 **简体中文** | [English (upstream)](https://github.com/obra/superpowers)
 
-> 🦸 **superpowers（116k+ ⭐）完整汉化 + 6 个中国原创 skills** — 让 OpenClaw / Claude Code / Cursor / Windsurf / Kiro / Gemini CLI 等 **14 款 AI 编程工具**真正会干活。从头脑风暴到代码审查，从 TDD 到调试，每个 skill 都是经过实战验证的工作方法论。
+> 🦸 **superpowers（116k+ ⭐）完整汉化 + 6 个中国原创 skills** — 让 Claude Code / Copilot CLI / Hermes Agent / Cursor / Windsurf / Kiro / Gemini CLI 等 **16 款 AI 编程工具**真正会干活。从头脑风暴到代码审查，从 TDD 到调试，每个 skill 都是经过实战验证的工作方法论。
 
-Chinese community edition of [superpowers](https://github.com/obra/superpowers) — 20 skills across 14 AI coding tools, including full translations and China-specific development skills.
+Chinese community edition of [superpowers](https://github.com/obra/superpowers) — 20 skills across 16 AI coding tools, including full translations and China-specific development skills.
 
 <!-- 效果对比 -->
 <table>
@@ -43,7 +43,7 @@ AI：在开始实现之前，我需要了解几个关键问题：
 
 | 📦 翻译 Skills | 🇨🇳 中国特色 Skills | 🤖 支持工具 |
 |:---:|:---:|:---:|
-| **14** | **6** | **OpenClaw / Claude Code / Cursor / Windsurf / Kiro / Gemini CLI / Codex / Aider / Trae / VS Code (Copilot) / DeerFlow / OpenCode / Qwen Code / Antigravity** |
+| **14** | **6** | **Claude Code / Copilot CLI / Hermes Agent / Cursor / Windsurf / Kiro / Gemini CLI / Codex / Aider / Trae / VS Code (Copilot) / DeerFlow / OpenCode / OpenClaw / Qwen Code / Antigravity** |
 
 ---
 
@@ -53,12 +53,13 @@ AI：在开始实现之前，我需要了解几个关键问题：
 
 **superpowers-zh** 在完整翻译的基础上，新增了面向中国开发者的特色 skills。
 
-### 🤖 支持 14 款主流 AI 编程工具
+### 🤖 支持 16 款主流 AI 编程工具
 
 | 工具 | 类型 | 一键安装 | 手动安装 |
 |------|------|:---:|:---:|
-| [OpenClaw](https://github.com/anthropics/openclaw) | CLI | `npx superpowers-zh` | `skills/` |
 | [Claude Code](https://claude.ai/code) | CLI | `npx superpowers-zh` | `.claude/skills/` |
+| [Copilot CLI](https://githubnext.com/projects/copilot-cli) | CLI | `npx superpowers-zh --tool copilot` | `.claude/skills/` |
+| [Hermes Agent](https://github.com/NousResearch/hermes-agent) | CLI | `npx superpowers-zh --tool hermes` | `.hermes/skills/` |
 | [Cursor](https://cursor.sh) | IDE | `npx superpowers-zh` | `.cursor/skills/` |
 | [Windsurf](https://codeium.com/windsurf) | IDE | `npx superpowers-zh` | `.windsurf/skills/` |
 | [Kiro](https://kiro.dev) | IDE | `npx superpowers-zh` | `.kiro/steering/` |
@@ -69,6 +70,7 @@ AI：在开始实现之前，我需要了解几个关键问题：
 | [VS Code](https://code.visualstudio.com) (Copilot) | IDE 插件 | `npx superpowers-zh` | `.github/superpowers/` |
 | [DeerFlow 2.0](https://github.com/bytedance/deer-flow) | Agent 框架 | `npx superpowers-zh` | `skills/custom/` |
 | [OpenCode](https://opencode.ai) | CLI | `npx superpowers-zh` | `.opencode/skills/` |
+| [OpenClaw](https://github.com/anthropics/openclaw) | CLI | `npx superpowers-zh` | `skills/` |
 | [Qwen Code](https://tongyi.aliyun.com/lingma) (通义灵码) | IDE 插件 | `npx superpowers-zh` | `.qwen/skills/` |
 | [Antigravity](https://github.com/anthropics/antigravity) | CLI | `npx superpowers-zh` | `.antigravity/skills/` |
 
@@ -122,7 +124,8 @@ npx superpowers-zh
 git clone https://github.com/jnMetaCode/superpowers-zh.git
 
 # 复制 skills 到你的项目（选择你使用的工具）
-cp -r superpowers-zh/skills /your/project/.claude/skills      # Claude Code
+cp -r superpowers-zh/skills /your/project/.claude/skills      # Claude Code / Copilot CLI
+cp -r superpowers-zh/skills /your/project/.hermes/skills      # Hermes Agent
 cp -r superpowers-zh/skills /your/project/.cursor/skills      # Cursor
 cp -r superpowers-zh/skills /your/project/.codex/skills       # Codex CLI
 cp -r superpowers-zh/skills /your/project/.kiro/steering      # Kiro
@@ -145,6 +148,8 @@ cp -r superpowers-zh/skills /your/project/.qwen/skills       # Qwen Code
 | 工具 | 配置文件 | 说明 |
 |------|---------|------|
 | Claude Code | `CLAUDE.md` | 项目根目录 |
+| Copilot CLI | `CLAUDE.md` | 与 Claude Code 共用插件格式 |
+| Hermes Agent | `HERMES.md` 或 `.hermes.md` | 项目根目录，安装时自动生成 |
 | Kiro | `.kiro/steering/*.md` | 支持 always/globs/手动三种模式 |
 | DeerFlow 2.0 | `skills/custom/*/SKILL.md` | 字节跳动开源 SuperAgent，自动发现自定义 skills |
 | Trae | `.trae/rules/project_rules.md` | 项目级规则 |
@@ -156,9 +161,10 @@ cp -r superpowers-zh/skills /your/project/.qwen/skills       # Qwen Code
 | Gemini CLI | `.gemini/skills/*/SKILL.md` | 项目级 skills 目录 |
 | Aider | `.aider/skills/*/SKILL.md` | 项目级 skills 目录 |
 | OpenCode | `.opencode/skills/*/SKILL.md` | 项目级 skills 目录 |
+| Hermes Agent | `.hermes/skills/*/SKILL.md` | 项目级 skills 目录 |
 | Qwen Code | `.qwen/skills/*/SKILL.md` | 项目级 skills 目录 |
 
-> **详细安装指南**：[Kiro](docs/README.kiro.md) · [DeerFlow](docs/README.deerflow.md) · [Trae](docs/README.trae.md) · [Antigravity](docs/README.antigravity.md) · [VS Code](docs/README.vscode.md) · [Codex](docs/README.codex.md) · [OpenCode](docs/README.opencode.md) · [OpenClaw](docs/README.openclaw.md) · [Windsurf](docs/README.windsurf.md) · [Gemini CLI](docs/README.gemini-cli.md) · [Aider](docs/README.aider.md) · [Qwen Code](docs/README.qwen.md)
+> **详细安装指南**：[Kiro](docs/README.kiro.md) · [DeerFlow](docs/README.deerflow.md) · [Trae](docs/README.trae.md) · [Antigravity](docs/README.antigravity.md) · [VS Code](docs/README.vscode.md) · [Codex](docs/README.codex.md) · [OpenCode](docs/README.opencode.md) · [OpenClaw](docs/README.openclaw.md) · [Windsurf](docs/README.windsurf.md) · [Gemini CLI](docs/README.gemini-cli.md) · [Aider](docs/README.aider.md) · [Qwen Code](docs/README.qwen.md) · [Hermes Agent](docs/README.hermes.md)
 
 ---
 
@@ -224,7 +230,7 @@ MIT License — 自由使用，商业或个人均可。
 
 <div align="center">
 
-**🦸 AI 编程超能力：让 OpenClaw / Claude Code / Cursor 等 14 款工具真正会干活**
+**🦸 AI 编程超能力：让 Claude Code / Hermes Agent / Cursor 等 16 款工具真正会干活**
 
 [Star 本项目](https://github.com/jnMetaCode/superpowers-zh) · [提交 Issue](https://github.com/jnMetaCode/superpowers-zh/issues) · [贡献代码](https://github.com/jnMetaCode/superpowers-zh/pulls)
 
