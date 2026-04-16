@@ -1,23 +1,34 @@
 #!/usr/bin/env node
 
-import { existsSync, mkdirSync, cpSync, readdirSync, readFileSync, writeFileSync, copyFileSync, statSync } from 'fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync, copyFileSync, lstatSync, realpathSync } from 'fs';
 import { resolve, dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 
-// Node 14/16 兼容：cpSync 在 Node 16.7+ 才可用
+// 手动递归复制：跨 Node 版本和操作系统行为一致
+// 不使用 cpSync —— 在 Windows + npx 缓存（含 junction）+ Node 16.7-18 下不稳定
 function copyDirSync(src, dest) {
-  if (typeof cpSync === 'function') {
-    cpSync(src, dest, { recursive: true });
-    return;
-  }
-  // 手动递归复制（兼容 Node 14+）
+  // 解析 junction/symlink，避免 Windows npx 缓存路径下 readdir 返回空
+  let realSrc = src;
+  try { realSrc = realpathSync(src); } catch {}
+
   mkdirSync(dest, { recursive: true });
-  for (const entry of readdirSync(src, { withFileTypes: true })) {
-    const srcPath = join(src, entry.name);
+  const entries = readdirSync(realSrc, { withFileTypes: true });
+  for (const entry of entries) {
+    const srcPath = join(realSrc, entry.name);
     const destPath = join(dest, entry.name);
-    if (entry.isDirectory()) {
+    let stat;
+    try { stat = lstatSync(srcPath); } catch { continue; }
+    if (stat.isSymbolicLink()) {
+      // 取消引用后按实际类型处理
+      try {
+        const real = realpathSync(srcPath);
+        const realStat = lstatSync(real);
+        if (realStat.isDirectory()) copyDirSync(real, destPath);
+        else copyFileSync(real, destPath);
+      } catch {}
+    } else if (stat.isDirectory()) {
       copyDirSync(srcPath, destPath);
-    } else {
+    } else if (stat.isFile()) {
       copyFileSync(srcPath, destPath);
     }
   }
@@ -340,9 +351,19 @@ function showHelp() {
 
 function installForTarget(target) {
   const dest = resolve(PROJECT_DIR, target.dir);
+  const srcCount = countDirs(SKILLS_SRC);
   mkdirSync(dest, { recursive: true });
   copyDirSync(SKILLS_SRC, dest);
   const count = countDirs(dest);
+  if (srcCount > 0 && count === 0) {
+    throw new Error(
+      `复制 skills 失败：源目录 ${SKILLS_SRC} 有 ${srcCount} 个 skill，但目标 ${dest} 为空。` +
+      `\n  这通常是 npx 缓存目录权限或路径问题。请尝试：\n` +
+      `    1. 清理缓存后重试: npm cache clean --force && npx superpowers-zh\n` +
+      `    2. 或全局安装: npm i -g superpowers-zh && superpowers-zh\n` +
+      `    3. 或手动克隆复制: 见 https://github.com/jnMetaCode/superpowers-zh#方式二手动安装`
+    );
+  }
   console.log(`  ✅ ${target.name}: ${count} 个 skills -> ${dest}`);
 
   if (target.name === 'Trae') {
