@@ -2,7 +2,7 @@
 
 🌐 **简体中文** | [English (upstream)](https://github.com/obra/superpowers)
 
-> 🦸 **superpowers（116k+ ⭐）完整汉化 + 6 个中国原创 skills** — 让 Claude Code / Copilot CLI / Hermes Agent / Cursor / Windsurf / Kiro / Gemini CLI 等 **16 款 AI 编程工具**真正会干活。从头脑风暴到代码审查，从 TDD 到调试，每个 skill 都是经过实战验证的工作方法论。
+> 🦸 **superpowers（159k+ ⭐）完整汉化 + 6 个中国原创 skills** — 让 Claude Code / Copilot CLI / Hermes Agent / Cursor / Windsurf / Kiro / Gemini CLI 等 **17 款 AI 编程工具**真正会干活。从头脑风暴到代码审查，从 TDD 到调试，每个 skill 都是经过实战验证的工作方法论。
 
 Chinese community edition of [superpowers](https://github.com/obra/superpowers) — 20 skills across 16 AI coding tools, including full translations and China-specific development skills.
 
@@ -43,17 +43,40 @@ AI：在开始实现之前，我需要了解几个关键问题：
 
 | 📦 翻译 Skills | 🇨🇳 中国特色 Skills | 🤖 支持工具 |
 |:---:|:---:|:---:|
-| **14** | **6** | **Claude Code / Copilot CLI / Hermes Agent / Cursor / Windsurf / Kiro / Gemini CLI / Codex / Aider / Trae / VS Code (Copilot) / DeerFlow / OpenCode / OpenClaw / Qwen Code / Antigravity** |
+| **14** | **6** | **Claude Code / Copilot CLI / Hermes Agent / Cursor / Windsurf / Kiro / Gemini CLI / Codex / Aider / Trae / VS Code (Copilot) / DeerFlow / OpenCode / OpenClaw / Qwen Code / Antigravity / Claw Code** |
 
 ---
 
 ## 这是什么？
 
-[superpowers](https://github.com/obra/superpowers) 是目前最火的 AI 编程 skills 框架（116k+ stars），为 AI 编程工具提供**系统化的工作方法论**。
+[superpowers](https://github.com/obra/superpowers) 是目前最火的 AI 编程 skills 框架（159k+ stars），为 AI 编程工具提供**系统化的工作方法论**。
 
 **superpowers-zh** 在完整翻译的基础上，新增了面向中国开发者的特色 skills。
 
-### 🤖 支持 16 款主流 AI 编程工具
+### 🆚 与英文上游的区别（老被问，一次说清）
+
+| 维度 | superpowers（英文上游） | superpowers-zh（中文增强版） |
+|------|----------------------|---------------------------|
+| ⭐ Star 数 | 159k+ | — |
+| 📦 Skills 总数 | 14 | **20**（14 翻译 + 6 国产原创） |
+| 🌐 语言 | 英文 | 中文（技术术语保留英文） |
+| 🤖 **支持工具** | **6 款**：Claude Code / Cursor / Codex / OpenCode / Copilot CLI / Gemini CLI | **17 款**：上述 6 款 + Hermes Agent / Trae / Kiro / Qwen Code（通义灵码）/ OpenClaw / Claw Code / Antigravity / DeerFlow / VS Code / Windsurf / Aider |
+| ⚡ **安装方式** | 按工具分别装（每款一条不同的 plugin marketplace 命令） | **`npx superpowers-zh` 一条命令自动识别项目里的工具并安装**；识别不出可 `--tool <name>` 显式指定 |
+| 🇨🇳 Git 平台 | GitHub 为主 | GitHub + Gitee + Coding + 极狐 GitLab + **CNB（腾讯云原生构建）** |
+| 🇨🇳 CI/CD 示例 | GitHub Actions | GitHub Actions + Gitee Go + Coding CI + 极狐 CI + `.cnb.yml` |
+| 🇨🇳 代码审查风格 | 西方直接风格 | 适配国内团队沟通文化 |
+| 🇨🇳 Git 提交规范 | 无 | Conventional Commits 中文适配 |
+| 🇨🇳 中文文档规范 | 无 | 中文排版 + 中英混排规则 + 告别机翻味 |
+| ➕ MCP 服务器构建 | 无 | 独立 `mcp-builder` skill |
+| ➕ 工作流执行器 | 无 | 独立 `workflow-runner` skill（多角色 YAML 编排） |
+| 🔄 版本跟进 | 独立迭代 | **同步上游 + 国产增量叠加** |
+| 🤝 接受新 skill PR | 一般不接受（原文：*"we don't generally accept contributions of new skills"*） | 欢迎 PR（中国开发者痛点优先） |
+| 💬 社区 | Discord | 微信公众号「AI不止语」+ 微信群 + QQ 群 |
+| 📜 License | MIT | MIT |
+
+**一句话总结：** 英文上游 = 方法论内核；中文增强版 = 方法论内核 **+** 17 款工具一键适配 **+** 国内 Git/CI 生态 **+** 中文化表达习惯。
+
+### 🤖 支持 17 款主流 AI 编程工具
 
 | 工具 | 类型 | 一键安装 | 手动安装 |
 |------|------|:---:|:---:|
@@ -73,6 +96,7 @@ AI：在开始实现之前，我需要了解几个关键问题：
 | [OpenClaw](https://github.com/anthropics/openclaw) | CLI | `npx superpowers-zh` | `skills/` |
 | [Qwen Code](https://tongyi.aliyun.com/lingma) (通义灵码) | IDE 插件 | `npx superpowers-zh` | `.qwen/skills/` |
 | [Antigravity](https://github.com/anthropics/antigravity) | CLI | `npx superpowers-zh` | `.antigravity/skills/` |
+| [Claw Code](https://github.com/ultraworkers/claw-code) | CLI (Rust) | `npx superpowers-zh` | `.claw/skills/` |
 
 > 运行 `npx superpowers-zh` 会自动检测你项目中使用的工具，将 20 个 skills 安装到正确位置。
 
@@ -139,6 +163,7 @@ cp -r superpowers-zh/skills /your/project/.gemini/skills     # Gemini CLI
 cp -r superpowers-zh/skills /your/project/.aider/skills      # Aider
 cp -r superpowers-zh/skills /your/project/.opencode/skills   # OpenCode
 cp -r superpowers-zh/skills /your/project/.qwen/skills       # Qwen Code
+cp -r superpowers-zh/skills /your/project/.claw/skills       # Claw Code（Rust 版）
 ```
 
 ### 方式三：在配置文件中引用
@@ -163,23 +188,9 @@ cp -r superpowers-zh/skills /your/project/.qwen/skills       # Qwen Code
 | OpenCode | `.opencode/skills/*/SKILL.md` | 项目级 skills 目录 |
 | Hermes Agent | `.hermes/skills/*/SKILL.md` | 项目级 skills 目录 |
 | Qwen Code | `.qwen/skills/*/SKILL.md` | 项目级 skills 目录 |
+| Claw Code | `.claw/skills/*/SKILL.md` | Rust 版 CLI agent，兼容 Claude Code 的 SKILL.md 格式 |
 
 > **详细安装指南**：[Kiro](docs/README.kiro.md) · [DeerFlow](docs/README.deerflow.md) · [Trae](docs/README.trae.md) · [Antigravity](docs/README.antigravity.md) · [VS Code](docs/README.vscode.md) · [Codex](docs/README.codex.md) · [OpenCode](docs/README.opencode.md) · [OpenClaw](docs/README.openclaw.md) · [Windsurf](docs/README.windsurf.md) · [Gemini CLI](docs/README.gemini-cli.md) · [Aider](docs/README.aider.md) · [Qwen Code](docs/README.qwen.md) · [Hermes Agent](docs/README.hermes.md)
-
----
-
-## 对比上游
-
-| 特性 | superpowers (英文) | superpowers-zh (中文) |
-|------|-------------------|----------------------|
-| Skills 数量 | 14 | **20**（14 翻译 + 6 原创） |
-| 语言 | 英文 | 中文（技术术语保留英文） |
-| 代码审查规范 | 西方直接风格 | 适配国内团队沟通文化 |
-| Git 平台 | GitHub 为主 | GitHub + Gitee + Coding + 极狐 |
-| Git 提交规范 | 无 | Conventional Commits 中文适配 |
-| 文档规范 | 英文 | 中文排版规范 + 中英混排 |
-| MCP 构建 | 无 | MCP 服务器构建方法论 |
-| 社区 | Discord | 微信公众号 + 微信群 |
 
 ---
 
@@ -205,8 +216,37 @@ cp -r superpowers-zh/skills /your/project/.qwen/skills       # Qwen Code
 
 | 渠道 | 加入方式 |
 |------|---------|
-| QQ 群 | [点击加入](https://qm.qq.com/q/EeNQA9xCxy)（群号 1071280067） |
+| QQ 2群 | [点击加入](https://qm.qq.com/q/EeNQA9xCxy)（群号 1071280067） |
 | 微信群 | 关注公众号后回复「群」获取入群方式 |
+
+---
+
+## 🌟 相关项目生态
+
+**五个项目组合使用，覆盖 AI 编程从"方法论 → 角色 → 协作 → 教程 → 安全"的完整链路。**
+
+| 项目 | 定位 | 一句话 |
+|------|------|-------|
+| **[superpowers-zh](https://github.com/jnMetaCode/superpowers-zh)**（本项目） ![](https://img.shields.io/github/stars/jnMetaCode/superpowers-zh?style=flat&label=⭐) | 🧠 工作方法论 | 20 个 skills 教 AI 怎么干活（TDD / 调试 / 代码审查等） |
+| **[agency-agents-zh](https://github.com/jnMetaCode/agency-agents-zh)** ![](https://img.shields.io/github/stars/jnMetaCode/agency-agents-zh?style=flat&label=⭐) | 🎭 专家角色库 | 211 个**即插即用** AI 专家，含 46 中国原创（小红书 / 抖音 / 飞书 / 钉钉） |
+| **[agency-orchestrator](https://github.com/jnMetaCode/agency-orchestrator)** | 🚀 编排引擎 | 一句话 → 211 专家协作，**几分钟出方案**（9 家 LLM / 6 免费） |
+| **[ai-coding-guide](https://github.com/jnMetaCode/ai-coding-guide)** | 📖 实战教程 | 66 个 Claude Code 技巧 + 9 款工具最佳实践 + 配置模板 |
+| **[shellward](https://github.com/jnMetaCode/shellward)** | 🛡️ 安全中间件 | 8 层防御 + DLP 数据流 + 注入检测，**零依赖**（含 MCP Server） |
+
+---
+
+### 🔥 重点推荐：[agency-orchestrator](https://github.com/jnMetaCode/agency-orchestrator) — 一句话调度 211 个 AI 专家协作，几分钟交付完整方案
+
+以前写个方案：你当指挥官，把 AI 轮流扮演 5 个角色，复制粘贴 10 次，1 小时没了。
+
+**现在：** 丢一句话进去 `"做一个电商退款流程"`，**产品 → 架构 → 安全 → 测试 → DBA 自动接力**，几分钟完整方案落地。
+
+- 🎭 **211+ 专家角色**（含 46 个中国市场原创：小红书 / 抖音 / 微信 / 飞书 / 钉钉）
+- 🧩 **零代码 YAML**，一行 prompt 就能跑
+- 💰 **9 家 LLM 可选**（DeepSeek / Claude / OpenAI / Ollama 等，**6 家免费**）
+- 🔗 **与 superpowers-zh 互补**：本项目管"**怎么做**"（方法论），orchestrator 管"**谁来做**"（角色协作）
+
+👉 **[立即体验 agency-orchestrator →](https://github.com/jnMetaCode/agency-orchestrator)**
 
 ---
 
@@ -214,11 +254,6 @@ cp -r superpowers-zh/skills /your/project/.qwen/skills       # Qwen Code
 
 - 原始英文版：[obra/superpowers](https://github.com/obra/superpowers)（MIT 协议）
 - 感谢 [@obra](https://github.com/obra) 创建了这个优秀的项目
-- 姊妹项目：
-  - [ai-coding-guide](https://github.com/jnMetaCode/ai-coding-guide) — AI 编程工具实战指南 — 66 个 Claude Code 技巧 + 9 款工具最佳实践 + 可复制配置模板
-  - [agency-agents-zh](https://github.com/jnMetaCode/agency-agents-zh) — 187 个专业角色，让 AI 变成安全工程师、DBA、产品经理等
-  - [agency-orchestrator](https://github.com/jnMetaCode/agency-orchestrator) — 多智能体编排引擎 — 用 YAML 编排 187 个角色协作，支持 DeepSeek/Claude/OpenAI/Ollama，零代码
-  - [shellward](https://github.com/jnMetaCode/shellward) — AI 智能体安全中间件 — 注入检测、数据防泄露、命令安全、零依赖、MCP Server
 
 ---
 
@@ -230,7 +265,7 @@ MIT License — 自由使用，商业或个人均可。
 
 <div align="center">
 
-**🦸 AI 编程超能力：让 Claude Code / Hermes Agent / Cursor 等 16 款工具真正会干活**
+**🦸 AI 编程超能力：让 Claude Code / Hermes Agent / Cursor / Claw Code 等 17 款工具真正会干活**
 
 [Star 本项目](https://github.com/jnMetaCode/superpowers-zh) · [提交 Issue](https://github.com/jnMetaCode/superpowers-zh/issues) · [贡献代码](https://github.com/jnMetaCode/superpowers-zh/pulls)
 
