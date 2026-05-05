@@ -1,6 +1,6 @@
 {
   "name": "superpowers-zh",
-  "version": "1.1.9",
+  "version": "1.2.1",
   "engines": {
     "node": ">=20.0.0"
   },
@@ -9,6 +9,9 @@
   "main": ".opencode/plugins/superpowers.js",
   "bin": {
     "superpowers-zh": "bin/superpowers-zh.js"
+  },
+  "scripts": {
+    "version": "node scripts/sync-plugin-version.js && git add .claude-plugin/plugin.json .cursor-plugin/plugin.json"
   },
   "files": [
     "bin/",
