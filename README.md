@@ -38,6 +38,7 @@ AI：在开始实现之前，我需要了解几个关键问题：
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://makeapullrequest.com)
 
+> 📖 **配套阅读**：[《AI 编程实战 · 方法论三卷书》](https://book.aibuzhiyu.com/) — 10 个 AI 编程工具完整教程 + 真实踩坑 · superpowers 装好之后，配上方法论效率翻倍 · 在线书 + PDF · 永久免费
 
 ### 📊 项目规模
 
