@@ -648,7 +648,7 @@ function build() {
     '  Referrer-Policy: no-referrer\n' +
     '  Cross-Origin-Opener-Policy: same-origin\n' +
     '  Permissions-Policy: geolocation=(), microphone=(), camera=()\n' +
-    '  Cache-Control: public, max-age=0, must-revalidate\n' +
+    '  Cache-Control: no-store\n' +
     '/assets/*\n  Cache-Control: public, max-age=31536000, immutable\n' +
     '/styles.css\n  Cache-Control: public, max-age=31536000, immutable\n' +
     '/app.js\n  Cache-Control: public, max-age=31536000, immutable\n');
