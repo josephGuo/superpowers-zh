@@ -108,7 +108,7 @@ const T = {
     htmlLang: 'zh-CN',
     title: 'superpowers-zh · AI 编程超能力中文增强版',
     desc: 'superpowers（233k+ ⭐）完整汉化 + 4 个中国原创 skills，一条 npx 命令为 18 款 AI 编程工具装上系统化工作方法论。',
-    nav: { why: '特性', install: '安装', skills: 'Skills', tools: '支持工具', faq: 'FAQ', github: 'GitHub ↗' },
+    nav: { why: '特性', install: '安装', skills: 'Skills', tools: '支持工具', faq: 'FAQ', learn: '学习 ↗', github: 'GitHub ↗' },
     heroBadge: 'superpowers 233k+ ⭐ · 完整汉化 + 中国原创',
     heroH1: '给你的 AI 编程工具<br>装上<span class="grad">真正会干活</span>的超能力',
     heroLead: '{n} 个经过实战验证的工作方法论 skill —— 从头脑风暴到 TDD，从系统化调试到代码审查。<br>一条命令，自动识别项目里的工具并安装。',
@@ -194,7 +194,7 @@ const T = {
     htmlLang: 'en',
     title: 'superpowers-zh · Battle-tested AI coding skills (CN-enhanced)',
     desc: 'Full Chinese localization of superpowers (233k+ ⭐) plus 4 China-native skills. One npx command installs systematic workflow methodology into 18 AI coding tools.',
-    nav: { why: 'Features', install: 'Install', skills: 'Skills', tools: 'Tools', faq: 'FAQ', github: 'GitHub ↗' },
+    nav: { why: 'Features', install: 'Install', skills: 'Skills', tools: 'Tools', faq: 'FAQ', learn: 'Learn ↗', github: 'GitHub ↗' },
     heroBadge: 'superpowers 233k+ ⭐ · Full CN localization + China-native skills',
     heroH1: 'Give your AI coding tools<br>superpowers that <span class="grad">actually ship</span>',
     heroLead: '{n} battle-tested workflow skills — from brainstorming to TDD, systematic debugging to code review.<br>One command auto-detects your tool and installs.',
@@ -349,7 +349,9 @@ ${extraHead}</head>
     <a href="${base}index.html#why">${t.nav.why}</a>
     <a href="${base}index.html#install">${t.nav.install}</a>
     <a href="${base}index.html#skills">${t.nav.skills}</a>
+    <a href="${base}index.html#tools">${t.nav.tools}</a>
     <a href="${base}index.html#faq">${t.nav.faq}</a>
+    <a href="https://aiolaola.com/?utm_source=sp1" target="_blank" rel="noopener">${t.nav.learn}</a>
     <a href="https://github.com/jnMetaCode/superpowers-zh" target="_blank" rel="noopener">${t.nav.github}</a>
     <a class="lang-switch" href="${langHref}">${other}</a>
     <button class="theme-btn" id="themeBtn" aria-label="theme" title="切换主题">◐</button>
