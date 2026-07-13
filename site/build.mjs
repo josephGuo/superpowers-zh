@@ -100,6 +100,8 @@ const TOOLS = [
   { name: 'Hermes Agent',   type: 'CLI',    cmd: 'npx superpowers-zh --tool hermes',  auto: false },
   { name: 'Claw Code',      type: 'CLI',    cmd: 'npx superpowers-zh --tool claw',    auto: false },
   { name: 'OpenClaw',       type: 'CLI',    cmd: 'npx superpowers-zh',                auto: true },
+  { name: 'CodeBuddy',      type: 'IDE',    cmd: 'npx superpowers-zh',                auto: true },
+  { name: 'CodeArts',       type: 'IDE',    cmd: 'npx superpowers-zh',                auto: true },
 ];
 
 // ---- 双语文案 ----
@@ -107,9 +109,9 @@ const T = {
   zh: {
     htmlLang: 'zh-CN',
     title: 'superpowers-zh · AI 编程超能力中文增强版',
-    desc: 'superpowers（233k+ ⭐）完整汉化 + 4 个中国原创 skills，一条 npx 命令为 18 款 AI 编程工具装上系统化工作方法论。',
+    desc: 'superpowers（250k+ ⭐）完整汉化 + 4 个中国原创 skills，一条 npx 命令为 20 款 AI 编程工具装上系统化工作方法论。',
     nav: { why: '特性', install: '安装', skills: 'Skills', tools: '支持工具', faq: 'FAQ', learn: '学习 ↗', github: 'GitHub ↗' },
-    heroBadge: 'superpowers 233k+ ⭐ · 完整汉化 + 中国原创',
+    heroBadge: 'superpowers 250k+ ⭐ · 完整汉化 + 中国原创',
     heroH1: '给你的 AI 编程工具<br>装上<span class="grad">真正会干活</span>的超能力',
     heroLead: '{n} 个经过实战验证的工作方法论 skill —— 从头脑风暴到 TDD，从系统化调试到代码审查。<br>一条命令，自动识别项目里的工具并安装。',
     heroBtn1: '查看安装命令', heroBtn2: 'GitHub 源码',
@@ -134,15 +136,12 @@ const T = {
     skDetail: '查看文档 →',
     tagCn: '中国原创',
     ucTitle: '典型使用场景', ucSub: '每个场景背后都是一组协同工作的 skill。',
-    toolsTitle: '一套 skill，18 款工具通用', toolsSub: '换工具不用换习惯，方法论跟着你走。',
+    toolsTitle: '一套 skill，20 款工具通用', toolsSub: '换工具不用换习惯，方法论跟着你走。',
     faqTitle: '常见问题',
     bookTitle: '装好之后，配上方法论效率翻倍',
     bookDesc: '《AI 编程实战 · 方法论三卷书》—— 10 个 AI 编程工具完整教程 + 真实踩坑。在线书 + PDF，永久免费。',
     bookBtn: '免费阅读 ↗',
     aiolaolaBtn: '免费学 AI 编程 · aiOlaOla ↗',
-    sponsorTitle: '赞助商',
-    sponsorDesc: '稳定高速的 API 中继服务，为 Claude Code、Codex 等平台提供 API 中继与 AI 生图服务。',
-    sponsorCta: '🙏 想出现在这里？联系 <b>jnMetaCode@qq.com</b>',
     ctaTitle: '准备好让 AI 真正会干活了吗？',
     ctaDesc: '一条命令，{n} 个实战方法论装进你的工具。免费、开源、零依赖。',
     ctaBtn1: '查看安装命令', ctaBtn2: '⭐ Star on GitHub',
@@ -161,10 +160,10 @@ const T = {
     detailSource: '在 GitHub 查看源文件 ↗',
     features: [
       { icon: '🧠', t: '20 个实战方法论', d: '不是 prompt 模板，是经过跨会话对抗式压力测试调优的工作方法论 —— 从头脑风暴到 TDD、调试、代码审查。' },
-      { icon: '🔌', t: '18 款工具通用', d: '一套 skill，Claude Code / Cursor / Codex / Gemini CLI / Windsurf… 全适配，换工具不用换习惯。' },
+      { icon: '🔌', t: '20 款工具通用', d: '一套 skill，Claude Code / Cursor / Codex / Gemini CLI / Windsurf… 全适配，换工具不用换习惯。' },
       { icon: '⚡', t: '一条命令安装', d: 'npx superpowers-zh 自动识别项目里用的是哪款工具并安装，零配置，装完重启即生效。' },
       { icon: '🇨🇳', t: '中国原创 Skills', d: '中文代码审查话术、中文提交规范、中文文档排版、国内 Git 平台（Gitee/Coding/极狐）配置 —— 上游没有。' },
-      { icon: '📖', t: '完整汉化上游', d: '同步 obra/superpowers（233k+ ⭐），核心 skill 全部中文母语化，不是机翻，是逐条校准。' },
+      { icon: '📖', t: '完整汉化上游', d: '同步 obra/superpowers（250k+ ⭐），核心 skill 全部中文母语化，不是机翻，是逐条校准。' },
       { icon: '🔓', t: '零依赖 · MIT 开源', d: '纯 Markdown skill，不引入任何外部依赖、不联网、不上传代码，按需触发零运行时开销。' },
     ],
     pipeline: [
@@ -183,19 +182,20 @@ const T = {
     ],
     faq: [
       { q: 'superpowers-zh 是免费的吗？', a: '完全免费。MIT 协议开源，永久免费，不含任何付费墙或订阅。' },
-      { q: '支持哪些 AI 编程工具？', a: '共 18 款：Claude Code、Cursor、Windsurf、Codex CLI、Gemini CLI、Kiro、Trae、Qoder、Aider、OpenCode、Qwen Code、Antigravity、DeerFlow、VS Code(Copilot)、Copilot CLI、Hermes Agent、Claw Code、OpenClaw。' },
-      { q: 'superpowers-zh 有哪些独特价值？', a: '一套完整中文化的系统工作方法论：从头脑风暴、规划、TDD 到调试、代码审查，每个 skill 都是实战验证的工作流；并叠加 4 个面向中国开发者的原创 skill（中文代码审查 / Git 工作流 / 文档规范 / 提交规范），适配 18 款 AI 编程工具。MIT 协议开源，永久免费。' },
+      { q: '支持哪些 AI 编程工具？', a: '共 20 款：Claude Code、Cursor、Windsurf、Codex CLI、Gemini CLI、Kiro、Trae、Qoder、CodeBuddy（腾讯）、CodeArts（华为云码道）、Aider、OpenCode、Qwen Code、Antigravity、DeerFlow、VS Code(Copilot)、Copilot CLI、Hermes Agent、Claw Code、OpenClaw。' },
+      { q: 'superpowers-zh 有哪些独特价值？', a: '一套完整中文化的系统工作方法论：从头脑风暴、规划、TDD 到调试、代码审查，每个 skill 都是实战验证的工作流；并叠加 4 个面向中国开发者的原创 skill（中文代码审查 / Git 工作流 / 文档规范 / 提交规范），适配 20 款 AI 编程工具。MIT 协议开源，永久免费。' },
       { q: '安装后怎么生效？', a: 'npx 会把 skill 文件装到你项目对应工具的目录（如 .claude/skills/），重启 AI 工具后，它会在恰当时机自动触发相应 skill —— 无需你每次手动调用。' },
+      { q: '能一次装好、所有项目都用吗？（全局安装）', a: '能。npx superpowers-zh --global 装到工具的用户级目录（如 ~/.claude/skills），所有项目自动共享，更新时只需重装一次。项目级优先、全局兜底，二者可共存。支持全局的工具（均为各工具文档确认的加载路径）：Claude Code / Codex CLI / Qoder / Windsurf / Qwen Code / OpenClaw / OpenCode；其余工具（含 Gemini / Antigravity，有各自专属全局方式）请在项目内安装或参考对应文档。' },
       { q: '会拖慢我的 AI 吗？会上传代码吗？', a: '不会。skill 是按需触发的纯 Markdown，零运行时、不联网、不上传任何代码或数据，全程在本地。' },
-      { q: '怎么更新或卸载？', a: '更新：重新运行 npx superpowers-zh 覆盖即可。卸载：npx superpowers-zh --uninstall 清理已安装的 skill 与 bootstrap 文件。' },
+      { q: '怎么更新或卸载？', a: '更新：重新运行 npx superpowers-zh 覆盖即可。卸载：npx superpowers-zh --uninstall 清理当前项目；全局安装用 npx superpowers-zh --global --uninstall 清理。' },
     ],
   },
   en: {
     htmlLang: 'en',
     title: 'superpowers-zh · Battle-tested AI coding skills (CN-enhanced)',
-    desc: 'Full Chinese localization of superpowers (233k+ ⭐) plus 4 China-native skills. One npx command installs systematic workflow methodology into 18 AI coding tools.',
+    desc: 'Full Chinese localization of superpowers (250k+ ⭐) plus 4 China-native skills. One npx command installs systematic workflow methodology into 20 AI coding tools.',
     nav: { why: 'Features', install: 'Install', skills: 'Skills', tools: 'Tools', faq: 'FAQ', learn: 'Learn ↗', github: 'GitHub ↗' },
-    heroBadge: 'superpowers 233k+ ⭐ · Full CN localization + China-native skills',
+    heroBadge: 'superpowers 250k+ ⭐ · Full CN localization + China-native skills',
     heroH1: 'Give your AI coding tools<br>superpowers that <span class="grad">actually ship</span>',
     heroLead: '{n} battle-tested workflow skills — from brainstorming to TDD, systematic debugging to code review.<br>One command auto-detects your tool and installs.',
     heroBtn1: 'Get the command', heroBtn2: 'GitHub',
@@ -220,15 +220,12 @@ const T = {
     skDetail: 'Read docs →',
     tagCn: 'China-native',
     ucTitle: 'Typical use cases', ucSub: 'Each scenario is backed by a set of cooperating skills.',
-    toolsTitle: 'One skill set, 18 tools', toolsSub: 'Switch tools without switching habits — the methodology follows you.',
+    toolsTitle: 'One skill set, 20 tools', toolsSub: 'Switch tools without switching habits — the methodology follows you.',
     faqTitle: 'FAQ',
     bookTitle: 'Pair it with the methodology for 2× efficiency',
     bookDesc: '"AI Coding in Practice · The Three-Volume Methodology" — full tutorials for 10 AI coding tools plus real-world pitfalls. Online book + PDF, free forever.',
     bookBtn: 'Read free ↗',
     aiolaolaBtn: 'Learn AI coding free · aiOlaOla ↗',
-    sponsorTitle: 'Sponsors',
-    sponsorDesc: 'A fast, reliable API relay for Claude Code, Codex and more — API relay and AI image generation.',
-    sponsorCta: '🙏 Want to appear here? Contact <b>jnMetaCode@qq.com</b>',
     ctaTitle: 'Ready to make your AI actually ship?',
     ctaDesc: 'One command installs {n} battle-tested skills into your tool. Free, open-source, zero-dependency.',
     ctaBtn1: 'Get the command', ctaBtn2: '⭐ Star on GitHub',
@@ -247,10 +244,10 @@ const T = {
     detailSource: 'View source on GitHub ↗',
     features: [
       { icon: '🧠', t: '20 battle-tested methods', d: 'Not prompt templates — workflow methodology hardened by cross-session adversarial testing, from brainstorming to TDD, debugging and review.' },
-      { icon: '🔌', t: 'Works in 18 tools', d: 'One skill set for Claude Code / Cursor / Codex / Gemini CLI / Windsurf and more. Switch tools, keep your habits.' },
+      { icon: '🔌', t: 'Works in 20 tools', d: 'One skill set for Claude Code / Cursor / Codex / Gemini CLI / Windsurf and more. Switch tools, keep your habits.' },
       { icon: '⚡', t: 'One-command install', d: 'npx superpowers-zh auto-detects your tool and installs. Zero config; restart to take effect.' },
       { icon: '🇨🇳', t: 'China-native skills', d: 'Chinese code-review phrasing, commit conventions, doc typography, and domestic Git platforms (Gitee/Coding/JiHu) — not in upstream.' },
-      { icon: '📖', t: 'Fully localized upstream', d: 'Tracks obra/superpowers (233k+ ⭐); every core skill localized into native Chinese — calibrated, not machine-translated.' },
+      { icon: '📖', t: 'Fully localized upstream', d: 'Tracks obra/superpowers (250k+ ⭐); every core skill localized into native Chinese — calibrated, not machine-translated.' },
       { icon: '🔓', t: 'Zero-dep · MIT', d: 'Pure Markdown skills. No external deps, no network, no code upload. Triggered on demand with zero runtime cost.' },
     ],
     pipeline: [
@@ -269,11 +266,12 @@ const T = {
     ],
     faq: [
       { q: 'Is superpowers-zh free?', a: 'Completely free. MIT-licensed open source, forever, with no paywall or subscription.' },
-      { q: 'Which AI coding tools are supported?', a: '18 tools: Claude Code, Cursor, Windsurf, Codex CLI, Gemini CLI, Kiro, Trae, Qoder, Aider, OpenCode, Qwen Code, Antigravity, DeerFlow, VS Code (Copilot), Copilot CLI, Hermes Agent, Claw Code, OpenClaw.' },
-      { q: 'What makes superpowers-zh unique?', a: 'A fully localized, battle-tested methodology framework for Chinese developers: brainstorming, planning, TDD, debugging, and code-review skills, plus 4 China-native skills (code review / Git workflow / docs / commit conventions), adapted for 18 AI coding tools. MIT-licensed and free forever.' },
+      { q: 'Which AI coding tools are supported?', a: '20 tools: Claude Code, Cursor, Windsurf, Codex CLI, Gemini CLI, Kiro, Trae, Qoder, CodeBuddy (Tencent), CodeArts (Huawei), Aider, OpenCode, Qwen Code, Antigravity, DeerFlow, VS Code (Copilot), Copilot CLI, Hermes Agent, Claw Code, OpenClaw.' },
+      { q: 'What makes superpowers-zh unique?', a: 'A fully localized, battle-tested methodology framework for Chinese developers: brainstorming, planning, TDD, debugging, and code-review skills, plus 4 China-native skills (code review / Git workflow / docs / commit conventions), adapted for 20 AI coding tools. MIT-licensed and free forever.' },
       { q: 'How does it take effect after install?', a: 'npx installs skill files into your tool\'s directory (e.g. .claude/skills/). After restarting your AI tool, it auto-triggers the right skill at the right moment — no manual invocation needed.' },
+      { q: 'Can I install once for all projects? (global install)', a: 'Yes. npx superpowers-zh --global installs into the tool\'s user-level directory (e.g. ~/.claude/skills), shared across all projects; you only re-install once to update. Project-level takes precedence, global is the fallback — they coexist. Tools with global support (all verified load paths per each tool\'s docs): Claude Code / Codex CLI / Qoder / Windsurf / Qwen Code / OpenClaw / OpenCode; other tools (incl. Gemini / Antigravity, which have their own global methods) should be installed per-project or via their docs.' },
       { q: 'Will it slow my AI down or upload my code?', a: 'No. Skills are on-demand Markdown: zero runtime, no network, no code or data upload — everything stays local.' },
-      { q: 'How do I update or uninstall?', a: 'Update: re-run npx superpowers-zh to overwrite. Uninstall: npx superpowers-zh --uninstall removes installed skills and bootstrap files.' },
+      { q: 'How do I update or uninstall?', a: 'Update: re-run npx superpowers-zh to overwrite. Uninstall: npx superpowers-zh --uninstall for the current project; npx superpowers-zh --global --uninstall for a global install.' },
     ],
   },
 };
@@ -423,7 +421,7 @@ function renderLanding(skills, lang) {
     <div class="stats">
       <div><b>${total}</b><span>${t.stats[0]}</span></div>
       <div><b>${cnCount}</b><span>${t.stats[1]}</span></div>
-      <div><b>18</b><span>${t.stats[2]}</span></div>
+      <div><b>20</b><span>${t.stats[2]}</span></div>
       <div><b>v${PKG.version}</b><span>${t.stats[3]}</span></div>
     </div>
   </section>
@@ -493,15 +491,6 @@ function renderLanding(skills, lang) {
     <a class="btn btn-ghost" href="https://book.aibuzhiyu.com/" target="_blank" rel="noopener">${t.bookBtn}</a>
   </div></div></section>
 
-  <section class="sponsor">
-    <h2 class="section-title">${t.sponsorTitle}</h2>
-    <a class="sponsor-card" href="https://www.5cookie.cc/sign-up?aff=Pj7u" target="_blank" rel="noopener">
-      <img src="assets/sponsors/5cookie-code.png" alt="5Cookie Code" width="160">
-      <div><b>5Cookie Code</b><span>${t.sponsorDesc}</span></div>
-    </a>
-    <p class="sponsor-cta">${t.sponsorCta}</p>
-  </section>
-
   <section class="cta"><div class="cta-inner">
     <h2>${t.ctaTitle}</h2><p>${fill(t.ctaDesc, { n: total })}</p>
     <div class="cta-cmd" data-copy="npx superpowers-zh"><code>$ npx superpowers-zh</code><button class="copy-btn">${t.copy}</button></div>
@@ -549,7 +538,7 @@ function renderDetail(skill, lang) {
 function build() {
   const skills = loadSkills();
   rmSync(DIST, { recursive: true, force: true });
-  mkdirSync(join(DIST, 'assets', 'sponsors'), { recursive: true });
+  mkdirSync(join(DIST, 'assets'), { recursive: true });
   mkdirSync(join(DIST, 'skills'), { recursive: true });
   mkdirSync(join(DIST, 'en', 'skills'), { recursive: true });
 
@@ -558,7 +547,6 @@ function build() {
   copyFileSync(join(TEMPLATE, 'app.js'), join(DIST, 'app.js'));
   copyFileSync(join(ROOT, 'assets', 'app-icon.png'), join(DIST, 'assets', 'app-icon.png'));
   copyFileSync(join(ROOT, 'assets', 'superpowers-small.svg'), join(DIST, 'assets', 'superpowers-small.svg'));
-  copyFileSync(join(ROOT, 'assets', 'sponsors', '5cookie-code.png'), join(DIST, 'assets', 'sponsors', '5cookie-code.png'));
   copyFileSync(join(TEMPLATE, 'assets', 'qr-wechat.jpg'), join(DIST, 'assets', 'qr-wechat.jpg'));
   copyFileSync(join(TEMPLATE, 'assets', 'qr-douyin.jpg'), join(DIST, 'assets', 'qr-douyin.jpg'));
 
