@@ -677,6 +677,29 @@ function build() {
     }
   }
 
+  // ---- 404 页 ----
+  // Cloudflare Pages：根目录存在 404.html 时，任何未匹配到静态文件的路径都会
+  // 返回它并带 **真正的 HTTP 404**（而非默认把首页当 SPA 兜底返回 200——那会让
+  // Google 把无数不存在的 URL 当成首页的重复页/软 404）。noindex 防止 404 页本身被收录。
+  // base 用 '/'：这一个文件会被任意深度的路径命中，导航链接必须是绝对路径。
+  writeFileSync(join(DIST, '404.html'), layout({
+    lang: 'zh', base: '/',
+    title: '页面找不到 (404) · superpowers-zh',
+    desc: '你访问的页面不存在或已被移动。',
+    extraHead: '<meta name="robots" content="noindex">\n',
+    pageClean: '', pageFile: '',
+    body: `<main class="doc" style="max-width:640px;margin:0 auto;padding:80px 20px;text-align:center">
+  <div style="font-size:64px;font-weight:800;letter-spacing:2px;opacity:.85">404</div>
+  <h1 style="margin:12px 0 8px">这个页面找不到了</h1>
+  <p style="opacity:.75;margin:0 0 28px">链接可能已过期或被移动。下面几个入口也许是你要找的：</p>
+  <p style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+    <a class="btn" href="/">返回首页</a>
+    <a class="btn" href="/#skills">浏览全部 Skill</a>
+    <a class="btn" href="/#install">安装命令</a>
+  </p>
+</main>`,
+  }));
+
   // ---- SEO: robots.txt + sitemap.xml ----
   writeFileSync(join(DIST, 'robots.txt'),
     'User-agent: *\nAllow: /\n\nSitemap: ' + SITE_URL + '/sitemap.xml\n');
