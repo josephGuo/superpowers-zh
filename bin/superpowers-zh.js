@@ -51,7 +51,7 @@ const LEGACY_AGENT_FILENAMES = ['code-reviewer.md'];
 //   global.dir     用户级 skills 目录（相对 home）
 //   global.detect  home 下用于自动检测该工具是否安装的标记目录
 //   global.boot    可选，用户级 bootstrap 文件（相对 home）；无则仅靠 skill 自动发现
-// 无 global 的工具（Cursor/Kiro/Trae/Aider/DeerFlow/VS Code/Hermes/Claw）规则是项目级、
+// 无 global 的工具（Cursor/Kiro/Trae/Aider/DeerFlow/VS Code/Hermes/Claw/Cline/Kilo Code）规则是项目级、
 // 或存在于应用内设置，没有稳定的用户级 skills 加载路径 —— --global 会明确拒绝而非写无效路径。
 const TARGETS = [
   { name: 'Claude Code',   dir: '.claude/skills',           detect: '.claude',                        global: { dir: '.claude/skills',         detect: '.claude',         boot: '.claude/CLAUDE.md' } },
@@ -82,6 +82,13 @@ const TARGETS = [
   // 仅 skills-only —— 其 bootstrap/指令文件约定未证实，靠 CodeArts 自身 skill 发现；
   // 若不自动触发需在对话里手动点名 skill（docs 已说明）。
   { name: 'CodeArts',      dir: '.codeartsdoer/skills',      detect: '.codeartsdoer' },
+  // Cline / Kilo Code 是 VS Code 扩展，加载的是「rules」而非 skills，且 rules 每轮常驻
+  // system prompt。因此 skills 放各自的 skills/ 目录（不被自动加载），只在 rules 目录里
+  // 放一份小索引 —— 见 generateClineBootstrapRule / generateKiloCodeBootstrapRule。
+  // 均无 global：Cline 全局 rules 在 ~/Documents/Cline/Rules（随 OS 变，Linux/WSL 还有
+  // ~/Cline/Rules 回退），不是通用 --global 能可靠覆盖的路径；Kilo 全局需改 kilo.jsonc。
+  { name: 'Cline',         dir: '.cline/skills',             detect: '.clinerules' },
+  { name: 'Kilo Code',     dir: '.kilocode/skills',          detect: ['.kilocode', '.kilo', 'kilo.jsonc'] },
 ];
 
 function countDirs(dir) {
@@ -158,6 +165,95 @@ ${skillTable}
   const rulePath = resolve(rulesDir, 'superpowers-zh.md');
   writeFileSync(rulePath, rule, 'utf8');
   console.log(`  ✅ Trae: bootstrap rule -> ${rulePath}`);
+}
+
+// Cline：`.clinerules/` 下所有 .md / .txt 都会被合并进 system prompt（docs.cline.bot
+// /customization/cline-rules 明确），是常驻开销 —— 所以 20 个 SKILL.md 绝不能放进去，
+// 只放一份小的索引 rule，skills 本体放 .cline/skills/ 由 agent 按需读。
+// 不写 YAML frontmatter：Cline 目前只支持 `paths` 一个条件字段，无 frontmatter 即始终生效。
+// 子目录是否递归扫描官方没写，因此索引 rule 保持在 .clinerules/ 根层、单文件。
+function generateClineBootstrapRule(projectDir) {
+  const rulesDir = resolve(projectDir, '.clinerules');
+  mkdirSync(rulesDir, { recursive: true });
+
+  const skillEntries = scanSkillEntries(SKILLS_SRC);
+  const skillTable = skillEntries.map(s => `| ${s.name} | ${s.desc} |`).join('\n');
+
+  const rule = `# Superpowers-ZH 中文增强版
+
+你已加载 superpowers-zh 技能框架（${skillEntries.length} 个 skills）。
+
+## 核心规则
+
+1. **收到任务时，先检查是否有匹配的 skill** — 哪怕只有 1% 的可能性也要检查
+2. **设计先于编码** — 收到功能需求时，先用 brainstorming skill 做需求分析
+3. **测试先于实现** — 写代码前先写测试（TDD）
+4. **验证先于完成** — 声称完成前必须运行验证命令
+
+## 可用 Skills
+
+Skills 位于 \`.cline/skills/\` 目录，每个 skill 有独立的 \`SKILL.md\` 文件。
+
+| Skill | 触发条件 |
+|-------|---------|
+${skillTable}
+
+## 如何使用
+
+当任务匹配某个 skill 的触发条件时，用读文件工具打开对应的
+\`.cline/skills/<skill-name>/SKILL.md\`，并严格遵循其流程。
+
+**不要**把 skill 正文复制到本文件 —— \`.clinerules/\` 里的内容每轮都进 prompt，
+按需读取才能把常驻开销控制在这张索引表。
+`;
+
+  const rulePath = resolve(rulesDir, 'superpowers-zh.md');
+  writeFileSync(rulePath, rule, 'utf8');
+  console.log(`  ✅ Cline: bootstrap rule -> ${rulePath}`);
+}
+
+// Kilo Code：v7 起官方推荐 .kilo/rules/ + 在 kilo.jsonc 的 instructions 数组里显式登记，
+// 但那要改用户的 kilo.jsonc（JSONC 带注释，安全合并困难，且属于侵入用户配置）。
+// 官方同时明确 `.kilocode/rules/` 向后兼容且无需配置即生效，故走这条：零配置改动。
+// 与 Cline 同理 —— rules 是常驻开销，只放索引，skills 本体放 .kilocode/skills/。
+function generateKiloCodeBootstrapRule(projectDir) {
+  const rulesDir = resolve(projectDir, '.kilocode', 'rules');
+  mkdirSync(rulesDir, { recursive: true });
+
+  const skillEntries = scanSkillEntries(SKILLS_SRC);
+  const skillTable = skillEntries.map(s => `| ${s.name} | ${s.desc} |`).join('\n');
+
+  const rule = `# Superpowers-ZH 中文增强版
+
+你已加载 superpowers-zh 技能框架（${skillEntries.length} 个 skills）。
+
+## 核心规则
+
+1. **收到任务时，先检查是否有匹配的 skill** — 哪怕只有 1% 的可能性也要检查
+2. **设计先于编码** — 收到功能需求时，先用 brainstorming skill 做需求分析
+3. **测试先于实现** — 写代码前先写测试（TDD）
+4. **验证先于完成** — 声称完成前必须运行验证命令
+
+## 可用 Skills
+
+Skills 位于 \`.kilocode/skills/\` 目录，每个 skill 有独立的 \`SKILL.md\` 文件。
+
+| Skill | 触发条件 |
+|-------|---------|
+${skillTable}
+
+## 如何使用
+
+当任务匹配某个 skill 的触发条件时，用读文件工具打开对应的
+\`.kilocode/skills/<skill-name>/SKILL.md\`，并严格遵循其流程。
+
+**不要**把 skill 正文复制到本文件 —— rules 每轮都进 prompt，按需读取才能把
+常驻开销控制在这张索引表。
+`;
+
+  const rulePath = resolve(rulesDir, 'superpowers-zh.md');
+  writeFileSync(rulePath, rule, 'utf8');
+  console.log(`  ✅ Kilo Code: bootstrap rule -> ${rulePath}`);
 }
 
 function generateQoderBootstrap(baseDir, isGlobal) {
@@ -474,6 +570,43 @@ ${skillList}
   }
 }
 
+// CLI 工具的可执行文件名 —— 用于检测落空时扫 PATH 给出针对性建议（issue #48）。
+// 只列 CLI：IDE（Cursor/Trae/Qoder 等）装在应用目录里，PATH 上探不到。
+const CLI_PROBES = {
+  'Claude Code':  ['claude', 'copilot'],
+  'Codex CLI':    ['codex'],
+  'Gemini CLI':   ['gemini'],
+  'OpenCode':     ['opencode'],
+  'Aider':        ['aider'],
+  'Qwen Code':    ['qwen'],
+  'OpenClaw':     ['openclaw'],
+  'Claw Code':    ['claw'],
+  'Hermes Agent': ['hermes'],
+};
+
+// 在 PATH 里找可执行文件。只查文件是否存在，不 spawn 进程 ——
+// 绝不在用户机器上执行探测命令（既慢又有副作用风险）。
+function isOnPath(bin) {
+  const sep = process.platform === 'win32' ? ';' : ':';
+  const dirs = (process.env.PATH || '').split(sep).filter(Boolean);
+  const exts = process.platform === 'win32'
+    ? ['', ...(process.env.PATHEXT || '.COM;.EXE;.BAT;.CMD').split(';').filter(Boolean)]
+    : [''];
+  for (const dir of dirs) {
+    for (const ext of exts) {
+      try { if (existsSync(join(dir, bin + ext))) return true; } catch {}
+    }
+  }
+  return false;
+}
+
+// 反查 TARGETS.name -> 最短别名，用于给用户拼出可直接复制的 --tool 命令
+function shortestAlias(toolName) {
+  return Object.keys(TOOL_ALIASES)
+    .filter(a => TOOL_ALIASES[a] === toolName)
+    .sort((a, b) => a.length - b.length)[0];
+}
+
 // 工具名称别名映射（用户输入 -> TARGETS.name）
 const TOOL_ALIASES = {
   'claude':       'Claude Code',
@@ -511,6 +644,10 @@ const TOOL_ALIASES = {
   'codeartsdoer': 'CodeArts',
   'codearts-doer': 'CodeArts',
   'huawei':       'CodeArts',
+  'cline':        'Cline',
+  'kilocode':     'Kilo Code',
+  'kilo':         'Kilo Code',
+  'kilo-code':    'Kilo Code',
 };
 
 function showHelp() {
@@ -560,7 +697,7 @@ function installForTarget(target, baseDir, isGlobal) {
       `\n  这通常是 npx 缓存目录权限或路径问题。请尝试：\n` +
       `    1. 清理缓存后重试: npm cache clean --force && npx superpowers-zh\n` +
       `    2. 或全局安装: npm i -g superpowers-zh && superpowers-zh\n` +
-      `    3. 或手动克隆复制: 见 https://github.com/jnMetaCode/superpowers-zh#方式二手动安装`
+      `    3. 或手动克隆复制: 见 https://github.com/jnMetaCode/superpowers-zh#快速开始`
     );
   }
   const scopeTag = isGlobal ? '[全局]' : '[项目]';
@@ -597,6 +734,14 @@ function installForTarget(target, baseDir, isGlobal) {
   if (target.name === 'CodeBuddy') {
     generateCodeBuddyBootstrap(baseDir);
   }
+
+  if (target.name === 'Cline') {
+    generateClineBootstrapRule(baseDir);
+  }
+
+  if (target.name === 'Kilo Code') {
+    generateKiloCodeBootstrapRule(baseDir);
+  }
 }
 
 function isHomeDir(p) {
@@ -612,6 +757,8 @@ const BOOTSTRAP_DELETE = [
   '.trae/rules/superpowers-zh.md',
   '.qoder/rules/superpowers-zh.md',
   '.agents/rules.md',
+  '.clinerules/superpowers-zh.md',
+  '.kilocode/rules/superpowers-zh.md',
 ];
 const BOOTSTRAP_CLEAN_SECTION = [
   'CLAUDE.md',
@@ -845,7 +992,7 @@ function install(forceToolName, force, isGlobal) {
     if (isGlobal && !target.global) {
       // 部分工具（如 Gemini CLI 的扩展目录）有专属全局方式，但与通用 --global 复制机制不同，
       // 指向对应 docs；其余工具规则为项目级或存于应用内设置，无稳定用户级路径。
-      const docSlug = { 'Gemini CLI': 'gemini-cli', 'Antigravity': 'antigravity', 'Trae': 'trae', 'Aider': 'aider', 'Hermes Agent': 'hermes', 'Kiro': 'kiro' }[target.name];
+      const docSlug = { 'Gemini CLI': 'gemini-cli', 'Antigravity': 'antigravity', 'Trae': 'trae', 'Aider': 'aider', 'Hermes Agent': 'hermes', 'Kiro': 'kiro', 'Cline': 'cline', 'Kilo Code': 'kilocode' }[target.name];
       console.error(
 `  ❌ ${target.name} 不支持通用全局安装（--global）。
 
@@ -883,16 +1030,39 @@ function install(forceToolName, force, isGlobal) {
     const where = isGlobal ? '你的用户主目录(~)' : '当前目录';
     const flag = isGlobal ? '--global ' : '';
     console.log(`  ⚠️  未在${where}检测到任何已知 AI 编程工具的标记。\n`);
-    console.log('  为避免装错工具，未做任何安装。请用 --tool 显式指定你的工具，例如：\n');
-    console.log(`    npx superpowers-zh ${flag}--tool claude        # Claude Code / Copilot CLI`);
+
+    // issue #48：用户明明装了 opencode / codex，但项目里没留下标记目录（没跑过、
+    // 或配置在别处），只报「未检测到」很让人懵。扫 PATH 找已装的 CLI，直接给出
+    // 可复制的命令。注意：只提示，绝不自动安装 —— 自动装错工具正是 issue #33。
+    const onPath = Object.entries(CLI_PROBES)
+      .filter(([toolName]) => !isGlobal || pool.some(t => t.name === toolName))
+      .filter(([, bins]) => bins.some(isOnPath));
+
+    if (onPath.length) {
+      // 探到了具体工具就不再列通用示例 —— 直接给可复制的命令，别让用户在一堆
+      // 无关工具名里自己挑。
+      console.log('  不过在 PATH 里找到了这些已安装的 CLI，你要装的应该是其中之一：\n');
+      for (const [toolName] of onPath) {
+        console.log(`    npx superpowers-zh ${flag}--tool ${shortestAlias(toolName).padEnd(13)}# ${toolName}`);
+      }
+      console.log('\n  为避免装错，未自动安装 —— PATH 上装了不代表这个项目要用它。');
+      console.log('  用上面任一条命令显式指定即可。\n');
+    } else {
+      console.log('  为避免装错工具，未做任何安装。请用 --tool 显式指定你的工具，例如：\n');
+      console.log(`    npx superpowers-zh ${flag}--tool claude        # Claude Code / Copilot CLI`);
+      if (isGlobal) {
+        console.log(`    npx superpowers-zh ${flag}--tool codex         # Codex CLI`);
+        console.log(`    npx superpowers-zh ${flag}--tool qoder         # Qoder\n`);
+      } else {
+        console.log(`    npx superpowers-zh ${flag}--tool antigravity   # Google Antigravity`);
+        console.log(`    npx superpowers-zh ${flag}--tool trae          # Trae`);
+        console.log(`    npx superpowers-zh ${flag}--tool cursor        # Cursor\n`);
+      }
+    }
+
     if (isGlobal) {
-      console.log(`    npx superpowers-zh ${flag}--tool codex         # Codex CLI`);
-      console.log(`    npx superpowers-zh ${flag}--tool qoder         # Qoder\n`);
       console.log(`  支持全局安装的工具：${GLOBAL_TARGETS.map(t => t.name).join('、')}\n`);
     } else {
-      console.log(`    npx superpowers-zh ${flag}--tool antigravity   # Google Antigravity`);
-      console.log(`    npx superpowers-zh ${flag}--tool trae          # Trae`);
-      console.log(`    npx superpowers-zh ${flag}--tool cursor        # Cursor\n`);
       console.log(`  全部可用别名：${Object.keys(TOOL_ALIASES).join(', ')}\n`);
     }
     process.exit(1);

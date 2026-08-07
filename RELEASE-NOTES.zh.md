@@ -6,6 +6,49 @@
 
 ---
 
+## v1.7.2 (2026-08-07)
+
+### 🆕 新增 Cline 与 Kilo Code 适配（工具数 20 → 22，关 #112、#88）
+
+两款都是 VS Code 扩展，加载的是 **rules 而非懒加载的 skills** —— rules 会并入**每一轮** system prompt。照搬「把 20 个 SKILL.md 复制进规则目录」会让每轮对话背着 **182 KB** 常驻开销（Cline 官方也提示规则超约 300 行后遵守度下降）。
+
+改用仓库既有的 **Trae 模式**：规则目录只放一份索引（核心规则 + 20 个 skill 的名称/触发条件表，实测 **4.5 KB**，比全量塞入小 40 倍），skills 本体放各自 `skills/` 目录由 agent 按需读取。
+
+- **Cline**：skills → `.cline/skills/`，索引 → `.clinerules/superpowers-zh.md`。不写 YAML frontmatter —— Cline 目前只支持 `paths` 一个条件字段，无 frontmatter 即始终生效。索引保持在 `.clinerules/` 根层单文件（子目录是否递归扫描官方未说明）。
+- **Kilo Code**：skills → `.kilocode/skills/`，索引 → `.kilocode/rules/superpowers-zh.md`。**有意不走 v7 推荐的 `.kilo/rules/` + `kilo.jsonc`** —— 后者需把路径登记进用户的 `kilo.jsonc`（带注释的 JSONC，安装器安全合并容易改坏用户配置）。官方明确 `.kilocode/rules/` 向后兼容且零配置生效，故选它；docs 里写明了想迁到 v7 该改哪一行，以及万一没生效如何反馈。
+- 两者均**无 `--global`**：Cline 全局 rules 路径随 OS 变（`~/Documents/Cline/Rules`，Linux/WSL 还有 `~/Cline/Rules` 回退），Kilo 全局同样要走 `kilo.jsonc` 登记 —— 不是通用复制机制能可靠命中的，`--global` 明确拒绝并指向 docs，绝不写无效路径。
+- 路径依据：[docs.cline.bot](https://docs.cline.bot/customization/cline-rules)、[kilo.ai](https://kilo.ai/docs/customize/custom-rules)。
+
+### 🔧 检测落空时给出针对性建议（关 #48）
+
+装了 opencode / codex 但项目里没留下标记目录时，原先只报「未检测到任何已知 AI 编程工具」，用户无从判断下一步。
+
+- 新增 PATH 探测：检测落空时扫 PATH 找已安装的 CLI，直接打印可复制的 `--tool` 命令。
+- **只提示、不自动安装** —— 自动装错工具正是 #33 修掉的问题：PATH 上装了不代表这个项目要用它。
+- `isOnPath()` 只查文件是否存在，**不 spawn 进程**（不在用户机器上执行探测命令）；Windows 下遍历 `PATHEXT`。
+- `--global` 模式只建议支持全局的工具，不推荐装不了的。
+- 健壮性已测：`PATH` 为空 / 含空段 / 未定义三种退化情形均优雅退出 1，无未捕获异常。
+
+### 📄 文档
+
+- **补充 plugin marketplace 安装方式（关 #39）**：`.claude-plugin/marketplace.json` 从 v1.7.x 起就存在且可用，但 README 从未写过怎么用。已实测 `plugin validate` / `marketplace add jnMetaCode/superpowers-zh`（GitHub 直连克隆）/ `plugin install` 全链路通过，安装缓存内含全部 20 个 SKILL.md。简繁 README 新增「方式二」，原手动安装与配置文件引用顺延为方式三 / 四。
+- **修正 Copilot CLI 在 Windows 的工具面（关 #93）**：`copilot-tools.md` 原先只记 `bash` + `async:true` 一套，但 Windows 实测（Copilot CLI 1.0.69-1）注册的是 `powershell` + `detach`，没有 `bash`/`async` 家族。现拆成两张表并注明「两套不会同时出现」，补充两个坑：`.sh` 需显式走 Git Bash；`stop_powershell` 停不掉 `detach:true` 的进程，需按真实 Windows PID（非 MSYS PID）`Stop-Process`。
+- 新增 `docs/README.cline.md`、`docs/README.kilocode.md`。
+- 修正 installer 报错文案里失效的章节锚点（改为指向父级 `#快速开始`，不再依赖会变的章节编号）。
+- 计数 20 → 22 同步：简繁 README、`package.json`、`CLAUDE.md`、3 份 plugin manifest。
+
+### ✅ 验证
+
+- `scripts/audit.sh`：**130 pass / 0 fail**（2 项 warn 为既有上游漂移，见 #19）
+- 发版前深度验证（比 audit 严，断言实际落盘而非只看退出码）：**82 项全通过**
+  - 22 款工具：装 → 断言 20 个 skill 落盘 → 二次装幂等 → 卸载后零残留；无 `skills/skills` 嵌套
+  - 19 个检测标记逐一验证只触发预期工具，既有 20 款检测结果与改动前一致
+  - `--global`：7 款成功、14 款明确拒绝且退出码 1；拒绝信息引用的 8 份 docs 均存在
+  - bootstrap 索引断言：表行数 = 20、无空 description、Cline 无 frontmatter、路径指向正确
+- **npm 包端到端**：`npm pack` → 从 tarball 装 → 用打包后的二进制真实跑 Cline 自动检测 → 20 skills + 索引生成 → 卸载零残留
+
+---
+
 ## v1.7.0 (2026-07-13)
 
 ### 🆕 新增两款国产 IDE 工具支持（工具数 18 → 20）

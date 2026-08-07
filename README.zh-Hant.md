@@ -2,9 +2,9 @@
 
 🌐 [简体中文](README.md) | **繁體中文** | [English (upstream)](https://github.com/obra/superpowers)
 
-> 🦸 **superpowers（250k+ ⭐）完整漢化 + 4 個中國原創 skills** — 讓 Claude Code / Copilot CLI / Hermes Agent / Cursor / Windsurf / Kiro / Gemini CLI / Qoder 等 **20 款 AI 編程工具**真正會幹活。從頭腦風暴到程式碼審查，從 TDD 到除錯，每個 skill 都是經過實戰驗證的工作方法論。
+> 🦸 **superpowers（250k+ ⭐）完整漢化 + 4 個中國原創 skills** — 讓 Claude Code / Copilot CLI / Hermes Agent / Cursor / Windsurf / Kiro / Gemini CLI / Qoder 等 **22 款 AI 編程工具**真正會幹活。從頭腦風暴到程式碼審查，從 TDD 到除錯，每個 skill 都是經過實戰驗證的工作方法論。
 
-Chinese community edition of [superpowers](https://github.com/obra/superpowers) — 20 skills across 20 AI coding tools, including full translations and China-specific development skills.
+Chinese community edition of [superpowers](https://github.com/obra/superpowers) — 20 skills across 22 AI coding tools, including full translations and China-specific development skills.
 
 [![官網 sp.aiolaola.com](https://img.shields.io/badge/🌐_官網-sp.aiolaola.com-F59E0B)](https://sp.aiolaola.com)
 [![GitHub stars](https://img.shields.io/github/stars/jnMetaCode/superpowers-zh?style=social)](https://github.com/jnMetaCode/superpowers-zh)
@@ -16,16 +16,16 @@ Chinese community edition of [superpowers](https://github.com/obra/superpowers) 
 
 > 📖 **免費配套學習** → [從零學會 AI 編程](https://aiolaola.com/?utm_source=github&utm_campaign=superpowers)：180 節免費實操課 + 《AI 編程實戰三卷書》線上閱讀 + 實戰社群 · superpowers 裝好後配上方法論效率翻倍 · 永久免費
 
-> 🆕 **v1.7.0 更新亮點**（[完整 Release Notes →](RELEASE-NOTES.zh.md)）
-> - 🌍 **全域安裝** `npx superpowers-zh --global` —— 一次安裝、所有專案共享，多專案使用者告別逐個重裝
-> - 🧩 新增 **騰訊 CodeBuddy** 與 **華為雲碼道 CodeArts** 兩款國產 IDE（工具數 18 → 20）
-> - 🌐 官網 [sp.aiolaola.com](https://sp.aiolaola.com) + README 新增**繁體中文**（簡 / 繁 / EN 三語）
+> 🆕 **v1.7.2 更新亮點**（[完整 Release Notes →](RELEASE-NOTES.zh.md)）
+> - 🧩 新增 **Cline** 與 **Kilo Code** 兩款 VS Code 外掛（工具數 20 → 22）—— 針對 rules 常駐開銷做了專門設計，索引僅 4.5 KB
+> - 🔧 偵測落空時會掃 PATH 給出**可直接複製的 `--tool` 命令**，不再只報「未偵測到」
+> - 📦 README 補上 **Plugin Marketplace 安裝方式**（`claude plugin marketplace add`，升級只需一條命令）
 
 ### 📊 專案規模
 
 | 📦 翻譯 Skills | 🇨🇳 中國特色 Skills | 🤖 支援工具 |
 |:---:|:---:|:---:|
-| **14** | **6** | **Claude Code / Copilot CLI / Hermes Agent / Cursor / Windsurf / Kiro / Gemini CLI / Codex / Aider / Trae / VS Code (Copilot) / DeerFlow / OpenCode / OpenClaw / Qwen Code / Antigravity / Claw Code / Qoder / CodeBuddy（騰訊）/ CodeArts（華為雲碼道）** |
+| **14** | **6** | **Claude Code / Copilot CLI / Hermes Agent / Cursor / Windsurf / Kiro / Gemini CLI / Codex / Aider / Trae / VS Code (Copilot) / DeerFlow / OpenCode / OpenClaw / Qwen Code / Antigravity / Claw Code / Qoder / CodeBuddy（騰訊）/ CodeArts（華為雲碼道）/ Cline / Kilo Code** |
 
 ---
 
@@ -33,11 +33,30 @@ Chinese community edition of [superpowers](https://github.com/obra/superpowers) 
 
 <table>
 <tr>
-<td width="400" align="center">
-<a href="https://passport.compshare.cn/register?referral_code=ETD3L5JBM13CtKARkMORot&ytag=GPU_YY_YX_git_superpowers-zh"><img src="assets/sponsors/compshare.jpg" width="380" alt="優雲智算 by UCloud — 熱門國產模型按次調用套餐包"></a>
+<td width="25%">
+  <a href="https://passport.compshare.cn/register?referral_code=ETD3L5JBM13CtKARkMORot&ytag=GPU_YY_YX_git_superpowers-zh">
+    <img src="assets/sponsors/compshare.jpg" alt="優雲智算 by UCloud — 熱門國產模型按次調用套餐包，低至 49 元/月起" width="100%">
+  </a>
 </td>
-<td>
-感謝 <a href="https://passport.compshare.cn/register?referral_code=ETD3L5JBM13CtKARkMORot&ytag=GPU_YY_YX_git_superpowers-zh"><b>優雲智算</b></a> 贊助本專案！優雲智算是 UCloud 旗下 AI 雲平台，主打包月、按次的高性價比國模 Agent Plan 方案，支援 GLM-5.2，低至 <b>49 元/月</b>起。同時提供官轉穩定海外模型。支援接入 Claude Code、Codex 及 API 呼叫。支援企業高併發、7×24 技術支援、自助開票。<br><br>🎁 透過<a href="https://passport.compshare.cn/register?referral_code=ETD3L5JBM13CtKARkMORot&ytag=GPU_YY_YX_git_superpowers-zh">此連結</a>註冊的使用者，可得<b>免費 5 元平台體驗金</b>！
+<td width="75%" valign="middle">
+
+感謝 [優雲智算](https://passport.compshare.cn/register?referral_code=ETD3L5JBM13CtKARkMORot&ytag=GPU_YY_YX_git_superpowers-zh) 贊助本專案！優雲智算是 UCloud 旗下 AI 雲平台，主打包月、按次的高性價比國模 Agent Plan 方案，支援 GLM-5.2，低至 **49 元/月**起。同時提供官轉穩定海外模型。支援接入 Claude Code、Codex 及 API 呼叫。支援企業高併發、7×24 技術支援、自助開票。🎁 **透過[此連結](https://passport.compshare.cn/register?referral_code=ETD3L5JBM13CtKARkMORot&ytag=GPU_YY_YX_git_superpowers-zh)註冊的使用者，可得免費 5 元平台體驗金！**
+
+</td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="25%">
+  <a href="https://cubence.com/signup?code=SCW29JP9">
+    <img src="assets/sponsors/cubence.jpg" alt="Cubence — 專業 AI API 閘道，穩定高效的 API 中轉服務，支援 Claude Code、Codex、Gemini 等多種模型" width="100%">
+  </a>
+</td>
+<td width="75%" valign="middle">
+
+感謝 [Cubence](https://cubence.com/signup?code=SCW29JP9) 對本專案的支持。Cubence 是一家致力為客戶提供穩定、高效的 API 中轉服務商。從 25 年 9 月營運至今，提供了 Claude Code、Codex、Gemini 等多種模型支援。🎁 **Cubence 為本開源專案的使用者提供了特別的專屬優惠碼 `AGENCY`，透過[此連結](https://cubence.com/signup?code=SCW29JP9)註冊的使用者，首次購買即可享受 9 折優惠！**
+
 </td>
 </tr>
 </table>
@@ -84,7 +103,7 @@ AI：在開始實作之前，我需要了解幾個關鍵問題：
 | ⭐ Star 數 | 250k+ | — |
 | 📦 Skills 總數 | 14 | **20**（14 翻譯 + 4 國產原創 + 2 上游歷史保留） |
 | 🌐 語言 | 英文 | 中文（技術術語保留英文） |
-| 🤖 **支援工具** | **6 款**：Claude Code / Cursor / Codex / OpenCode / Copilot CLI / Gemini CLI | **20 款**：上述 6 款 + Hermes Agent / Trae / Kiro / Qwen Code（通義靈碼）/ OpenClaw / Claw Code / Antigravity / DeerFlow / VS Code / Windsurf / Aider / Qoder / CodeBuddy（騰訊） / CodeArts（華為雲碼道） |
+| 🤖 **支援工具** | **6 款**：Claude Code / Cursor / Codex / OpenCode / Copilot CLI / Gemini CLI | **22 款**：上述 6 款 + Hermes Agent / Trae / Kiro / Qwen Code（通義靈碼）/ OpenClaw / Claw Code / Antigravity / DeerFlow / VS Code / Windsurf / Aider / Qoder / CodeBuddy（騰訊） / CodeArts（華為雲碼道） / Cline / Kilo Code |
 | ⚡ **安裝方式** | 按工具分別裝（每款一條不同的 plugin marketplace 命令） | **`npx superpowers-zh` 一條命令自動識別專案裡的工具並安裝**；識別不出可 `--tool <name>` 顯式指定 |
 | 🇨🇳 Git 平台 | GitHub 為主 | GitHub + Gitee + Coding + 極狐 GitLab + **CNB（騰訊雲原生建置）** |
 | 🇨🇳 CI/CD 範例 | GitHub Actions | GitHub Actions + Gitee Go + Coding CI + 極狐 CI + `.cnb.yml` |
@@ -98,9 +117,9 @@ AI：在開始實作之前，我需要了解幾個關鍵問題：
 | 💬 社群 | Discord | 微信公眾號「AI不止語」+ 微信群 + QQ 群 |
 | 📜 License | MIT | MIT |
 
-**一句話總結：** 英文上游 = 方法論核心；中文增強版 = 方法論核心 **+** 20 款工具一鍵適配 **+** 國內 Git/CI 生態 **+** 中文化表達習慣。
+**一句話總結：** 英文上游 = 方法論核心；中文增強版 = 方法論核心 **+** 22 款工具一鍵適配 **+** 國內 Git/CI 生態 **+** 中文化表達習慣。
 
-### 🤖 支援 20 款主流 AI 編程工具
+### 🤖 支援 22 款主流 AI 編程工具
 
 | 工具 | 類型 | 一鍵安裝 | 手動安裝 |
 |------|------|:---:|:---:|
@@ -124,6 +143,8 @@ AI：在開始實作之前，我需要了解幾個關鍵問題：
 | [Qoder](https://qoder.com) (阿里 AI IDE) | IDE | `npx superpowers-zh` | `.qoder/skills/` + `.qoder/rules/` |
 | [CodeBuddy](https://copilot.tencent.com) (騰訊 AI IDE) | IDE | `npx superpowers-zh` | `.codebuddy/skills/` + `CODEBUDDY.md` |
 | [華為雲碼道 CodeArts](https://www.huaweicloud.com/product/codeartsdoer.html) | IDE | `npx superpowers-zh` | `.codeartsdoer/skills/` |
+| [Cline](https://cline.bot) | IDE 外掛 | `npx superpowers-zh --tool cline` | `.cline/skills/` + `.clinerules/` |
+| [Kilo Code](https://kilo.ai) | IDE 外掛 | `npx superpowers-zh --tool kilocode` | `.kilocode/skills/` + `.kilocode/rules/` |
 
 > 執行 `npx superpowers-zh` 會自動偵測你專案中使用的工具，將 20 個 skills 安裝到正確位置。
 
@@ -184,7 +205,7 @@ npx superpowers-zh --global --tool claude   # 或指定工具
 
 全域安裝把 skills 裝到工具的**使用者級目錄**（如 `~/.claude/skills`），一次安裝所有專案自動可用，更新時也只需重裝一次。**專案級優先、全域兜底**，二者可共存。
 
-支援通用全域安裝的工具（均為 docs 已證實的使用者級載入路徑）：**Claude Code · Codex CLI · Qoder · Windsurf · Qwen Code · OpenClaw · OpenCode**。其中 **Codex CLI** 全域裝到 `~/.agents/skills`（Codex 啟動掃描目錄）。其餘工具（Cursor / Kiro / Trae / Aider / DeerFlow / VS Code / Hermes / Claw）規則是專案級或存於應用內設定，`--global` 會提示改用專案級；**Gemini CLI / Antigravity** 有各自專屬的全域方式（Gemini 走擴充目錄），見對應 `docs/README.*.md`。
+支援通用全域安裝的工具（均為 docs 已證實的使用者級載入路徑）：**Claude Code · Codex CLI · Qoder · Windsurf · Qwen Code · OpenClaw · OpenCode**。其中 **Codex CLI** 全域裝到 `~/.agents/skills`（Codex 啟動掃描目錄）。其餘工具（Cursor / Kiro / Trae / Aider / DeerFlow / VS Code / Hermes / Claw / Cline / Kilo Code）規則是專案級或存於應用內設定，`--global` 會提示改用專案級；**Gemini CLI / Antigravity** 有各自專屬的全域方式（Gemini 走擴充目錄），見對應 `docs/README.*.md`。
 
 | | 專案級（預設） | 全域（`--global`） |
 |---|---|---|
@@ -193,7 +214,35 @@ npx superpowers-zh --global --tool claude   # 或指定工具
 | 適合 | 單專案、需專案內版本固定 | 多專案、想一次裝好到處可用 |
 | 解除安裝 | `npx superpowers-zh --uninstall` | `npx superpowers-zh --global --uninstall` |
 
-### 方式二：手動安裝（low-fidelity，僅作備選）
+### 方式二：Claude Code Plugin Marketplace
+
+**僅限 Claude Code。** 走官方 plugin 機制安裝，好處是升級只要一條 `claude plugin update`，不用重跑 npx：
+
+```bash
+claude plugin marketplace add jnMetaCode/superpowers-zh
+claude plugin install superpowers-zh@superpowers-zh
+```
+
+裝完 `claude plugin list` 應該看到：
+
+```
+  ❯ superpowers-zh@superpowers-zh
+    Version: <当前版本>
+    Scope: user
+    Status: ✔ enabled
+```
+
+升級與卸載：
+
+```bash
+claude plugin marketplace update superpowers-zh          # 先刷新 marketplace 快取
+claude plugin update superpowers-zh@superpowers-zh       # 再升級 plugin（需重啟生效）
+claude plugin uninstall superpowers-zh@superpowers-zh    # 卸載
+```
+
+> **和方式一怎麼選？** marketplace 裝的是**完整 plugin**（skills + hooks + bootstrap 由 Claude Code 統一託管、隨版本更新），但只服務 Claude Code 一款工具。要裝給其餘 19 款工具，仍然用方式一的 `npx superpowers-zh`。兩者可以共存，但同一個專案裡別重複裝 Claude Code，否則 skills 會出現兩份。
+
+### 方式三：手動安裝（low-fidelity，僅作備選）
 
 > ⚠️ **手動 `cp -r skills` 是低保版安裝，不等同於完整 plugin。**
 >
@@ -227,7 +276,7 @@ cp -r superpowers-zh/skills /your/project/.claw/skills       # Claw Code（Rust 
 cp -r superpowers-zh/skills /your/project/.qoder/skills      # Qoder（阿里 AI IDE）
 ```
 
-### 方式三：在設定檔中引用
+### 方式四：在設定檔中引用
 
 根據你使用的工具，在對應設定檔中引用 skills：
 
@@ -366,7 +415,7 @@ MIT License — 自由使用，商業或個人均可。
 
 <div align="center">
 
-**🦸 AI 編程超能力：讓 Claude Code / Hermes Agent / Cursor / Claw Code / Qoder 等 20 款工具真正會幹活**
+**🦸 AI 編程超能力：讓 Claude Code / Hermes Agent / Cursor / Claw Code / Qoder 等 22 款工具真正會幹活**
 
 [Star 本專案](https://github.com/jnMetaCode/superpowers-zh) · [提交 Issue](https://github.com/jnMetaCode/superpowers-zh/issues) · [貢獻程式碼](https://github.com/jnMetaCode/superpowers-zh/pulls)
 
