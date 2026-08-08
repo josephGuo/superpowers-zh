@@ -180,6 +180,28 @@ else
     fi
   done
 
+  # 3c-bis. fork 增量必须显式声明
+  #
+  # 翻译 skill 的标题数应等于「上游标题数 + 本文件里声明的 fork 增量节数」。
+  # 增量节靠正文里的一行标记声明（见下方 FORK_MARK），标记与内容同处一文件，
+  # 不会各自漂移。没打标记就多出章节 = 隐性分叉，下次同步时会被误当成漏译。
+  FORK_MARK='本节是 superpowers-zh 的增量内容'
+  for s in "${SKILLS[@]}"; do
+    up=$(git show upstream/main:skills/$s/SKILL.md 2>/dev/null | count_headings || echo 0)
+    our=$(count_headings < "skills/$s/SKILL.md" 2>/dev/null || echo 0)
+    # 注意：grep -c 找到 0 个时输出 "0" 但退出码为 1，写成 `|| echo 0` 会拼出
+    # "0\n0"，后续整数比较直接报错、检查静默失效。用 `; true` 只吞退出码。
+    declared=$(grep -c "$FORK_MARK" "skills/$s/SKILL.md" 2>/dev/null; true)
+    declared=${declared:-0}
+    delta=$((our - up))
+    if [ "$delta" = "$declared" ]; then
+      ok
+    elif [ "$delta" -gt "$declared" ]; then
+      bad "未声明的 fork 增量: ${s} 比上游多 ${delta} 节，但只声明了 ${declared} 节 —— 给增量节加上「${FORK_MARK}」标记，或回归上游"
+    fi
+    # delta < declared 由 3c 的漂移检查覆盖，此处不重复报
+  done
+
   # 3d. requesting-code-review/code-reviewer.md 结构（v5.1.0 self-contained）
   up=$(git show upstream/main:skills/requesting-code-review/code-reviewer.md 2>/dev/null | count_headings || echo 0)
   our=$(count_headings < skills/requesting-code-review/code-reviewer.md)

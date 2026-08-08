@@ -51,7 +51,7 @@ const LEGACY_AGENT_FILENAMES = ['code-reviewer.md'];
 //   global.dir     用户级 skills 目录（相对 home）
 //   global.detect  home 下用于自动检测该工具是否安装的标记目录
 //   global.boot    可选，用户级 bootstrap 文件（相对 home）；无则仅靠 skill 自动发现
-// 无 global 的工具（Cursor/Kiro/Trae/Aider/DeerFlow/VS Code/Hermes/Claw/Cline/Kilo Code）规则是项目级、
+// 无 global 的工具（Cursor/Kiro/Trae/Aider/DeerFlow/VS Code/Claw/Cline/Kilo Code）规则是项目级、
 // 或存在于应用内设置，没有稳定的用户级 skills 加载路径 —— --global 会明确拒绝而非写无效路径。
 const TARGETS = [
   { name: 'Claude Code',   dir: '.claude/skills',           detect: '.claude',                        global: { dir: '.claude/skills',         detect: '.claude',         boot: '.claude/CLAUDE.md' } },
@@ -74,7 +74,11 @@ const TARGETS = [
   { name: 'Aider',         dir: '.aider/skills',             detect: '.aider' },
   { name: 'OpenCode',      dir: '.opencode/skills',          detect: '.opencode',                      global: { dir: '.config/opencode/skills', detect: '.config/opencode' } },
   { name: 'Qwen Code',     dir: '.qwen/skills',             detect: '.qwen',                           global: { dir: '.qwen/skills',           detect: '.qwen' } },
-  { name: 'Hermes Agent',  dir: '.hermes/skills',            detect: ['.hermes', 'HERMES.md', '.hermes.md'] },
+  // Hermes 官方文档：只自动加载 ~/.hermes/skills/（"the primary directory and
+  // source of truth"），项目级目录不被自动发现，外部目录必须写进
+  // ~/.hermes/config.yaml 的 skills.external_dirs。所以全局才是能直接生效的装法；
+  // 项目级仍保留（便于随仓库分发），但装完会打印需要粘贴的 config.yaml 片段。
+  { name: 'Hermes Agent',  dir: '.hermes/skills',            detect: ['.hermes', 'HERMES.md', '.hermes.md'], global: { dir: '.hermes/skills',         detect: '.hermes' } },
   { name: 'Claw Code',     dir: '.claw/skills',              detect: ['.claw', 'CLAW.md'] },
   { name: 'Qoder',         dir: '.qoder/skills',             detect: '.qoder',                         global: { dir: '.qoder/skills',          detect: '.qoder' } },
   { name: 'CodeBuddy',     dir: '.codebuddy/skills',         detect: ['.codebuddy', 'CODEBUDDY.md'] },
@@ -431,7 +435,17 @@ ${skillList}
   }
 }
 
-function generateHermesBootstrap(projectDir) {
+function generateHermesBootstrap(projectDir, isGlobal) {
+  // 全局模式不写 bootstrap：Hermes 的用户级指令文件约定未在 docs 证实，
+  // 往 $HOME 根目录写 HERMES.md 是猜路径 + 污染主目录。~/.hermes/skills/ 里的
+  // skill 靠 name/description 被 skills_list / skill_view 发现，本就不依赖 bootstrap。
+  if (isGlobal) {
+    console.log('  ℹ️  Hermes 全局安装不写 bootstrap 文件（其用户级指令文件约定未证实）。');
+    console.log('     skills 已在 ~/.hermes/skills/，可用 skills_list / skill_view 发现。');
+    console.log('     想让它在项目里自动触发，在该项目跑一次项目级安装以生成 HERMES.md。');
+    return;
+  }
+
   const skillEntries = scanSkillEntries(SKILLS_SRC);
   const skillList = skillEntries.map(s => `- **${s.name}**: ${s.desc}`).join('\n');
 
@@ -484,6 +498,25 @@ ${skillList}
   } else {
     writeFileSync(hermesPath, wrapWithSentinel(content), 'utf8');
     console.log(`  ✅ Hermes Agent: bootstrap -> ${hermesPath}`);
+  }
+
+  // 项目级安装 Hermes 认不到 —— 必须显式登记到 config.yaml。不替用户改配置
+  // （那是他们的文件），改为打印可直接粘贴的片段。见 issue #45。
+  if (!isGlobal) {
+    const abs = resolve(projectDir, '.hermes', 'skills');
+    console.log('');
+    console.log('  ⚠️  Hermes 只自动扫描 ~/.hermes/skills/，不会发现项目级目录。');
+    console.log('     二选一让它生效：');
+    console.log('');
+    console.log('     A) 改用全局安装（推荐，装完即生效）：');
+    console.log('        npx superpowers-zh --global --tool hermes');
+    console.log('');
+    console.log('     B) 保留项目级，把这段加进 ~/.hermes/config.yaml：');
+    console.log('');
+    console.log('        skills:');
+    console.log('          external_dirs:');
+    console.log(`            - ${abs}`);
+    console.log('');
   }
 }
 
@@ -732,7 +765,7 @@ function installForTarget(target, baseDir, isGlobal) {
   }
 
   if (target.name === 'Hermes Agent') {
-    generateHermesBootstrap(baseDir);
+    generateHermesBootstrap(baseDir, isGlobal);
   }
 
   if (target.name === 'Claude Code') {

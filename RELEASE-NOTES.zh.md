@@ -6,6 +6,67 @@
 
 ---
 
+## v1.7.8 (2026-08-08)
+
+本版本源于一次**定位核查**：按「superpowers-zh 只是完整翻译上游 + 增加更多工具支持」这个定位，逐层比对我们与 [obra/superpowers](https://github.com/obra/superpowers) 的差异。结论是**定位基本站得住，但不完全** —— 查出 5 处偏离，全部修掉。
+
+### 🔍 核查方法
+
+1. **文件级**：上游 `skills/` 与我们逐文件比对，分出「仅上游有」「仅我们有」
+2. **内容级**：14 个翻译 skill 各自比对标题数（排除代码围栏）、表格行数、列表项数
+3. **溯源**：每处差异追查来源 —— 是声明过的 fork 增量，还是漏译／漏同步
+
+### 🐛 修掉的 5 处偏离
+
+**① `antigravity-tools.md` 上游有、我们没有**
+
+而 installer 里明明支持 Antigravity —— 该工具用户拿不到任何工具映射。影响是实质的：**Antigravity 没有 todo 工具**（`manage_task` 管的是后台进程），没这份映射，所有说「创建待办」的 skill 在它上面都会走偏。已翻译补入，并按上游同序列入平台适配清单。
+
+**② `finishing-a-development-branch` 漏同步 3 个 commit**
+
+C 块时的 commit 清单不全，漏了 `fbb6dba` / `bcfe798` / `9dff1a9`。其中 `9dff1a9` 是**行为变更**：上游把菜单从 4 个选项减为 3 个，**删掉了「丢弃这份工作」**，丢弃改为只在人类伙伴明确提出时才走的独立小节；基础分支判定也从盲跑 `merge-base` 改为「先确认，合并到错分支代价很高」。已照上游当前状态整体重译（一次拿到全部 4 个 commit），并断言 D 块的 worktree 修复完整保留。
+
+**③ `writing-plans` 漏译整节** —— 上游的 `Task Right-Sizing`（任务边界怎么划）我们完全没有。
+
+**④ `writing-skills` 四个问题** —— 漏译 H2 整节 `Match the Form to the Failure`（含「禁令在塑形类问题上会反噬」的实测结论）、漏译 H3 `Micro-Test Wording Before Full Scenarios`、**两个连续小节都编号为 4**、节名仍是过时的「Claude 搜索优化（CSO）」（上游早已改名 SDO），正文两处引用一并同步。
+
+**⑤ fork 增量插在了上游步骤序列中间**
+
+`executing-plans` 把「处理常见异常」插成步骤 3，于是上游的 `Step 3: Complete Development` 被挤成我们的「步骤 4」；`Remember` 也从上游的 6 条被加到 7 条。**这不是「不影响上游」，是改了上游的结构编号。**
+
+改为**外挂式**：增量移出步骤序列、挂在「何时停下来求助」之后（它本就是那节三种情形的展开），步骤编号恢复 1/2/3，`Remember` 恢复 6 条。
+
+### 🛡️ 让「不影响上游」成为可执行的检查
+
+README 声明会漂移，所以新增 **audit 3c-bis**：
+
+> 翻译 skill 的标题数必须等于「上游标题数 + 本文件里带标注的增量节数」
+
+增量节靠正文里一行标注声明（`本节是 superpowers-zh 的增量内容`），标注与内容同处一文件、不会各自漂移。**未标注就多出章节 = 隐性分叉，直接 FAIL。** 已双向验证：偷偷加一节会被拦下并给出可操作提示，加标注后放行。
+
+目前全仓仅 2 处带标注的增量：`executing-plans` 的「常见异常处理」、`using-superpowers` 的「中国特色技能路由」。
+
+### 🐛 修掉一个让守卫从未生效的 bug
+
+3c-bis 第一次测试**没拦住**。查出原因：`grep -c` 匹配到 0 个时输出 `"0"` 但**退出码为 1**，写成 `$(grep -c ... || echo 0)` 会拼出 `"0\n0"`，后续整数比较直接报错、检查静默失效。改用 `; true` 只吞退出码。
+
+全仓扫同一模式，**测试辅助里也有 3 处**（上游同样有）：`test-helpers.sh` 的 `assert_count`、`test-subagent-driven-development-integration.sh` 的 `task_count` / `todo_count`。后果是这些断言**永远无法正常失败** —— 模式没匹配到时比较报错而非判定失败。三处一并修掉并加注释。（`tests/` 不进 npm 包，仅开发使用。）
+
+修复后 audit 由 154 升到 **166 pass** —— 因为 3c-bis 现在真的对 14 个 skill 都跑了。
+
+### ✅ 核查后的定位现状
+
+**纯增量部分（符合定位）：**
+- 6 个 fork 专属 skill：`chinese-*` ×4 + `mcp-builder` + `workflow-runner`
+- 3 个 fork 专属 references：`copilot` / `hermes` / `qoder`（我们支持、上游不支持或已删的 harness）
+- 2 处带标注的翻译 skill 内增量
+
+**14 个翻译 skill 的上游各节现已全部逐节对应。**
+
+`scripts/audit.sh` **166 pass / 0 warn / 0 fail**、`scripts/verify-release.sh` **90 pass / 0 fail**。
+
+---
+
 ## v1.7.7 (2026-08-08)
 
 ### 🆕 新增 Crush 适配（工具数 22 → 23，关 #40）
