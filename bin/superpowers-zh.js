@@ -87,6 +87,12 @@ const TARGETS = [
   // 放一份小索引 —— 见 generateClineBootstrapRule / generateKiloCodeBootstrapRule。
   // 均无 global：Cline 全局 rules 在 ~/Documents/Cline/Rules（随 OS 变，Linux/WSL 还有
   // ~/Cline/Rules 回退），不是通用 --global 能可靠覆盖的路径；Kilo 全局需改 kilo.jsonc。
+  // Crush 遵循 Agent Skills 开放标准，项目级自动发现 .crush/skills、.agents/skills、
+  // .claude/skills、.cursor/skills 四个目录（其 repo 文档明示），无需任何配置。
+  // 因此若用户已为 Claude Code / Cursor / Codex 装过，Crush 其实已经能读到 ——
+  // docs 里写明了别重复装，否则 Crush 会加载两份。
+  // 全局：~/.config/crush/skills 是官方 docs 确认的用户级路径。
+  { name: 'Crush',         dir: '.crush/skills',             detect: ['.crush', 'crush.json', '.crush.json'], global: { dir: '.config/crush/skills', detect: '.config/crush' } },
   { name: 'Cline',         dir: '.cline/skills',             detect: '.clinerules' },
   { name: 'Kilo Code',     dir: '.kilocode/skills',          detect: ['.kilocode', '.kilo', 'kilo.jsonc'] },
 ];
@@ -581,6 +587,7 @@ const CLI_PROBES = {
   'Qwen Code':    ['qwen'],
   'OpenClaw':     ['openclaw'],
   'Claw Code':    ['claw'],
+  'Crush':        ['crush'],
   'Hermes Agent': ['hermes'],
 };
 
@@ -645,6 +652,7 @@ const TOOL_ALIASES = {
   'codearts-doer': 'CodeArts',
   'huawei':       'CodeArts',
   'cline':        'Cline',
+  'crush':        'Crush',
   'kilocode':     'Kilo Code',
   'kilo':         'Kilo Code',
   'kilo-code':    'Kilo Code',

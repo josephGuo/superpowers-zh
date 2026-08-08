@@ -6,6 +6,243 @@
 
 ---
 
+## v1.7.7 (2026-08-08)
+
+### 🆕 新增 Crush 适配（工具数 22 → 23，关 #40）
+
+查权威源（[charmbracelet/crush](https://github.com/charmbracelet/crush) repo 文档）确认：Crush 遵循 **Agent Skills 开放标准**，项目级**自动发现**四个目录，无需任何配置：
+
+```
+.crush/skills    .agents/skills    .claude/skills    .cursor/skills
+```
+
+用户级为 `~/.config/crush/skills`，因此**支持 `--global`**。
+
+> ⚠️ **一个重要副作用：** 已经为 Claude Code / Cursor / Codex / Antigravity 装过 superpowers-zh 的用户，**Crush 现在就已经能读到那些 skills** —— 此时**不要**再装 `--tool crush`，否则同一批 skills 会有两份被重复加载。[docs/README.crush.md](https://github.com/jnMetaCode/superpowers-zh/blob/main/docs/README.crush.md) 里给了确认命令。
+
+skills-only 适配，不需要 bootstrap；**不动你的 `crush.json`**（四个自动发现目录已够用）。实测：装 20 skills / 二次装幂等 / 卸载零残留且正确保留用户的 `crush.json`；`--global` 装到 `~/.config/crush/skills` 并可干净卸载。
+
+### 🎯 上个版本新加的计数检查，第一次在真实改动里生效
+
+加 Crush 时漏改了 `site/build.mjs` 的 5 处计数（三语言标语 + FAQ 枚举）。v1.7.3 引入的 audit Category 5 **直接 FAIL 拦下**：
+
+```
+❌ 计数不一致: site/build.mjs「官网简体标语」= 22，应为 23
+❌ 计数不一致: site/build.mjs「官网 FAQ 枚举」= 22，应为 23
+... 共 5 条
+```
+
+已补 site 18 处并重建，三语言首页 23 计数、0 残留、Crush 均已出现。
+
+### 🔧 `verify-release.sh` 有同样的漂移问题，已修
+
+它有自己独立的覆盖清单 —— 加新工具时不进去就**静默不测**。本次 Crush 就是这样：分数仍是 82，因为压根没测它。
+
+- `SPEC` / `DETECT` / `GLOBAL_OK` 三处补 Crush
+- 顺带发现 B 段还漏了 **3 个工具**的检测标记：DeerFlow（`deer_flow`）、VS Code（`.github/copilot-instructions.md`）、Gemini CLI（`GEMINI.md`）—— 后两个是**文件而非目录**，原先的 DETECT 循环一律 `mkdir`，现按扩展名区分创建方式
+- **新增 G 段自检**：`SPEC` 覆盖数必须等于 installer 宣称的工具数；`DETECT` 覆盖的工具名集合必须包含全部 `TARGETS` 名字（用**集合比对**而非数条数 —— 一个工具可以有多个检测标记，数数会误判）
+
+覆盖从 **82 项升到 90 项**。
+
+### ✅ 验证
+
+`scripts/audit.sh` **152 pass / 0 warn / 0 fail**、`scripts/verify-release.sh` **90 pass / 0 fail**。
+
+---
+
+## v1.7.6 (2026-08-08)
+
+**上游 v6.2.0 对齐完成** —— [#19](https://github.com/jnMetaCode/superpowers-zh/issues/19) 的 C 块收尾，`scripts/audit.sh` 的上游结构漂移告警**清零**。
+
+### 🧾 盘点先行：其中 3 项不是风格性改动
+
+C 块表面上是 14 个 `refactor(skills)` commit（"drop social proof"、"drop The Bottom Line"、"fold into rationalization table"），看着像上游在统一自己的文风。开工前做了逐 commit 盘点，判定标准定为**「删掉的文字里有没有别处没写的规则」**——结论纠正了原本的假设：
+
+- **`cfb6281`** 新增了一张 rationalization 表（2 行**全新规则**），替换掉「与工作流的集成」那份清单
+- **`03147d2`** 给 `executing-plans` 加了「先确保隔离工作区」作为**步骤 1**（SDD 那一半已随 A 块完成）
+- **`bc86802`** 把「常见错误」5 个小节 + 「红线」Never/Always 双清单压成 5 行表，**规则一条不少**——这也是此前唯一有客观漂移证据的 skill
+
+### ✂️ 其余各项逐条核实后才删
+
+| skill | 删掉的 | 规则去哪了 |
+|---|---|---|
+| `receiving-code-review` | 「底线」 | 概述已有「核心原则：先验证再实施。先提问再假设」 |
+| `writing-skills` | 「总结」 | 铁律节 + TDD 循环表已完整承载 |
+| `writing-plans` | 「注意事项」 | 精确路径 / `Run:` / 预期输出 三条都**内建在任务结构模板**里——上游是把「告知」改成「示范」 |
+| `brainstorming` | 「核心原则」6 条 | 5 条已在流程详述逐条体现；YAGNI 按上游移到「探索方案」的使用现场 |
+| `systematic-debugging` | 「实际效果」+ 社会证明句 | 核心原则行保留；「相关技能」块折入第四阶段「验证修复」 |
+| `dispatching-parallel-agents` | 「核心优势」「实际效果」 | 验证节保留 |
+| `verification-before-completion` | 「为什么这很重要」「底线」 | 「证据先于宣称」核心原则行保留 |
+| `executing-plans` | 质量宣称、「集成」 | 按上游改写为平铺平台清单 |
+
+### ✅ 验证
+
+**结构**：10 个 skill 的 H2 数与上游逐一对齐（8 个完全相同、2 个差 1）；`executing-plans` / `using-git-worktrees` / `requesting-code-review` 的 `superpowers:` 引用集与上游**完全一致**。
+
+**行为 eval —— 两轮共 11 题全对。** 专门考被删段落里的规则是否仍生效：原生 worktree 工具 vs `git worktree add`（答出「第一大错误」与「幽灵状态」）、跳过 `check-ignore` 的后果、目录名优先级、基线失败能否继续、能否无证据宣称完成、审查建议有疑问时该照做还是反驳、能否先打补丁再查根因、能否自己读 diff 代替派审查者（命中 `cfb6281` 新增表行）、方案里的「以后可能用得上」怎么处理（命中 YAGNI 新落点）。
+
+**回归**：`scripts/audit.sh` **150 pass / 0 warn / 0 fail**、`scripts/verify-release.sh` **82 pass / 0 fail**。
+
+> audit PASS 由 152 降至 150 —— 上游有意删除的两个「集成」节里各有 `superpowers:` 引用，Category 4b 因此少 2 项检查；引用集已核对与上游一致。
+
+---
+
+## v1.7.5 (2026-08-07)
+
+对齐上游 v6.2.0 的 **B 块 + D 块**（[#19](https://github.com/jnMetaCode/superpowers-zh/issues/19)）。
+
+### 🐛 worktree 清理静默空转（真 bug，我们与上游同样存在）
+
+`finishing-a-development-branch` 的步骤 6 在步骤 5 已经 `cd` 到主仓库根之后，才用 `git rev-parse --show-toplevel` 重算 `WORKTREE_PATH` —— 于是拿到主根路径，`.worktrees/` 溯源判断**永远匹配不上**，清理静默空转，随后分支删除还会因为 worktree 仍挂着而失败。上游记录说测试对象不得不偏离 skill 原文才能跑通。
+
+修法：步骤 2 趁还在工作区内就捕获，步骤 6 消费该值并加显式警告说明为何不能重算；去掉步骤 6 冗余的 `MAIN_ROOT` 推导与 `cd`；选项 2 补上菜单已声称的分离 HEAD 推送变体。
+
+**已实际复现验证**（临时仓库 + `.worktrees/feature`）：旧逻辑算得 `main` → 溯源未命中 → 清理空转；新逻辑捕获到 `main/.worktrees/feature` → 命中 → `worktree remove` 与 `branch -D` 均成功。
+
+### 🐛 我们把 Gemini 的子智能体支持写错了
+
+`gemini-tools.md` 原文称 Gemini CLI 没有 Task 等价物、依赖子智能体的 skill「退化为 `executing-plans` 单会话执行」。**这是错的** —— Gemini CLI 通过 `invoke_agent`（`agent_name: "generalist"`，也可用 `@generalist` 聊天语法）支持子智能体，且支持同一响应内多调用并行分派。
+
+这个错误会让 Gemini CLI 用户的 `subagent-driven-development` / `dispatching-parallel-agents` / `requesting-code-review` 全部瘸腿。按上游重写（33 → 62 行），补齐指令文件层级加载、`~/.gemini/skills` 与 `~/.agents/skills` 优先级、模板填写、并行分派，以及此前缺失的 20 个工具名。已全仓扫描确认无别处重复该说法。
+
+### 🔄 `testing-anti-patterns.md` → `writing-good-tests.md`
+
+上游把 299 行的反模式枚举重写为 198 行的**两条原则**：
+
+- **原则 1「点名它要抓的破坏」** —— 写测试体前先答"什么生产改动会让它失败，那是 bug 还是决定"。含镜像断言、变更探测器、测行为不测文本、测你的代码不测框架
+- **原则 2「跑真东西」** —— mock 不配拥有断言、在正确层级 mock、替身要具体、完整镜像真实数据、生产类只承载生产方法
+- 新增**变异检查**：收尾前在脑中变异生产代码，每种现实变异都应至少让一个测试失败
+- 触发条件放宽到「编写或修改**任何**测试时」
+
+TDD SKILL.md 同步：删掉「为什么顺序很重要」整节长散文（论点折进合理化借口表，5 行扩写）、删掉末尾已失效的「测试反模式」一节。
+
+### 🔧 audit 结构漂移度量修正（此前一直在虚报欠账）
+
+`audit.sh` 用 `grep -cE '^#{1,4} '` 数标题，但这会把 ``` 围栏内的 shell 注释（`# 运行测试`）当成 markdown 标题 —— 多几行 bash 注释就能凭空造出「结构漂移」。
+
+用正确口径（awk 逐行跟踪围栏）重算 14 个 skill，3 条告警里 **2 条是假阳性**：
+
+| skill | 旧口径 | 新口径 |
+|---|---|---|
+| `executing-plans` | 9/16 **WARN** | 9/11 pass |
+| `finishing-a-development-branch` | 21/31 **WARN** | 14/17 pass |
+| `using-git-worktrees` | 21/28 WARN | 14/21 **WARN（真漂移）** |
+
+双向验证：给 `brainstorming` 加 5 个真标题会触发告警，加 5 行围栏内 shell 注释不触发。
+
+### ✅ 验证
+
+- 两个新/改文件章节均与上游一一对应；`writing-good-tests.md` 指标精确一致（12 bold 要点 / 11 行表格 / 11 条危险信号 / 14 项代码记号）
+- **行为 eval 8 个判断场景：8/8 全对**。附带一个有价值的对照：agent 拿不到 `writing-good-tests.md`、只能退回 SKILL.md 四条摘要时得分 6/8 —— 错的恰好是只存在于参考文件里的两条规则（部分 mock 静默失败、琐碎转发 getter 不配有测试）。说明参考文件承载着摘要覆盖不到的承重规则。
+- `scripts/audit.sh` **152 pass / 1 warn / 0 fail**（原 150/3）、`scripts/verify-release.sh` **82 pass / 0 fail**
+
+---
+
+## v1.7.4 (2026-08-07)
+
+### 🔄 SDD 同步上游 v6.2.0：plan 作用域工作区 + 基于唤回的修复循环（#19 A 块）
+
+对齐上游 `subagent-driven-development` 的 6 个 commit。这是 [#19](https://github.com/jnMetaCode/superpowers-zh/issues/19) 拆分后的 A 块 —— 注意 v1.7.1 刚对齐过 SDD，本次是那之后的**新增量**。
+
+**为什么脚本与文档必须整块一起改：** 我们的 SKILL.md 里写的是旧签名 `review-package BASE HEAD`。脚本换成 plan 作用域签名后若不同步改文档，agent 会照旧签名调用直接吃 usage 错误 —— 比不同步更糟。
+
+**plan 作用域工作区（结构性修复）**
+
+原先所有计划共用 `.superpowers/sdd/` 一个目录，一份过期账本被误读成当前进度会让控制者**跳过整段任务序列**（上游称之为观察到的最昂贵失败）。现在每个计划一个 `.superpowers/sdd/<计划文件名>/`，从结构上消除误读。账本新增身份行 `# SDD ledger — plan: <路径>`。
+
+- `sdd-workspace` / `review-package` 在我们这边与上游 v6.1.1 字节一致（从未汉化），直接取上游版
+- `task-brief` 只手工应用上游那两处改动，**保留 fork 适配**（awk 同时匹配 `Task N` 与 `任务 N`，因为本仓库 writing-plans 产出中文标题）
+
+**SKILL.md 全面重写（平铺 14 节 → 生命周期结构）**
+
+- **修复循环**：一轮 = 一次修复分派 + 一次定向复审，每任务上限五轮。第 1-3 轮**唤回原实现者**（context 完整），第 4-5 轮换全新实现者 + 高一档模型
+- **熔断**：第 5 轮仍有未解决发现则停止分派，逐条裁定 —— 搁置（附裁定）或在承重项上 BLOCKED。只在上限处裁定，提早裁定等于换名字的预先定性
+- Minor 发现与「计划要求的」发现两条路在循环外
+- 新增「常见的合理化借口」表取代原「红线」清单
+- 新增 `re-review-prompt.md`（106 行全文翻译）
+
+### 🧹 清除 v1.7.1 遗留的生成产物
+
+三个 SDD 文件末尾都残留着 `</content>` —— v1.7.1 那次重写（PR #108, `d7885ca`）留下的，上游没有。这些文件会整体进 agent 的 prompt，属于污染。已全部清除并全仓扫描确认无同类残留。
+
+### ✅ 验证（含行为 eval）
+
+**结构性核对**
+- 章节结构与上游 14 节一一对应；`superpowers:` 引用集与上游完全一致
+- 26 项关键技术记号（脚本签名、账本行格式、四种状态、`ADDRESSED`/`NOT ADDRESSED`、数值门槛）逐一确认存在，无漏译
+- 两个 dot 图节点/边数与上游精确一致（6/6 与 23/28），且**无幽灵节点、无孤立节点** —— 手工翻译 dot 标签最易在边里写错，会静默产生幽灵节点
+
+**脚本实测**（临时 git 仓库）
+- 两个计划各得独立目录；往 A 计划写 ledger 后 B 计划目录仍为空（关键回归）
+- `.gitignore` 落在 `.superpowers/sdd/` 层且 `git status` 干净
+- 中文「任务 2」与英文「Task 3」经新路径均抽取成功
+- `review-package` 旧签名正确报 usage 错误
+
+**行为 eval —— 新机制 7 个场景全对**
+
+考察译文是否真的传达了新规则（第 2 轮该唤回还是换新、第 4 轮模型档位、第 5 轮能否再开一轮、承重发现该搁置还是停下、Minor 走哪条路、遇到别的计划的账本怎么办、控制者能否自己修）：**7/7 正确**，连「运行环境无法唤回时才改派全新实现者」这个细节都答出。
+
+**集成 eval —— 真实 agent 的准备阶段**
+
+用 `tests/subagent-driven-dev/go-fractals` 脚手架跑真实执行的准备阶段，验证 agent 是否按**新签名**调脚本（旧习惯可能让它省掉 `PLAN_FILE`）：
+
+- ✔ 实际调用 `sdd-workspace plan.md`，带上了 PLAN_FILE 参数
+- ✔ 同时检查了 plan 作用域账本**和**旧扁平路径的游离账本
+- ✔ 账本第一行为正确的身份行
+- ✔ 工作区落在 `.superpowers/sdd/plan/`，未在旧扁平路径写账本
+- ✔ 起飞前冲突扫描产出 5 条**打包成一次**的提问（而非逐条打断）
+- ✔ 建了 10 条待办，并按指令在分派实现者前停下
+
+**回归**：`scripts/audit.sh` 150 pass / 0 fail、`scripts/verify-release.sh` 82 pass / 0 fail。SDD 已从 audit 的上游漂移警告里消失（结构层级现已对齐）。
+
+> audit PASS 由 153 降至 150，是上游有意删除 Integration 一节（原列 `executing-plans` / `test-driven-development` / `writing-plans` 三个引用）导致 Category 4b 少 3 项引用检查，非静默跳过。
+
+---
+
+## v1.7.3 (2026-08-07)
+
+### 🐛 同步上游两处纯代码修复（对齐 v6.1.1 → v6.2.0 时挑出）
+
+两个文件在我们这边都与上游 v6.1.1 **字节一致**（从未汉化改动），因此可直接取上游版 —— 无需翻译、无需 eval。
+
+- **`hooks/hooks.json` 加 `"shell": "bash"`**（上游 `5151e7a`）：SessionStart hook 在 Windows 上原先不经 Git Bash 分发。我们的 hooks.json 与上游除这一行外完全相同。这条直接改善 Windows 用户的 bootstrap 可靠性 —— **bootstrap 不加载，skill 就是死重**。
+- **`skills/systematic-debugging/find-polluter.sh`**（上游 `6015d37`、`c8921b5`）：修三个真 bug，已逐个实测新旧版对比：
+  - pattern 带 `./` 前缀时匹配不到（`find .` 输出 `./` 前缀路径）：旧 1 个 → 新 2 个
+  - `-path` 的 `**/` 无法匹配零层目录，`src/**/*.test.ts` 漏掉 `src/top.test.ts`：旧 1 个 → 新 2 个
+  - 完全无匹配时计数为 1 而非 0（`echo` 空串仍算一行）：旧 1 → 新 0
+
+### 🧪 新增工具计数一致性检查（audit Category 5，+24 项）
+
+加一款工具要同步简繁 README（各 6 处）、`package.json`、`CLAUDE.md`、`site/build.mjs`（三语言 15 处）、3 份 plugin manifest —— v1.7.2 全靠人工 grep 才没漏。现在从 installer 的 `TARGETS` 推导期望值并逐处断言，另加两条结构性检查：README 工具表行数必须等于宣称数、Category 2 实际测试的工具数必须等于宣称数（**宣称了就必须测**）。
+
+已验证会拦：把标题改成 23 款、删掉一行工具表，两种漂移都被抓到。
+
+口径写进注释：`TARGETS` 是「安装目标」共 21 个；Copilot CLI 与 CC 共用 `.claude/skills`（别名映射过去）不占独立条目，但文案里作为独立产品单独计数，所以「文案数 = TARGETS 数 + 1 = 22」。
+
+### 🐛 修 bash 3.2 下 CJK 报错信息乱码
+
+macOS 自带 bash 3.2.57 解析标识符时不识别多字节字符，`$file「` 会把「的首字节 `0xE3` 吞进变量名，导致变量展开为空且字符被截断。报错信息变成「计数不一致: ����= ��应为 22」—— **只在检查失败时才暴露，写检查的人看不到**。
+
+复现：`bash -c 'f=README.md; echo "文件: $f「标签」结束"'` → `文件: ��标签」结束`
+
+修法是给紧跟 CJK 标点的变量加花括号。全仓扫描 `$var` 紧跟非 ASCII 字节的模式，命中 3 处（audit.sh 2 处、verify-release.sh 1 处 —— 后者因为检测项一直全通过，从没暴露过）。
+
+### 🧹 其他
+
+- `.gitignore` 补上 `.cline/`、`.clinerules/`、`.kilocode/` —— 与 `.trae/`、`.qoder/` 一致，避免在本仓库内自测安装器留下未跟踪文件。
+- 官网 `site/build.mjs` 工具计数 20 → 22，三语言 FAQ 枚举补入 Cline、Kilo Code（v1.7.2 发了但站点没跟）。
+
+### ✅ 验证
+
+- `scripts/audit.sh`：**153 pass / 0 fail**（3 项 warn 为上游漂移，见 #19）
+- `scripts/verify-release.sh`：**82 pass / 0 fail**
+- SessionStart hook 冒烟：退出码 0，输出正确的 SessionStart JSON
+- npm 包端到端：pack → 从 tarball 安装 → 真实跑安装器 → 卸载零残留
+
+> ⚠️ audit 的上游漂移 warn 从 2 条变 3 条（新增 `using-git-worktrees`），且 `executing-plans` / `finishing-a-development-branch` 的上游 H 值有变化 —— 这是本次 `git fetch upstream` 把对比基准从旧快照更新到 **v6.2.0** 导致的，不是代码改动引起。
+
+---
+
 ## v1.7.2 (2026-08-07)
 
 ### 🆕 新增 Cline 与 Kilo Code 适配（工具数 20 → 22，关 #112、#88）

@@ -35,6 +35,7 @@ declare -a SPEC=(
   "claw:.claw/skills"              "copilot:.claude/skills"       "qoder:.qoder/skills"
   "codebuddy:.codebuddy/skills"    "codearts:.codeartsdoer/skills"
   "cline:.cline/skills"            "kilocode:.kilocode/skills"
+  "crush:.crush/skills"
 )
 
 echo "═══ 期望每款装入 $EXPECT_SKILLS 个 skill ═══"
@@ -83,14 +84,20 @@ declare -a DETECT=(
   ".opencode:OpenCode"       ".qwen:Qwen Code"       ".hermes:Hermes Agent"
   ".claw:Claw Code"          ".qoder:Qoder"          ".codebuddy:CodeBuddy"
   ".codeartsdoer:CodeArts"   ".clinerules:Cline"     ".kilocode:Kilo Code"
-  ".kilo:Kilo Code"
+  ".kilo:Kilo Code"          ".crush:Crush"
+  "deer_flow:DeerFlow"       ".github/copilot-instructions.md:VS Code"
+  "GEMINI.md:Gemini CLI"
 )
 for entry in "${DETECT[@]}"; do
   marker="${entry%%:*}"; want="${entry#*:}"
-  T=$(mktemp -d); cd "$T"; mkdir -p "$marker"
+  T=$(mktemp -d); cd "$T"
+  case "$marker" in
+    *.md|*.json) mkdir -p "$(dirname "$marker")" 2>/dev/null; : > "$marker" ;;
+    *)           mkdir -p "$marker" ;;
+  esac
   got=$(node "$INS" 2>&1 | grep -oE '✅ [A-Za-z][A-Za-z ]*(\[|:)' | sed 's/✅ //; s/ *[:[]$//' | sort -u | tr '\n' ',' | sed 's/,$//')
   if [ "$got" != "$want" ]; then
-    bad "检测 $marker/ -> 得到「$got」，期望「$want」"
+    bad "检测 ${marker}/ -> 得到「${got}」，期望「${want}」"
   else
     ok
   fi
@@ -99,7 +106,7 @@ done
 
 echo ""
 echo "─── C. --global：7 款应成功，其余应明确拒绝且退出码 1 ───"
-declare -a GLOBAL_OK=(claude codex openclaw windsurf opencode qwen qoder)
+declare -a GLOBAL_OK=(claude codex openclaw windsurf opencode qwen qoder crush)
 declare -a GLOBAL_NO=(cursor kiro trae aider deerflow vscode hermes claw gemini antigravity codebuddy codearts cline kilocode)
 for tool in "${GLOBAL_OK[@]}"; do
   H=$(mktemp -d)
@@ -151,6 +158,22 @@ out=$(PATH="/nonexistent:::/also/missing" "$NODE" "$INS" 2>&1); rc=$?
 [ $rc -eq 1 ] && ok || bad "PATH 含空段/不存在目录时应优雅退出 1，得到 $rc"
 echo "$out" | grep -qi "error\|Traceback\|ENOENT" && bad "PATH 异常时输出了未捕获错误" || ok
 cd /; rm -rf "$T"
+
+echo ""
+echo "─── G. 自检：本脚本的覆盖清单不得落后于 installer ───"
+# 与 audit.sh Category 5 同一口径：TARGETS 条目数 + 1（Copilot CLI 与 CC 共用目标）
+targets=$(sed -n '/^const TARGETS = \[/,/^\];/p' "$INS" | grep -cE "^  \{ name: '")
+expected=$((targets + 1))
+if [ "${#SPEC[@]}" = "$expected" ]; then ok; else
+  bad "A 段只覆盖 ${#SPEC[@]} 款工具，installer 支持 ${expected} 款 —— 新工具没进 SPEC 会被静默漏测"
+fi
+# 比对工具名集合，而不是数条数 —— 一个工具可以有多个检测标记
+detect_tools=$(printf '%s\n' "${DETECT[@]}" | sed 's/^[^:]*://' | sort -u)
+target_tools=$(sed -n '/^const TARGETS = \[/,/^\];/p' "$INS" | sed -nE "s/^  \{ name: '([^']+)'.*/\1/p" | sort -u)
+uncovered=$(comm -13 <(printf '%s\n' "$detect_tools") <(printf '%s\n' "$target_tools"))
+if [ -z "$uncovered" ]; then ok; else
+  bad "B 段未验证这些工具的检测标记: $(printf '%s' "$uncovered" | tr '\n' ' ')"
+fi
 
 echo ""
 echo "═══════════════════════════════════"
