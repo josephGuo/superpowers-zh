@@ -6,6 +6,48 @@
 
 ---
 
+## v1.7.9 (2026-08-11)
+
+**如果你在用 Hermes Agent，请重新安装。** 本版本之前我们对 Hermes 的支持是**坏的** —— 不是"不好用"，是装完完全不生效。
+
+### 🐛 Hermes：我们一直装错了目录（[#45](https://github.com/jnMetaCode/superpowers-zh/issues/45)）
+
+报告人说「项目级 `.hermes/skills/` 里的 20 个 skill 全部返回 404，必须手动复制到 `~/.hermes/skills/` 才被识别」。查[官方文档](https://hermes-agent.nousresearch.com/docs/user-guide/features/skills)核实，他是对的：
+
+> Hermes 只自动加载 `~/.hermes/skills/`（原文称其为 "the primary directory and source of truth"），**项目级目录不会被自动发现**；外部目录必须写进 `~/.hermes/config.yaml` 的 `skills.external_dirs`。
+
+而我们从支持 Hermes 起就只装项目级 `.hermes/skills/` —— **那个目录 Hermes 根本不读**。装了 20 个 skill，一个都不生效，比不支持更糟：用户以为装好了。
+
+**改法：**
+
+- **全局成为推荐装法** —— `npx superpowers-zh --global --tool hermes` 装到 `~/.hermes/skills/`，装完即生效，`skills_list` 直接能看到 20 个 skill
+- **项目级保留**（skills 可以随仓库分发），但装完打印**可直接粘贴**的配置片段，带绝对路径：
+
+  ```yaml
+  skills:
+    external_dirs:
+      - /your/project/.hermes/skills
+  ```
+
+  **我们不替你改 `config.yaml`** —— 那是你的文件。文档里特意写明「配置里不存在的路径会被静默跳过」，所以写错不会报错、只会"没生效"，这个坑值得先说。
+
+**过程中拦住了一次自己猜路径：** 第一版全局实现把 `HERMES.md` 引导文件写到了 `$HOME` 根目录。Hermes 的用户级指令文件约定**没有公开文档** —— 那是在猜路径 + 污染用户主目录。已改为全局模式不写 bootstrap，并在文档里说明理由。实测：全局装完 `$HOME` 根目录 0 个新文件、卸载 0 残留。
+
+### 🔧 发版工具：`bump-version.sh` 缺 jq 时会静默改错
+
+本次发版时踩到：机器上没有 `jq`，脚本不报错退出，而是每个文件打一行 `command not found` 后**继续往下跑**，最后以 `unbound variable` 收场 —— 版本号一个都没写进去，但输出里混着 "Done."。已加前置检查：缺 `jq` 直接退出并给出安装命令。
+
+### ℹ️ #45 的后半部分未动（说明理由）
+
+#45 还提到 7 个 skill 文件里有 24 处硬编码的 Claude 工具名（`TodoWrite` / `Read` / `Bash` 等）。**本次不动**，理由：那属于行为塑造内容，且 `references/hermes-tools.md` 已有完整映射表。正确解法是强化「查映射表」的引用，而不是把正文改成某个 harness 专属的工具名 —— 那会伤到其余 22 款工具。
+
+### ✅ 发版前门禁
+
+- `audit.sh` 166 pass / 0 warn / 0 fail
+- `verify-release.sh` 90 pass / 0 fail（`--global` 支持清单 6 → 7 款，新增 hermes）
+
+---
+
 ## v1.7.8 (2026-08-08)
 
 本版本源于一次**定位核查**：按「superpowers-zh 只是完整翻译上游 + 增加更多工具支持」这个定位，逐层比对我们与 [obra/superpowers](https://github.com/obra/superpowers) 的差异。结论是**定位基本站得住，但不完全** —— 查出 5 处偏离，全部修掉。

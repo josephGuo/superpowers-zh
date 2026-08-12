@@ -16,7 +16,8 @@ Chinese community edition of [superpowers](https://github.com/obra/superpowers) 
 
 > 📖 **免費配套學習** → [從零學會 AI 編程](https://aiolaola.com/?utm_source=github&utm_campaign=superpowers)：180 節免費實操課 + 《AI 編程實戰三卷書》線上閱讀 + 實戰社群 · superpowers 裝好後配上方法論效率翻倍 · 永久免費
 
-> 🆕 **v1.7.8 更新亮點**（[完整 Release Notes →](RELEASE-NOTES.zh.md)）
+> 🆕 **v1.7.9 更新亮點**（[完整 Release Notes →](RELEASE-NOTES.zh.md)）
+> - 🐛 **Hermes 使用者請重裝** —— 之前我們只裝專案級 `.hermes/skills/`，而 Hermes 根本不讀那個目錄，等於**裝了完全不生效**。現在改用 `npx superpowers-zh --global --tool hermes` 裝到 `~/.hermes/skills/`（[#45](https://github.com/jnMetaCode/superpowers-zh/issues/45)）
 > - 🔍 **定位核查** —— 逐層比對上游，修掉 5 處「不是增量」的偏離；新增 audit 檢查強制 fork 增量必須顯式聲明
 > - 🆕 **新增 Crush**（工具數 22 → 23）—— 若你已為 CC / Cursor / Codex 裝過，Crush 其實已經能讀到，別重複裝
 > - 🎯 **上游 v6.2.0 對齊完成** —— audit 的結構漂移告警清零；C 塊盤點時發現其中 3 項不是風格改動而是實質新規則

@@ -16,7 +16,8 @@ Chinese community edition of [superpowers](https://github.com/obra/superpowers) 
 >
 > 🌍 Also available in [English](https://aiolaola.com/en?utm_source=github&utm_campaign=superpowers) · [日本語](https://aiolaola.com/ja?utm_source=github&utm_campaign=superpowers) · [Español](https://aiolaola.com/es?utm_source=github&utm_campaign=superpowers) · [한국어](https://aiolaola.com/ko?utm_source=github&utm_campaign=superpowers) · [繁體中文](https://aiolaola.com/zh-Hant?utm_source=github&utm_campaign=superpowers)
 
-> 🆕 **v1.7.8 更新亮点**（[完整 Release Notes →](RELEASE-NOTES.zh.md)）
+> 🆕 **v1.7.9 更新亮点**（[完整 Release Notes →](RELEASE-NOTES.zh.md)）
+> - 🐛 **Hermes 用户请重装** —— 之前我们只装项目级 `.hermes/skills/`，而 Hermes 根本不读那个目录，等于**装了完全不生效**。现在改用 `npx superpowers-zh --global --tool hermes` 装到 `~/.hermes/skills/`（[#45](https://github.com/jnMetaCode/superpowers-zh/issues/45)）
 > - 🔍 **定位核查** —— 逐层比对上游，修掉 5 处「不是增量」的偏离；新增 audit 检查强制 fork 增量必须显式声明
 > - 🆕 **新增 Crush**（工具数 22 → 23）—— 若你已为 CC / Cursor / Codex 装过，Crush 其实已经能读到，别重复装
 > - 🎯 **上游 v6.2.0 对齐完成** —— audit 的结构漂移告警清零；C 块盘点时发现其中 3 项不是风格改动而是实质新规则
