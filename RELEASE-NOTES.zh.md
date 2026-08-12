@@ -6,6 +6,84 @@
 
 ---
 
+## v1.7.10 (2026-08-12)
+
+**Aider 和 Kiro 用户请重新安装。** 本版本源于一次对「我们自己那层工具支持」的系统核查 —— 起因是 v1.7.9 修 Hermes 时发现：我们从支持它起就装错了目录。既然错过一次，就该问一句**还有几个**。
+
+答案是：又查出三个，全部是我们自己写的、全部没查过官方文档。
+
+### 🐛 Aider：两个错叠在一起，等于完全不可用
+
+**① 真实的 Aider 项目从来没被自动检测到过。**
+
+检测标记写的是 `.aider`，即要求存在一个 `.aider/` **目录** —— 而 Aider 根本不创建这个目录。它在项目根留下的是 `.aider.` 前缀的产物：`.aider.conf.yml`、`.aider.chat.history.md`、`.aider.tags.cache.v3/`。
+
+实测：造一个含这三样的真实 Aider 项目跑 `npx superpowers-zh`，输出「未检测到任何已知 AI 编程工具」。而文档一直写着「会自动检测 `.aider.conf.yml` 文件」—— **文档描述的是意图，代码做的是另一回事。**
+
+已改为认这四个标记。
+
+**② `CONVENTIONS.md` 不会被 Aider 自动加载。**
+
+代码注释和文档都断言「Aider 原生支持自动加载此文件」。[官方文档](https://aider.chat/docs/usage/conventions.html)说的是反的：必须 `aider --read CONVENTIONS.md`，或在 `.aider.conf.yml` 里写 `read: CONVENTIONS.md`。
+
+最糟的是文档「Skills 未生效」排障的第 3 条写着「Aider 会自动读取 CONVENTIONS.md，无需额外配置」—— **用户卡住时来查文档，看到的正好是让他继续卡住的那句。**
+
+改法照搬 v1.7.9 的 Hermes：装完打印可直接用的两种激活方式，**不替用户改 `.aider.conf.yml`**（那是他们的文件）。
+
+### 🐛 Kiro：错的方向正好相反 —— 每一轮烧 335 KB
+
+[Kiro 官方文档](https://kiro.dev/docs/steering/)明确：`.kiro/steering/` 下的文件**默认就是 `inclusion: always`**，"loaded into every Kiro interaction automatically"。
+
+而我们把 20 个 skill 的正文整个装了进去。实测 **47 个 md、335 KB，每一轮对话全量进上下文**。
+
+讽刺的是这个问题我们早解过 —— 当初给 Cline / Kilo Code 做适配时专门设计了「常驻位置只放索引、正文按需读取」（那次是 182 KB）。只是没意识到 Kiro 的 steering 是同一性质。现在照搬：
+
+| | v1.7.9 | v1.7.10 |
+|---|---|---|
+| steering 常驻 | 47 个 md / 335 KB | **1 个索引 / 4.4 KB** |
+| skill 正文 | `.kiro/steering/<name>/` | `.kiro/skills/<name>/`（按需读取） |
+
+**76 倍。** 升级路径是这次最要紧的一块：老用户通常直接重装而不会先卸载，不清旧布局的话新旧两份并存、335 KB 一点没减 —— 那就等于没修。所以安装时先清 `.kiro/steering/` 下与我们 skill 同名的目录，并打印清理了几个。**你自己写的 steering 文件不会被动**，已实测。
+
+另外文档里写的加载模式 `alwaysApply: true` / `globs: "*.ts"` —— 这两个键 **Kiro 文档里根本不存在**，是 Cursor / Trae 的约定被误写成了 Kiro 的。Kiro 实际用 `inclusion` / `fileMatchPattern`。已按官方文档重写整篇。
+
+### 🐛 Qoder：工具映射表是编的（[#119](https://github.com/jnMetaCode/superpowers-zh/issues/119)）
+
+报告人说 Qoder IDE 里没有 `general-purpose` 子智能体，而我们的 `qoder-tools.md` 白纸黑字写着有。查该文件的引入 commit —— **没有引用任何来源**。
+
+对照 [Qoder 官方子代理文档](https://docs.qoder.com/zh/cli/subagent)，4 行错了 2 行：`Explore → explore-agent`、`Plan → plan-agent` 都是错的，文档里就是**同名**；「Qoder 有内置 `code-reviewer`」也是编的（文档里的 `api-reviewer` 是用户自建示例）。
+
+但最关键的不是这几行 —— **那张表根本没标适用范围**。官方文档只覆盖 Qoder CLI，报告人用的是 Qoder IDE，两个产品面本来就不同，而我们的表让 IDE 用户当成了权威。已补适用范围、来源链接、核对日期，和一节 IDE/CLI 差异说明。
+
+### 🛡️ 把「拿代码测代码」的盲区堵上
+
+Aider 那个 bug 能在 90 项全绿的情况下活下来，是因为测试写的是 `mkdir .aider` 然后断言认出 Aider —— **拿代码测代码，真实标记一个都没测。**
+
+已补：
+
+- Aider 的三个真实标记进检测测试；`case` 分支加 `*.yml`（`.aider.conf.yml` 是文件不是目录，用目录冒充等于测了个假场景）
+- Kiro 两条硬回归守卫：steering 下**只能有 1 个 md**、常驻总字节 **< 20 KB**；外加升级路径断言（旧布局必须清掉、用户文件必须保留）。双向验证过 —— 模拟退回旧布局，两条断言都会失败
+
+`verify-release.sh` 90 → **101 pass**。
+
+### 📋 四个工具，四种失效方式
+
+| 工具 | 错法 | 后果 |
+|---|---|---|
+| Hermes（v1.7.9 已修） | 装到不被读的目录 | 完全不生效 |
+| Aider | 检测标记不存在 + 断言文件会自动加载 | 检测不到 + 装了不生效 |
+| Kiro | 正文放进每轮常驻的目录 | 每轮烧 335 KB |
+| Qoder | 映射表照着别家约定编 | 用户按错的工具名调用 |
+
+**四个都是我们自己那层写的，四个都没查官方文档。** 这已经不是个案。剩余工具的核查还在继续，会在后续版本陆续修。
+
+### ✅ 发版前门禁
+
+- `audit.sh` 166 pass / 0 warn / 0 fail
+- `verify-release.sh` 101 pass / 0 fail
+
+---
+
 ## v1.7.9 (2026-08-11)
 
 **如果你在用 Hermes Agent，请重新安装。** 本版本之前我们对 Hermes 的支持是**坏的** —— 不是"不好用"，是装完完全不生效。

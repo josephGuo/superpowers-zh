@@ -1,6 +1,6 @@
 # Superpowers 中文版 — Windsurf 安装指南
 
-在 [Windsurf](https://codeium.com/windsurf) 中使用 superpowers-zh 的完整指南。
+在 [Windsurf](https://windsurf.com) 中使用 superpowers-zh 的完整指南。
 
 ## 自动安装
 
@@ -53,4 +53,4 @@ cp -r superpowers-zh/skills ~/.windsurf/skills
 
 - 提交 Issue：https://github.com/jnMetaCode/superpowers-zh/issues
 - 项目主页：https://github.com/jnMetaCode/superpowers-zh
-- Windsurf 文档：https://docs.codeium.com/windsurf
+- Windsurf 文档：https://docs.windsurf.com/windsurf/cascade/memories

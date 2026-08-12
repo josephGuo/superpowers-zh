@@ -28,7 +28,7 @@ bad()  { FAIL=$((FAIL+1)); FAILURES+=("$1"); printf '  ❌ %s\n' "$1"; }
 # 工具别名 -> 期望的 skills 目录（相对项目根）
 declare -a SPEC=(
   "claude:.claude/skills"          "cursor:.cursor/skills"        "codex:.codex/skills"
-  "kiro:.kiro/steering"            "deerflow:skills/custom"       "trae:.trae/skills"
+  "kiro:.kiro/skills"                  "deerflow:skills/custom"       "trae:.trae/skills"
   "antigravity:.agents/skills"     "vscode:.github/superpowers"   "openclaw:skills"
   "windsurf:.windsurf/skills"      "gemini:.gemini/skills"        "aider:.aider/skills"
   "opencode:.opencode/skills"      "qwen:.qwen/skills"            "hermes:.hermes/skills"
@@ -81,18 +81,26 @@ declare -a DETECT=(
   ".claude:Claude Code"      ".cursor:Cursor"        ".codex:Codex CLI"
   ".kiro:Kiro"               ".trae:Trae"            ".agents:Antigravity"
   ".openclaw:OpenClaw"       ".windsurf:Windsurf"    ".aider:Aider"
+  # Aider 的真实标记：它不创建 .aider/ 目录，留下的是 .aider. 前缀的产物。
+  # 只测 ".aider" 等于拿代码测代码 —— 真实 Aider 项目一个都匹配不上。
+  ".aider.conf.yml:Aider"    ".aider.chat.history.md:Aider"  ".aider.tags.cache.v3:Aider"
   ".opencode:OpenCode"       ".qwen:Qwen Code"       ".hermes:Hermes Agent"
   ".claw:Claw Code"          ".qoder:Qoder"          ".codebuddy:CodeBuddy"
   ".codeartsdoer:CodeArts"   ".clinerules:Cline"     ".kilocode:Kilo Code"
   ".kilo:Kilo Code"          ".crush:Crush"
-  "deer_flow:DeerFlow"       ".github/copilot-instructions.md:VS Code"
+  # DeerFlow 2.0 顶层没有 deer_flow 目录（backend/frontend/skills/…），只测它等于
+  # 拿代码测代码。skills/public 是 skills 机制本身、随仓库版本控制，才是真实标记。
+  "skills/public:DeerFlow"   "deer_flow:DeerFlow"
+  ".github/copilot-instructions.md:VS Code"
   "GEMINI.md:Gemini CLI"
 )
 for entry in "${DETECT[@]}"; do
   marker="${entry%%:*}"; want="${entry#*:}"
   T=$(mktemp -d); cd "$T"
   case "$marker" in
-    *.md|*.json) mkdir -p "$(dirname "$marker")" 2>/dev/null; : > "$marker" ;;
+    # .yml 也要按「文件」建 —— .aider.conf.yml 是文件不是目录。existsSync 两者都
+    # 匹配得上，但用目录冒充文件等于测了个假场景，下次改检测逻辑就发现不了问题。
+    *.md|*.json|*.yml) mkdir -p "$(dirname "$marker")" 2>/dev/null; : > "$marker" ;;
     *)           mkdir -p "$marker" ;;
   esac
   got=$(node "$INS" 2>&1 | grep -oE '✅ [A-Za-z][A-Za-z ]*(\[|:)' | sed 's/✅ //; s/ *[:[]$//' | sort -u | tr '\n' ',' | sed 's/,$//')
@@ -105,9 +113,9 @@ for entry in "${DETECT[@]}"; do
 done
 
 echo ""
-echo "─── C. --global：7 款应成功，其余应明确拒绝且退出码 1 ───"
-declare -a GLOBAL_OK=(claude codex openclaw windsurf opencode qwen qoder crush hermes)
-declare -a GLOBAL_NO=(cursor kiro trae aider deerflow vscode claw gemini antigravity codebuddy codearts cline kilocode)
+echo "─── C. --global：10 款应成功，其余应明确拒绝且退出码 1 ───"
+declare -a GLOBAL_OK=(claude codex openclaw windsurf opencode qwen qoder crush hermes codebuddy)
+declare -a GLOBAL_NO=(cursor kiro trae aider deerflow vscode claw gemini antigravity codearts cline kilocode)
 for tool in "${GLOBAL_OK[@]}"; do
   H=$(mktemp -d)
   if HOME="$H" node "$INS" --global --tool "$tool" >/dev/null 2>&1; then ok; else bad "--global $tool 应成功但失败"; fi
@@ -148,6 +156,51 @@ rows=$(grep -cE '^\| [a-z][a-z0-9-]+ \|' "$R")
 grep -q '\.kilocode/skills/' "$R" && ok || bad "Kilo 索引未指向 .kilocode/skills/"
 cd /; rm -rf "$T"
 
+T=$(mktemp -d); cd "$T"; node "$INS" --tool kiro >/dev/null 2>&1
+R="$T/.kiro/steering/superpowers-zh.md"
+[ -f "$R" ] && ok || bad "Kiro steering 索引未生成"
+head -2 "$R" | grep -q '^inclusion: always' && ok || bad "Kiro 索引缺 inclusion: always frontmatter"
+rows=$(grep -cE '^\| [a-z][a-z0-9-]+ \|' "$R")
+[ "$rows" = "$EXPECT_SKILLS" ] && ok || bad "Kiro 索引表 $rows 行，期望 $EXPECT_SKILLS"
+grep -q '\.kiro/skills/' "$R" && ok || bad "Kiro 索引未指向 .kiro/skills/"
+# 回归守卫：steering 每轮常驻，里面只能有索引这一个文件。v1.7.9 曾把 20 个 skill
+# 正文装在这里 —— 47 个 md、335 KB 每轮进 prompt。别再退回去。
+steer_md=$(find "$T/.kiro/steering" -name '*.md' | wc -l | tr -d ' ')
+[ "$steer_md" = "1" ] && ok || bad "Kiro steering 下有 $steer_md 个 md（只该有索引 1 个）—— 正文不能放常驻目录"
+steer_bytes=$(find "$T/.kiro/steering" -name '*.md' -exec cat {} + | wc -c | tr -d ' ')
+[ "$steer_bytes" -lt 20000 ] && ok || bad "Kiro steering 常驻 $steer_bytes 字节，超过 20 KB 阈值"
+cd /; rm -rf "$T"
+
+# 升级路径：旧布局（正文躺在 steering 下）必须被清掉，否则新旧并存等于没修
+T=$(mktemp -d); cd "$T"; mkdir -p .kiro/steering/brainstorming
+echo "旧正文" > .kiro/steering/brainstorming/SKILL.md
+printf -- '---\ninclusion: always\n---\n我自己的规则\n' > .kiro/steering/my-own.md
+node "$INS" --tool kiro >/dev/null 2>&1
+[ -d "$T/.kiro/steering/brainstorming" ] && bad "Kiro 升级未清理旧布局 .kiro/steering/<skill>/" || ok
+[ -f "$T/.kiro/steering/my-own.md" ] && ok || bad "Kiro 升级误删了用户自己的 steering 文件"
+cd /; rm -rf "$T"
+
+# Qwen Code：bootstrap 必须写 QWEN.md（官方分层记忆的默认上下文文件），
+# 且项目级/全局装卸都不能留残留。v1.7.10 及更早只装 skills 不写 bootstrap。
+T=$(mktemp -d); cd "$T"
+printf '# 用户自己的上下文\n' > QWEN.md
+node "$INS" --tool qwen >/dev/null 2>&1
+grep -q 'superpowers-zh' QWEN.md && ok || bad "Qwen: QWEN.md 未写入 bootstrap"
+grep -q '用户自己的上下文' QWEN.md && ok || bad "Qwen: 覆盖了用户已有的 QWEN.md"
+grep -q '\.qwen/skills/' QWEN.md && ok || bad "Qwen: bootstrap 未指向 .qwen/skills/"
+node "$INS" --uninstall >/dev/null 2>&1
+grep -q 'superpowers-zh' QWEN.md && bad "Qwen: 卸载后 QWEN.md 仍残留 superpowers-zh 段" || ok
+grep -q '用户自己的上下文' QWEN.md && ok || bad "Qwen: 卸载误删了用户自己的 QWEN.md 内容"
+cd /; rm -rf "$T"
+
+H=$(mktemp -d)
+HOME="$H" node "$INS" --global --tool qwen >/dev/null 2>&1
+[ -f "$H/.qwen/QWEN.md" ] && ok || bad "Qwen --global: 未写 ~/.qwen/QWEN.md"
+HOME="$H" node "$INS" --global --uninstall >/dev/null 2>&1
+left=$(find "$H" -type f 2>/dev/null | wc -l | tr -d ' ')
+[ "$left" = "0" ] && ok || bad "Qwen --global 卸载后 HOME 残留 $left 个文件"
+rm -rf "$H"
+
 echo ""
 echo "─── F. PATH 探测健壮性（issue #48 新代码）───"
 T=$(mktemp -d); cd "$T"
@@ -158,6 +211,44 @@ out=$(PATH="/nonexistent:::/also/missing" "$NODE" "$INS" 2>&1); rc=$?
 [ $rc -eq 1 ] && ok || bad "PATH 含空段/不存在目录时应优雅退出 1，得到 $rc"
 echo "$out" | grep -qi "error\|Traceback\|ENOENT" && bad "PATH 异常时输出了未捕获错误" || ok
 cd /; rm -rf "$T"
+
+echo ""
+echo "─── H. 外链验活：docs / README 里引用的官方文档必须真实存在 ───"
+# 起因：docs/README.openclaw.md 长期链着 github.com/anthropics/openclaw —— 那个仓库
+# 根本不存在（真正的是 openclaw/openclaw）；README 还把谷歌的 Antigravity 链成
+# anthropics/antigravity。编造出来的「出处」比没有出处更坏：它让人以为核实过了。
+# 无网络时跳过，不阻塞离线发版。
+# 串行跑 45 条链接（每条最多 12s）会把整个脚本拖到分钟级并撞上超时 —— 第一版就是
+# 这么写的，直接把 verify-release 跑挂了。改成 xargs -P 并行 + 8s 上限，结果写进
+# 临时文件后再回到主 shell 计数（bad 是函数，在子进程里加不上计数）。
+if curl -sS -o /dev/null --max-time 5 https://github.com 2>/dev/null; then
+  LINKTMP=$(mktemp)
+  # 第一遍并行快扫。注意这一遍**会误报** —— 实测 docs.codeium.com 在 8s 上限下
+  # 偶发超时，而它其实活着。一个会误报的门禁比没有门禁更糟：人会学会忽略它。
+  # 所以第一遍只产出「嫌疑名单」，不下结论。
+  grep -rhoE "https://[a-zA-Z0-9./_-]+" "$REPO"/docs/*.md "$REPO"/README.md "$REPO"/README.zh-Hant.md 2>/dev/null \
+    | grep -viE "jnmetacode|aiolaola|user-images|shields\.io|opensource\.org|makeapullrequest|npmjs\.com|compshare|cubence|claude\.ai/code" \
+    | sed 's/[.,)]*$//' | sort -u \
+    | xargs -P 10 -I{} sh -c 'c=$(curl -sS -o /dev/null -w "%{http_code}" -L --max-time 8 "$1" 2>/dev/null); case "$c" in 2*|3*|403) ;; *) echo "$1" ;; esac' _ {} \
+    > "$LINKTMP" 2>/dev/null
+  # 第二遍：只对嫌疑名单串行复核，放宽超时并让 curl 自己重试。两遍都判死才算死。
+  suspects=$(wc -l < "$LINKTMP" | tr -d ' ')
+  dead=0
+  if [ "$suspects" != "0" ]; then
+    while read -r u; do
+      [ -z "$u" ] && continue
+      c=$(curl -sS -o /dev/null -w "%{http_code}" -L --max-time 25 --retry 2 --retry-delay 1 "$u" 2>/dev/null)
+      case "$c" in
+        2*|3*|403) ;;
+        *) bad "死链（${c:-无响应}）: ${u}"; dead=$((dead+1)) ;;
+      esac
+    done < "$LINKTMP"
+  fi
+  [ "$dead" = "0" ] && ok || true
+  rm -f "$LINKTMP"
+else
+  echo "  (无网络，跳过外链验活)"
+fi
 
 echo ""
 echo "─── G. 自检：本脚本的覆盖清单不得落后于 installer ───"

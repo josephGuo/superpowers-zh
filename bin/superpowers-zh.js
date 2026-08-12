@@ -59,8 +59,23 @@ const TARGETS = [
   // Codex 全局：docs 确认 Codex 启动时扫描 ~/.agents/skills/（不是 ~/.codex/skills），
   // 直接把每个 skill 复制到 ~/.agents/skills/<skill>/ 正好命中它的扁平扫描。
   { name: 'Codex CLI',     dir: '.codex/skills',            detect: '.codex',                         global: { dir: '.agents/skills',         detect: '.codex' } },
-  { name: 'Kiro',          dir: '.kiro/steering',            detect: '.kiro' },
-  { name: 'DeerFlow',      dir: 'skills/custom',             detect: 'deer_flow' },
+  // Kiro 的 steering 与 Cline / Kilo 的 rules 同性质：**每轮常驻**。官方文档
+  // （kiro.dev/docs/steering）明确 `.kiro/steering/` 下的文件默认 inclusion: always，
+  // "loaded into every Kiro interaction automatically"。
+  // v1.7.9 及更早把 20 个 skill 整个装进 .kiro/steering/ —— 实测 47 个 md、335 KB，
+  // 每一轮全量进上下文。改为与 Cline / Kilo 同一套：skills 放 .kiro/skills/（不被
+  // 自动加载），只在 steering 里放一份带 inclusion: always 的小索引。
+  // 注意 Kiro 的 frontmatter 键是 inclusion / fileMatchPattern，不是 Cursor 系的
+  // alwaysApply / globs —— 我们旧文档写错过，见 docs/README.kiro.md。
+  { name: 'Kiro',          dir: '.kiro/skills',              detect: '.kiro' },
+  // DeerFlow 安装路径 skills/custom/ 经官方文档核实（bytedance-deer-flow.mintlify.app
+  // /concepts/skills）：自动扫描 ["skills/public", "skills/custom"] 两个固定目录，
+  // custom 默认被 gitignore，无需任何配置。容器内挂到 /mnt/skills/。
+  // 但检测标记原来写的是 deer_flow —— DeerFlow 2.0 顶层是 backend/frontend/skills/…，
+  // **没有 deer_flow 这个目录**（实测 GitHub API 列目录确认），所以真实的 DeerFlow
+  // 检出从来没被自动检测到过。改认 skills/public：它是 skills 机制本身、随仓库版本
+  // 控制，任何 DeerFlow 检出都有；deer_flow 保留作 1.x 兼容。
+  { name: 'DeerFlow',      dir: 'skills/custom',             detect: ['skills/public', 'deer_flow'] },
   { name: 'Trae',          dir: '.trae/skills',              detect: '.trae' },
   // Antigravity 无 global：其全局 skills 加载路径未在 docs 证实（全局规则走 ~/.gemini/GEMINI.md），
   // 不确认能生效就不写，避免「装了不生效」。用户用项目级安装。
@@ -71,17 +86,38 @@ const TARGETS = [
   // Gemini 无 global：其全局加载是「扩展目录」~/.gemini/extensions/*/skills/ + gemini-extension.json，
   // 不是简单复制到 ~/.gemini/skills，通用 --global 覆盖不了。见 docs/README.gemini-cli.md。
   { name: 'Gemini CLI',    dir: '.gemini/skills',            detect: 'GEMINI.md' },
-  { name: 'Aider',         dir: '.aider/skills',             detect: '.aider' },
+  // Aider 两点都跟直觉相反，都是实测确认的：
+  // 1) Aider 不创建 `.aider/` 目录，它在项目根留下的是 `.aider.` 前缀的产物
+  //    （.aider.conf.yml / .aider.chat.history.md / .aider.tags.cache.v3/）。
+  //    原来 detect 写 '.aider' 永远匹配不上 —— 真实 Aider 项目从来没被自动检测到过。
+  // 2) CONVENTIONS.md **不会**被 Aider 自动加载。官方文档（aider.chat/docs/usage/
+  //    conventions.html）明确要 `aider --read CONVENTIONS.md` 或在 .aider.conf.yml
+  //    写 `read: CONVENTIONS.md`。所以装完必须打印激活方式，否则又是「装了不生效」。
+  { name: 'Aider',         dir: '.aider/skills',             detect: ['.aider.conf.yml', '.aider.chat.history.md', '.aider.tags.cache.v3', '.aider'] },
   { name: 'OpenCode',      dir: '.opencode/skills',          detect: '.opencode',                      global: { dir: '.config/opencode/skills', detect: '.config/opencode' } },
+  // Qwen Code = QwenLM/qwen-code 这个 CLI（Gemini CLI 的 fork），**不是**通义灵码
+  // （通义灵码是阿里的 IDE 插件，另一个产品，路径完全不同）。旧文档写混过。
+  // 路径经官方文档核实：项目 .qwen/skills/、用户 ~/.qwen/skills/，自动发现无需配置。
   { name: 'Qwen Code',     dir: '.qwen/skills',             detect: '.qwen',                           global: { dir: '.qwen/skills',           detect: '.qwen' } },
   // Hermes 官方文档：只自动加载 ~/.hermes/skills/（"the primary directory and
   // source of truth"），项目级目录不被自动发现，外部目录必须写进
   // ~/.hermes/config.yaml 的 skills.external_dirs。所以全局才是能直接生效的装法；
   // 项目级仍保留（便于随仓库分发），但装完会打印需要粘贴的 config.yaml 片段。
   { name: 'Hermes Agent',  dir: '.hermes/skills',            detect: ['.hermes', 'HERMES.md', '.hermes.md'], global: { dir: '.hermes/skills',         detect: '.hermes' } },
+  // Claw Code 两处都有源码级证据（ultraworkers/claw-code）：
+  //   - skills：rust/crates/plugins/src/lib.rs 里明写 "discovers skills from local
+  //     roots such as `.claw/skills`, `.omc/skills`, `.agents/skills` …"
+  //   - 指令文件：USAGE.md 列出根指令文件 CLAUDE.md / CLAW.md / AGENTS.md，
+  //     优先级 CLAUDE.md > CLAW.md > AGENTS.md
+  // 注意 claw 也扫 .agents/skills —— 装过 Antigravity 的项目它已经能读到，别重复装。
   { name: 'Claw Code',     dir: '.claw/skills',              detect: ['.claw', 'CLAW.md'] },
   { name: 'Qoder',         dir: '.qoder/skills',             detect: '.qoder',                         global: { dir: '.qoder/skills',          detect: '.qoder' } },
-  { name: 'CodeBuddy',     dir: '.codebuddy/skills',         detect: ['.codebuddy', 'CODEBUDDY.md'] },
+  // CodeBuddy 官方文档（codebuddy.cn/docs/cli/codebuddy-dir）确认全局与项目级同构：
+  //   skills  ~/.codebuddy/skills/   与  .codebuddy/skills/
+  //   记忆文件 ~/.codebuddy/CODEBUDDY.md 与 项目根 CODEBUDDY.md（两处等价）
+  // 优先级 项目级 > 用户级。v1.7.10 及更早文档写「用户级路径尚未验证」而没有
+  // --global —— 现已核实，补上。
+  { name: 'CodeBuddy',     dir: '.codebuddy/skills',         detect: ['.codebuddy', 'CODEBUDDY.md'], global: { dir: '.codebuddy/skills',      detect: '.codebuddy' } },
   // 华为云码道（CodeArts Doer）：skills 放 .codeartsdoer/skills/（用户在 #20 确认）。
   // 仅 skills-only —— 其 bootstrap/指令文件约定未证实，靠 CodeArts 自身 skill 发现；
   // 若不自动触发需在对话里手动点名 skill（docs 已说明）。
@@ -220,6 +256,68 @@ ${skillTable}
   const rulePath = resolve(rulesDir, 'superpowers-zh.md');
   writeFileSync(rulePath, rule, 'utf8');
   console.log(`  ✅ Cline: bootstrap rule -> ${rulePath}`);
+}
+
+// Kiro：steering 每轮常驻，所以这里只放索引，skill 正文放 .kiro/skills/ 按需读取。
+// frontmatter 用 Kiro 自己的 inclusion: always（不是 Cursor 系的 alwaysApply）。
+function generateKiroSteeringIndex(projectDir) {
+  const steeringDir = resolve(projectDir, '.kiro', 'steering');
+  mkdirSync(steeringDir, { recursive: true });
+
+  const skillEntries = scanSkillEntries(SKILLS_SRC);
+
+  // 先清掉旧布局：v1.7.9 及更早把 skill 正文装在 .kiro/steering/<skill>/。
+  // 升级的人通常直接重装而不会先卸载，不清的话新旧两份并存，335 KB 的常驻开销
+  // 一点没减 —— 这才是本次要修的东西。只删我们自己装过的那些 skill 同名目录。
+  const ourSkillNames = new Set(skillEntries.map(s => s.name));
+  let legacyRemoved = 0;
+  for (const entry of readdirSync(steeringDir, { withFileTypes: true })) {
+    if (entry.isDirectory() && ourSkillNames.has(entry.name)) {
+      rmSync(resolve(steeringDir, entry.name), { recursive: true, force: true });
+      legacyRemoved++;
+    }
+  }
+  if (legacyRemoved > 0) {
+    console.log(`  🧹 Kiro: 清理旧布局 ${legacyRemoved} 个 skill 目录 <- .kiro/steering/`);
+    console.log(`     （旧版把正文放在这里，而 steering 每轮常驻，会一直进 prompt）`);
+  }
+  const skillTable = skillEntries.map(s => `| ${s.name} | ${s.desc} |`).join('\n');
+
+  const rule = `---
+inclusion: always
+---
+
+# Superpowers-ZH 中文增强版
+
+你已加载 superpowers-zh 技能框架（${skillEntries.length} 个 skills）。
+
+## 核心规则
+
+1. **收到任务时，先检查是否有匹配的 skill** — 哪怕只有 1% 的可能性也要检查
+2. **设计先于编码** — 收到功能需求时，先用 brainstorming skill 做需求分析
+3. **测试先于实现** — 写代码前先写测试（TDD）
+4. **验证先于完成** — 声称完成前必须运行验证命令
+
+## 可用 Skills
+
+Skills 位于 \`.kiro/skills/\` 目录，每个 skill 有独立的 \`SKILL.md\` 文件。
+
+| Skill | 触发条件 |
+|-------|---------|
+${skillTable}
+
+## 如何使用
+
+当任务匹配某个 skill 的触发条件时，用读文件工具打开对应的
+\`.kiro/skills/<skill-name>/SKILL.md\`，并严格遵循其流程。
+
+**不要**把 skill 正文复制到本文件 —— \`.kiro/steering/\` 里的内容每轮都进 prompt，
+按需读取才能把常驻开销控制在这张索引表。
+`;
+
+  const rulePath = resolve(steeringDir, 'superpowers-zh.md');
+  writeFileSync(rulePath, rule, 'utf8');
+  console.log(`  ✅ Kiro: steering 索引 -> ${rulePath}`);
 }
 
 // Kilo Code：v7 起官方推荐 .kilo/rules/ + 在 kilo.jsonc 的 instructions 数组里显式登记，
@@ -373,7 +471,8 @@ ${skillList}
 当任务匹配某个 skill 时，读取对应的 \`.aider/skills/<skill-name>/SKILL.md\` 并严格遵循其流程。
 `;
 
-  // 写入 CONVENTIONS.md（Aider 原生支持自动加载此文件）
+  // 写入 CONVENTIONS.md。注意：Aider **不会**自动加载这个文件（见 TARGETS 里的
+  // Aider 注释），所以写完必须告诉用户怎么激活，否则装了等于没装。
   // 如果已有 CONVENTIONS.md，追加而不覆盖
   const convPath = resolve(projectDir, 'CONVENTIONS.md');
   if (existsSync(convPath)) {
@@ -388,6 +487,18 @@ ${skillList}
     writeFileSync(convPath, wrapWithSentinel(content), 'utf8');
     console.log(`  ✅ Aider: bootstrap -> ${convPath}`);
   }
+
+  // 激活提示。不替用户改 .aider.conf.yml —— 那是他们的配置文件。
+  console.log('');
+  console.log('  ⚠️  Aider 不会自动加载 CONVENTIONS.md，还需一步才生效：');
+  console.log('');
+  console.log('     每次启动时带上：');
+  console.log('        aider --read CONVENTIONS.md');
+  console.log('');
+  console.log('     或写进 .aider.conf.yml 一劳永逸：');
+  console.log('');
+  console.log('        read: CONVENTIONS.md');
+  console.log('');
 }
 
 function generateGeminiBootstrap(baseDir, isGlobal) {
@@ -432,6 +543,110 @@ ${skillList}
   } else {
     writeFileSync(geminiPath, wrapWithSentinel(content), 'utf8');
     console.log(`  ✅ Gemini CLI: bootstrap -> ${geminiPath}`);
+  }
+}
+
+// Qwen Code 与 Gemini CLI 同源（前者是后者的 fork），两套机制都对得上：
+//   - skills：官方文档确认自动发现 .qwen/skills/ 与 ~/.qwen/skills/，无需配置
+//     （qwenlm.github.io/qwen-code-docs/en/users/features/skills/）
+//   - bootstrap：分层记忆系统的默认上下文文件就是 QWEN.md，从 cwd 逐层向上到项目根
+//     发现并拼接（可用 contextFileName 改名，默认 QWEN.md）；全局在 ~/.qwen/QWEN.md
+// v1.7.10 及更早只装 skills、不写 bootstrap —— skills 能被发现，但没有引导就不会
+// 在恰当时机自动触发，等于死重。
+function generateQwenBootstrap(baseDir, isGlobal) {
+  const skillEntries = scanSkillEntries(SKILLS_SRC);
+  const skillList = skillEntries.map(s => `- **${s.name}**: ${s.desc}`).join('\n');
+  const scope = isGlobal ? '已全局安装 superpowers-zh 技能框架，所有项目共享' : '本项目已安装 superpowers-zh 技能框架';
+  const skillsRef = isGlobal ? '~/.qwen/skills/' : '.qwen/skills/';
+
+  const content = `# Superpowers-ZH 中文增强版
+
+${scope}（${skillEntries.length} 个 skills）。
+
+## 核心规则
+
+1. **收到任务时，先检查是否有匹配的 skill** — 哪怕只有 1% 的可能性也要检查
+2. **设计先于编码** — 收到功能需求时，先用 brainstorming skill 做需求分析
+3. **测试先于实现** — 写代码前先写测试（TDD）
+4. **验证先于完成** — 声称完成前必须运行验证命令
+
+## 可用 Skills
+
+Skills 位于 \`${skillsRef}\` 目录，每个 skill 有独立的 \`SKILL.md\` 文件。
+
+${skillList}
+
+## 如何使用
+
+当任务匹配某个 skill 时，读取对应的 \`${skillsRef}<skill-name>/SKILL.md\` 并严格遵循其流程。
+`;
+
+  const qwenPath = isGlobal ? resolve(baseDir, '.qwen', 'QWEN.md') : resolve(baseDir, 'QWEN.md');
+  mkdirSync(dirname(qwenPath), { recursive: true });
+  if (existsSync(qwenPath)) {
+    const existing = readFileSync(qwenPath, 'utf8');
+    if (!existing.includes('superpowers-zh')) {
+      writeFileSync(qwenPath, existing.replace(/\s+$/, '') + '\n\n' + wrapWithSentinel(content), 'utf8');
+      console.log(`  ✅ Qwen Code: 追加 skills 引用 -> ${qwenPath}`);
+    } else {
+      console.log(`  ✅ Qwen Code: QWEN.md 已包含 superpowers-zh 引用`);
+    }
+  } else {
+    writeFileSync(qwenPath, wrapWithSentinel(content), 'utf8');
+    console.log(`  ✅ Qwen Code: bootstrap -> ${qwenPath}`);
+  }
+}
+
+// Claw Code：根指令文件是 CLAW.md（优先级 CLAUDE.md > CLAW.md > AGENTS.md，
+// 见 ultraworkers/claw-code 的 USAGE.md）。v1.7.10 及更早只装 skills、不写 bootstrap。
+function generateClawBootstrap(projectDir) {
+  const skillEntries = scanSkillEntries(SKILLS_SRC);
+  const skillList = skillEntries.map(s => `- **${s.name}**: ${s.desc}`).join('\n');
+  const scope = isGlobal ? '已全局安装 superpowers-zh 技能框架，所有项目共享' : '本项目已安装 superpowers-zh 技能框架';
+  const skillsRef = isGlobal ? '~/.codebuddy/skills/' : '.codebuddy/skills/';
+
+  const content = `# Superpowers-ZH 中文增强版
+
+${scope}（${skillEntries.length} 个 skills）。
+
+## 核心规则
+
+1. **收到任务时，先检查是否有匹配的 skill** — 哪怕只有 1% 的可能性也要检查
+2. **设计先于编码** — 收到功能需求时，先用 brainstorming skill 做需求分析
+3. **测试先于实现** — 写代码前先写测试（TDD）
+4. **验证先于完成** — 声称完成前必须运行验证命令
+
+## 可用 Skills
+
+Skills 位于 \`.claw/skills/\` 目录，每个 skill 有独立的 \`SKILL.md\` 文件。
+
+${skillList}
+
+## 如何使用
+
+当任务匹配某个 skill 时，读取对应的 \`.claw/skills/<skill-name>/SKILL.md\` 并严格遵循其流程。
+`;
+
+  const mdPath = resolve(projectDir, 'CLAW.md');
+  if (existsSync(mdPath)) {
+    const existing = readFileSync(mdPath, 'utf8');
+    if (!existing.includes('superpowers-zh')) {
+      writeFileSync(mdPath, existing.replace(/\s+$/, '') + '\n\n' + wrapWithSentinel(content), 'utf8');
+      console.log(`  ✅ Claw Code: 追加 skills 引用 -> ${mdPath}`);
+    } else {
+      console.log(`  ✅ Claw Code: CLAW.md 已包含 superpowers-zh 引用`);
+    }
+  } else {
+    writeFileSync(mdPath, wrapWithSentinel(content), 'utf8');
+    console.log(`  ✅ Claw Code: bootstrap -> ${mdPath}`);
+  }
+
+  // claw 的根指令文件优先级是 CLAUDE.md > CLAW.md。项目里若已有 CLAUDE.md，
+  // 它可能压过 CLAW.md —— 说清楚，别让人以为装了没生效。
+  if (existsSync(resolve(projectDir, 'CLAUDE.md'))) {
+    console.log('  ℹ️  检测到项目里已有 CLAUDE.md。claw 的根指令文件优先级是');
+    console.log('     CLAUDE.md > CLAW.md > AGENTS.md，CLAUDE.md 可能压过刚写的 CLAW.md。');
+    console.log('     如果 skill 不触发，跑一次 `npx superpowers-zh --tool claude` 让 CLAUDE.md 也带上引导。');
   }
 }
 
@@ -568,13 +783,15 @@ ${skillList}
 
 // CodeBuddy（腾讯 AI IDE）—— 加载机制类似 Claude Code：项目根 CODEBUDDY.md 作 bootstrap，
 // skills 放 .codebuddy/skills/。仅项目级（其用户级 skills 加载路径未证实，暂不做全局）。
-function generateCodeBuddyBootstrap(baseDir) {
+function generateCodeBuddyBootstrap(baseDir, isGlobal) {
   const skillEntries = scanSkillEntries(SKILLS_SRC);
   const skillList = skillEntries.map(s => `- **${s.name}**: ${s.desc}`).join('\n');
+  const scope = isGlobal ? '已全局安装 superpowers-zh 技能框架，所有项目共享' : '本项目已安装 superpowers-zh 技能框架';
+  const skillsRef = isGlobal ? '~/.codebuddy/skills/' : '.codebuddy/skills/';
 
   const content = `# Superpowers-ZH 中文增强版
 
-本项目已安装 superpowers-zh 技能框架（${skillEntries.length} 个 skills）。
+${scope}（${skillEntries.length} 个 skills）。
 
 ## 核心规则
 
@@ -585,16 +802,18 @@ function generateCodeBuddyBootstrap(baseDir) {
 
 ## 可用 Skills
 
-Skills 位于 \`.codebuddy/skills/\` 目录，每个 skill 有独立的 \`SKILL.md\` 文件。
+Skills 位于 \`${skillsRef}\` 目录，每个 skill 有独立的 \`SKILL.md\` 文件。
 
 ${skillList}
 
 ## 如何使用
 
-当任务匹配某个 skill 时，读取对应的 \`.codebuddy/skills/<skill-name>/SKILL.md\` 并严格遵循其流程。
+当任务匹配某个 skill 时，读取对应的 \`${skillsRef}<skill-name>/SKILL.md\` 并严格遵循其流程。
 `;
 
-  const mdPath = resolve(baseDir, 'CODEBUDDY.md');
+  // 全局记忆文件在 ~/.codebuddy/CODEBUDDY.md；项目级放项目根（官方称两处等价）
+  const mdPath = isGlobal ? resolve(baseDir, '.codebuddy', 'CODEBUDDY.md') : resolve(baseDir, 'CODEBUDDY.md');
+  mkdirSync(dirname(mdPath), { recursive: true });
   if (existsSync(mdPath)) {
     const existing = readFileSync(mdPath, 'utf8');
     if (!existing.includes('superpowers-zh')) {
@@ -764,6 +983,14 @@ function installForTarget(target, baseDir, isGlobal) {
     generateGeminiBootstrap(baseDir, isGlobal);
   }
 
+  if (target.name === 'Qwen Code') {
+    generateQwenBootstrap(baseDir, isGlobal);
+  }
+
+  if (target.name === 'Claw Code') {
+    generateClawBootstrap(baseDir);
+  }
+
   if (target.name === 'Hermes Agent') {
     generateHermesBootstrap(baseDir, isGlobal);
   }
@@ -773,7 +1000,11 @@ function installForTarget(target, baseDir, isGlobal) {
   }
 
   if (target.name === 'CodeBuddy') {
-    generateCodeBuddyBootstrap(baseDir);
+    generateCodeBuddyBootstrap(baseDir, isGlobal);
+  }
+
+  if (target.name === 'Kiro') {
+    generateKiroSteeringIndex(baseDir);
   }
 
   if (target.name === 'Cline') {
@@ -800,10 +1031,18 @@ const BOOTSTRAP_DELETE = [
   '.agents/rules.md',
   '.clinerules/superpowers-zh.md',
   '.kilocode/rules/superpowers-zh.md',
+  '.kiro/steering/superpowers-zh.md',
 ];
+
+// v1.7.9 及更早把 skill 正文直接装进 .kiro/steering/<skill>/，而 steering 每轮常驻 ——
+// 那 335 KB 会一直进 prompt。升级的用户不会重跑旧版卸载，所以这里按老路径也清一遍，
+// 否则新旧两份并存，开销问题原样保留。
+const LEGACY_SKILL_DIRS = ['.kiro/steering'];
 const BOOTSTRAP_CLEAN_SECTION = [
   'CLAUDE.md',
   'GEMINI.md',
+  'QWEN.md',
+  'CLAW.md',
   'HERMES.md',
   'CONVENTIONS.md',
   'CODEBUDDY.md',
@@ -887,7 +1126,9 @@ function cleanBootstrapSection(filePath) {
 // 仅 Claude Code（~/.claude/CLAUDE.md，全局记忆已证实）和 Qoder（~/.qoder/rules/，镜像其项目机制）
 // 会写全局 bootstrap；其余全局工具靠 skill 自动发现，无 bootstrap 需清理。
 const GLOBAL_BOOTSTRAP_DELETE = ['.qoder/rules/superpowers-zh.md'];
-const GLOBAL_BOOTSTRAP_CLEAN_SECTION = ['.claude/CLAUDE.md'];
+// qwen 在 GLOBAL_OK 里，--global 会写 ~/.qwen/QWEN.md，全局卸载必须清掉它，
+// 否则 --global 装卸一轮会在用户主目录留残留。
+const GLOBAL_BOOTSTRAP_CLEAN_SECTION = ['.claude/CLAUDE.md', '.qwen/QWEN.md', '.codebuddy/CODEBUDDY.md'];
 
 function uninstallForTarget(target, srcSkillNames, baseDir, isGlobal) {
   const relDir = isGlobal ? (target.global && target.global.dir) : target.dir;
@@ -926,6 +1167,22 @@ function uninstall(isGlobal) {
       .filter(e => e.isDirectory())
       .map(e => e.name)
   );
+
+  // 旧布局清理：见 LEGACY_SKILL_DIRS 的说明。老用户跑新版卸载也应清干净。
+  if (!isGlobal) {
+    for (const rel of LEGACY_SKILL_DIRS) {
+      const legacyDir = resolve(baseDir, rel);
+      if (!existsSync(legacyDir)) continue;
+      let n = 0;
+      for (const entry of readdirSync(legacyDir, { withFileTypes: true })) {
+        if (entry.isDirectory() && srcSkillNames.has(entry.name)) {
+          rmSync(resolve(legacyDir, entry.name), { recursive: true, force: true });
+          n++;
+        }
+      }
+      if (n > 0) console.log(`  ✅ 清理旧布局: 移除 ${n} 个 skills <- ${legacyDir}`);
+    }
+  }
 
   const pool = isGlobal ? GLOBAL_TARGETS : TARGETS;
   let totalSkills = 0;
