@@ -18,11 +18,33 @@ git clone https://github.com/jnMetaCode/superpowers-zh.git
 cp -r superpowers-zh/skills /your/project/.windsurf/skills
 ```
 
-或全局安装：
+或全局安装（注意路径 —— **不是** `~/.windsurf/skills`）：
 
 ```bash
-cp -r superpowers-zh/skills ~/.windsurf/skills
+npx superpowers-zh --global --tool windsurf
+# 等价于手动：cp -r superpowers-zh/skills/* ~/.codeium/windsurf/skills/
 ```
+
+> 📌 **v1.7.10 及更早的 `--global` 装到了 `~/.windsurf/skills`，Windsurf 不读那里，等于装了不生效。** 这是我们的实现错误，v1.7.11 起修正为官方路径 `~/.codeium/windsurf/skills/`。之前全局装过的请重装，并可手动删掉遗留的 `~/.windsurf/skills`。
+
+## 工作原理
+
+[Windsurf 官方文档](https://docs.windsurf.com/windsurf/cascade/skills)明确了两个路径，**它们不同构**：
+
+| 范围 | 路径 |
+|---|---|
+| 项目级 | `.windsurf/skills/<skill-name>/` |
+| 用户级（全局） | `~/.codeium/windsurf/skills/<skill-name>/` |
+
+用户级在 `~/.codeium/` 下而不是 `~/.windsurf/` 下 —— 这点反直觉，是我们之前搞错的地方。
+
+自动发现，无需配置。Cascade 采用渐进式披露：默认只把 skill 的 name 和 description 交给模型，决定调用时才加载 SKILL.md 全文，所以装 20 个不会造成常驻开销。
+
+### 跨工具发现
+
+官方还写明 Windsurf 会扫 `.agents/skills/` 与 `~/.agents/skills/`；若开启了读取 Claude Code 配置，`.claude/skills/` 与 `~/.claude/skills/` 也会被扫描。
+
+也就是说：**如果你已经为 Antigravity（`.agents/skills`）或 Claude Code 装过，Windsurf 其实已经能读到**，不必重复装 —— 否则会加载两份。
 
 ## Skill 加载优先级
 

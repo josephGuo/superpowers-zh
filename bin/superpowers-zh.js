@@ -55,10 +55,18 @@ const LEGACY_AGENT_FILENAMES = ['code-reviewer.md'];
 // 或存在于应用内设置，没有稳定的用户级 skills 加载路径 —— --global 会明确拒绝而非写无效路径。
 const TARGETS = [
   { name: 'Claude Code',   dir: '.claude/skills',           detect: '.claude',                        global: { dir: '.claude/skills',         detect: '.claude',         boot: '.claude/CLAUDE.md' } },
+  // Cursor 经官方文档核实（cursor.com/docs/skills）：.cursor/skills/<name>/SKILL.md，
+  // 启动时自动发现并交给 Agent 按上下文选用，也可在对话里打 / 手动点名。无需配置。
   { name: 'Cursor',        dir: '.cursor/skills',           detect: ['.cursor', '.cursorrules'] },
-  // Codex 全局：docs 确认 Codex 启动时扫描 ~/.agents/skills/（不是 ~/.codex/skills），
-  // 直接把每个 skill 复制到 ~/.agents/skills/<skill>/ 正好命中它的扁平扫描。
-  { name: 'Codex CLI',     dir: '.codex/skills',            detect: '.codex',                         global: { dir: '.agents/skills',         detect: '.codex' } },
+  // Codex 各层级扫的都是 .agents/skills，**从不扫 .codex/skills**。官方文档
+  // （developers.openai.com/codex/skills，308 跳 learn.chatgpt.com/docs/build-skills）
+  // 给出的完整清单只有：
+  //   $CWD/.agents/skills、$CWD/../.agents/skills、$REPO_ROOT/.agents/skills
+  //   $HOME/.agents/skills、/etc/codex/skills、以及内置 skill
+  // 全局一直是对的（~/.agents/skills），但**项目级原来装到 .codex/skills —— Codex
+  // 不读那里，等于装了不生效**。v1.7.11 改为 .agents/skills，并清理旧位置。
+  // 与 Antigravity 装在同一目录是预期的：两者共用 .agents/skills 这个开放约定。
+  { name: 'Codex CLI',     dir: '.agents/skills',           detect: '.codex',                         global: { dir: '.agents/skills',         detect: '.codex' } },
   // Kiro 的 steering 与 Cline / Kilo 的 rules 同性质：**每轮常驻**。官方文档
   // （kiro.dev/docs/steering）明确 `.kiro/steering/` 下的文件默认 inclusion: always，
   // "loaded into every Kiro interaction automatically"。
@@ -80,9 +88,25 @@ const TARGETS = [
   // Antigravity 无 global：其全局 skills 加载路径未在 docs 证实（全局规则走 ~/.gemini/GEMINI.md），
   // 不确认能生效就不写，避免「装了不生效」。用户用项目级安装。
   { name: 'Antigravity',   dir: '.agents/skills',            detect: '.agents' },
-  { name: 'VS Code',       dir: '.github/superpowers',       detect: '.github/copilot-instructions.md' },
+  // VS Code Copilot **不认识** .github/superpowers/ —— 官方（code.visualstudio.com
+  // /docs/copilot/customization/custom-instructions）只自动读这几处：
+  //   .github/copilot-instructions.md、AGENTS.md、CLAUDE.md（always-on）
+  //   .github/instructions/*.instructions.md（按 frontmatter 的 applyTo 匹配）
+  // v1.7.10 及更早只把 skills 拷进 .github/superpowers/ 且**不写任何引导** ——
+  // 20 个文件 Copilot 一个都不会读，纯死重。旧文档甚至写着「建议你自己创建
+  // copilot-instructions.md 引用它们」，等于知道需要却不做。
+  // 现在写 .github/instructions/superpowers-zh.instructions.md（applyTo: "**" 即
+  // 全局生效）—— 用我们自己的文件而不是去改用户的 copilot-instructions.md。
+  // 检测标记同时认 .github/instructions（用了 instructions 机制的项目都有）。
+  { name: 'VS Code',       dir: '.github/superpowers',       detect: ['.github/copilot-instructions.md', '.github/instructions'] },
   { name: 'OpenClaw',      dir: 'skills',                     detect: '.openclaw',                     global: { dir: '.openclaw/skills',       detect: '.openclaw' } },
-  { name: 'Windsurf',      dir: '.windsurf/skills',          detect: '.windsurf',                      global: { dir: '.windsurf/skills',       detect: '.windsurf' } },
+  // Windsurf 全局路径与项目级**不同构**，这点反直觉：官方文档（docs.windsurf.com
+  // /windsurf/cascade/skills，现 307 跳 docs.devin.ai/desktop/cascade/skills）写明
+  //   项目级：.windsurf/skills/<skill-name>/
+  //   用户级：~/.codeium/windsurf/skills/<skill-name>/   ← 不是 ~/.windsurf/skills
+  // v1.7.10 及更早 --global 装到 ~/.windsurf/skills —— Windsurf 不读那里，装了不生效。
+  // 它还会扫 .agents/skills 与 ~/.agents/skills；开了读取 CC 配置时也扫 .claude/skills。
+  { name: 'Windsurf',      dir: '.windsurf/skills',          detect: '.windsurf',                      global: { dir: '.codeium/windsurf/skills', detect: '.codeium' } },
   // Gemini 无 global：其全局加载是「扩展目录」~/.gemini/extensions/*/skills/ + gemini-extension.json，
   // 不是简单复制到 ~/.gemini/skills，通用 --global 覆盖不了。见 docs/README.gemini-cli.md。
   { name: 'Gemini CLI',    dir: '.gemini/skills',            detect: 'GEMINI.md' },
@@ -94,6 +118,10 @@ const TARGETS = [
   //    conventions.html）明确要 `aider --read CONVENTIONS.md` 或在 .aider.conf.yml
   //    写 `read: CONVENTIONS.md`。所以装完必须打印激活方式，否则又是「装了不生效」。
   { name: 'Aider',         dir: '.aider/skills',             detect: ['.aider.conf.yml', '.aider.chat.history.md', '.aider.tags.cache.v3', '.aider'] },
+  // OpenCode 经官方文档核实（opencode.ai/docs/skills）：项目 .opencode/skills/<name>/SKILL.md、
+  // 全局 ~/.config/opencode/skills/<name>/SKILL.md，自动发现（项目级会从 cwd 向上走到
+  // git worktree 根）。它同时扫 .claude/skills 与 .agents/skills —— 装过 CC 或
+  // Antigravity 的项目它已经能读到，别重复装。
   { name: 'OpenCode',      dir: '.opencode/skills',          detect: '.opencode',                      global: { dir: '.config/opencode/skills', detect: '.config/opencode' } },
   // Qwen Code = QwenLM/qwen-code 这个 CLI（Gemini CLI 的 fork），**不是**通义灵码
   // （通义灵码是阿里的 IDE 插件，另一个产品，路径完全不同）。旧文档写混过。
@@ -118,10 +146,14 @@ const TARGETS = [
   // 优先级 项目级 > 用户级。v1.7.10 及更早文档写「用户级路径尚未验证」而没有
   // --global —— 现已核实，补上。
   { name: 'CodeBuddy',     dir: '.codebuddy/skills',         detect: ['.codebuddy', 'CODEBUDDY.md'], global: { dir: '.codebuddy/skills',      detect: '.codebuddy' } },
-  // 华为云码道（CodeArts Doer）：skills 放 .codeartsdoer/skills/（用户在 #20 确认）。
-  // 仅 skills-only —— 其 bootstrap/指令文件约定未证实，靠 CodeArts 自身 skill 发现；
-  // 若不自动触发需在对话里手动点名 skill（docs 已说明）。
-  { name: 'CodeArts',      dir: '.codeartsdoer/skills',      detect: '.codeartsdoer' },
+  // 华为云码道（CodeArts Doer）。原注释只写「用户在 #20 确认」—— 已补官方出处：
+  // support.huaweicloud.com/usermanual-codeartssnap/codeartsdoer_ug_0024.html
+  //   项目级：项目根目录的 ./.codeartsdoer/skills/
+  //   个人级：%USERPROFILE%/.codeartsdoer/skills   ← 即 ~/.codeartsdoer/skills
+  // 每个 skill 目录根必须有 SKILL.md，自动发现、创建后立刻生效、无需配置。
+  // 个人级路径既然已证实，v1.7.11 起支持 --global（此前一直在拒绝名单里）。
+  // 仍是 skills-only —— 其 bootstrap/指令文件约定未证实，不猜路径。
+  { name: 'CodeArts',      dir: '.codeartsdoer/skills',      detect: '.codeartsdoer', global: { dir: '.codeartsdoer/skills',   detect: '.codeartsdoer' } },
   // Cline / Kilo Code 是 VS Code 扩展，加载的是「rules」而非 skills，且 rules 每轮常驻
   // system prompt。因此 skills 放各自的 skills/ 目录（不被自动加载），只在 rules 目录里
   // 放一份小索引 —— 见 generateClineBootstrapRule / generateKiloCodeBootstrapRule。
@@ -599,6 +631,55 @@ ${skillList}
 
 // Claw Code：根指令文件是 CLAW.md（优先级 CLAUDE.md > CLAW.md > AGENTS.md，
 // 见 ultraworkers/claw-code 的 USAGE.md）。v1.7.10 及更早只装 skills、不写 bootstrap。
+// VS Code Copilot：写 .github/instructions/superpowers-zh.instructions.md。
+// applyTo: "**" 表示对所有请求生效（省略该字段则只能手动挂载，等于白写）。
+// 刻意不动用户的 .github/copilot-instructions.md —— 那是他们的文件。
+function generateVSCodeBootstrap(projectDir) {
+  const instrDir = resolve(projectDir, '.github', 'instructions');
+  mkdirSync(instrDir, { recursive: true });
+
+  const skillEntries = scanSkillEntries(SKILLS_SRC);
+  const skillTable = skillEntries.map(s => `| ${s.name} | ${s.desc} |`).join('\n');
+
+  const rule = `---
+applyTo: "**"
+name: Superpowers-ZH
+description: superpowers-zh 技能框架的索引与触发规则
+---
+
+# Superpowers-ZH 中文增强版
+
+本项目已安装 superpowers-zh 技能框架（${skillEntries.length} 个 skills）。
+
+## 核心规则
+
+1. **收到任务时，先检查是否有匹配的 skill** — 哪怕只有 1% 的可能性也要检查
+2. **设计先于编码** — 收到功能需求时，先用 brainstorming skill 做需求分析
+3. **测试先于实现** — 写代码前先写测试（TDD）
+4. **验证先于完成** — 声称完成前必须运行验证命令
+
+## 可用 Skills
+
+Skills 位于 \`.github/superpowers/\` 目录，每个 skill 有独立的 \`SKILL.md\` 文件。
+
+| Skill | 触发条件 |
+|-------|---------|
+${skillTable}
+
+## 如何使用
+
+当任务匹配某个 skill 的触发条件时，读取对应的
+\`.github/superpowers/<skill-name>/SKILL.md\` 并严格遵循其流程。
+
+**不要**把 skill 正文复制到本文件 —— 本文件对每个请求都生效，按需读取才能把
+常驻开销控制在这张索引表。
+`;
+
+  const rulePath = resolve(instrDir, 'superpowers-zh.instructions.md');
+  writeFileSync(rulePath, rule, 'utf8');
+  console.log(`  ✅ VS Code: instructions -> ${rulePath}`);
+}
+
 function generateClawBootstrap(projectDir) {
   const skillEntries = scanSkillEntries(SKILLS_SRC);
   const skillList = skillEntries.map(s => `- **${s.name}**: ${s.desc}`).join('\n');
@@ -987,6 +1068,28 @@ function installForTarget(target, baseDir, isGlobal) {
     generateQwenBootstrap(baseDir, isGlobal);
   }
 
+  // Codex 项目级旧位置清理：v1.7.10 及更早装到 .codex/skills，而 Codex 从不扫那里。
+  // 升级的人通常直接重装不会先卸载，不清的话旧目录留着白占地方、还让人以为在生效。
+  if (target.name === 'Codex CLI' && !isGlobal) {
+    const legacy = resolve(baseDir, '.codex', 'skills');
+    if (existsSync(legacy)) {
+      const ours = new Set(scanSkillEntries(SKILLS_SRC).map(s => s.name));
+      let n = 0;
+      for (const e of readdirSync(legacy, { withFileTypes: true })) {
+        if (e.isDirectory() && ours.has(e.name)) { rmSync(resolve(legacy, e.name), { recursive: true, force: true }); n++; }
+      }
+      if (n > 0) {
+        console.log(`  🧹 Codex: 清理旧位置 ${n} 个 skill 目录 <- .codex/skills/`);
+        console.log(`     （Codex 只扫 .agents/skills，旧版装错了地方）`);
+      }
+      try { if (readdirSync(legacy).filter(x => x !== '.DS_Store').length === 0) rmSync(legacy, { recursive: true, force: true }); } catch {}
+    }
+  }
+
+  if (target.name === 'VS Code') {
+    generateVSCodeBootstrap(baseDir);
+  }
+
   if (target.name === 'Claw Code') {
     generateClawBootstrap(baseDir);
   }
@@ -1026,6 +1129,7 @@ function isHomeDir(p) {
 
 // 卸载支持：完整删除的 bootstrap 文件、需要清理段落的 bootstrap 文件
 const BOOTSTRAP_DELETE = [
+  '.github/instructions/superpowers-zh.instructions.md',
   '.trae/rules/superpowers-zh.md',
   '.qoder/rules/superpowers-zh.md',
   '.agents/rules.md',
@@ -1037,7 +1141,7 @@ const BOOTSTRAP_DELETE = [
 // v1.7.9 及更早把 skill 正文直接装进 .kiro/steering/<skill>/，而 steering 每轮常驻 ——
 // 那 335 KB 会一直进 prompt。升级的用户不会重跑旧版卸载，所以这里按老路径也清一遍，
 // 否则新旧两份并存，开销问题原样保留。
-const LEGACY_SKILL_DIRS = ['.kiro/steering'];
+const LEGACY_SKILL_DIRS = ['.kiro/steering', '.codex/skills'];
 const BOOTSTRAP_CLEAN_SECTION = [
   'CLAUDE.md',
   'GEMINI.md',
@@ -1311,10 +1415,19 @@ function install(forceToolName, force, isGlobal) {
   let installed = 0;
   const pool = isGlobal ? GLOBAL_TARGETS : TARGETS;
 
+  // 先把所有工具的检测结果一次性算完，再开始装。
+  // 边装边判会有顺序依赖：Codex 装到 .agents/skills 会创建 .agents/，紧接着
+  // Antigravity（detect: '.agents'）就被误判为「项目里有」，于是多装一份。
+  // 两款共用 .agents/skills 是官方约定，但检测必须基于**安装前**的项目状态。
+  const detectedBefore = new Map();
   for (const target of pool) {
-    const detectMarker = isGlobal ? target.global.detect : target.detect;
-    const detects = Array.isArray(detectMarker) ? detectMarker : [detectMarker];
-    const found = detects.some(d => existsSync(resolve(baseDir, d)));
+    const dm = isGlobal ? target.global.detect : target.detect;
+    const ds = Array.isArray(dm) ? dm : [dm];
+    detectedBefore.set(target.name, ds.some(d => existsSync(resolve(baseDir, d))));
+  }
+
+  for (const target of pool) {
+    const found = detectedBefore.get(target.name);
     if (found) {
       installForTarget(target, baseDir, isGlobal);
       installed++;

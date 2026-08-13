@@ -90,6 +90,25 @@ for f in hooks/session-start hooks/run-hook.cmd; do
   if [ -x "$f" ]; then ok; else bad "Not executable: $f"; fi
 done
 
+# 1e. shell 脚本里「变量后紧跟多字节字符」
+#
+# bash 解析变量名时会把紧随其后的多字节字符吞进名字里，于是 set -u 下直接报
+# unbound variable 并中断脚本。本仓已踩过两次，两次都是「脚本半途崩掉、看起来
+# 像没跑」。写成花括号界定即可。
+#
+# 注意实现：这里不能用 grep -P —— macOS 的 /usr/bin/grep 是 BSD grep，不支持 -P，
+# 配上 2>/dev/null 就成了静默失效的检查（本检查第一版正是这么写的，交互 shell 里
+# 用 ugrep 看着能用，进了脚本一个都匹配不到）。用 LC_ALL=C + ERE：C locale 下
+# 多字节字符按单字节处理，>0x7F 的字节自然落在 [^ -~] 之外，BSD/GNU 都支持。
+# 排除注释行，否则本条说明文字自己会被命中。
+while IFS= read -r hit; do
+  case "${hit#*:*:}" in
+    \#*|" "*\#*) continue ;;   # 注释行（含缩进注释）不算
+  esac
+  bad "变量后紧跟多字节字符，bash 会吞进变量名（用 \${VAR} 界定）: $hit"
+done < <(LC_ALL=C grep -nE '\$[A-Za-z_][A-Za-z0-9_]*[^ -~]' scripts/*.sh hooks/session-start 2>/dev/null)
+ok
+
 #==============================================================================
 if [ "$QUICK" != "1" ]; then
 hdr "Category 2: Installer 功能测试（23 款工具）"
