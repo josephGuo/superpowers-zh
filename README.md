@@ -16,22 +16,14 @@ Chinese community edition of [superpowers](https://github.com/obra/superpowers) 
 >
 > 🌍 Also available in [English](https://aiolaola.com/en?utm_source=github&utm_campaign=superpowers) · [日本語](https://aiolaola.com/ja?utm_source=github&utm_campaign=superpowers) · [Español](https://aiolaola.com/es?utm_source=github&utm_campaign=superpowers) · [한국어](https://aiolaola.com/ko?utm_source=github&utm_campaign=superpowers) · [繁體中文](https://aiolaola.com/zh-Hant?utm_source=github&utm_campaign=superpowers)
 
-> 🆕 **v1.7.10 更新亮点**（[完整 Release Notes →](RELEASE-NOTES.zh.md)）
-> - 🐛 **Aider 用户请重装** —— 两个错叠一起等于完全不可用：真实 Aider 项目从来没被自动检测到过（它不创建 `.aider/` 目录），且 `CONVENTIONS.md` **不会**被自动加载（官方要求 `--read`）。现在检测认真实标记，装完打印激活命令
-> - 🐛 **Kiro 用户请重装** —— `.kiro/steering/` 下的文件**每轮对话全量进上下文**，而我们把 20 个 skill 正文全塞了进去：实测 **335 KB/轮**。改为索引式后 **4.4 KB**（76 倍），重装会自动清旧布局
-> - 🐛 **Qoder 工具映射表有错** —— `Explore`/`Plan` 的 agent 名是编的（官方就是同名），且表没标适用范围（只覆盖 Qoder CLI，IDE 不同）（[#119](https://github.com/jnMetaCode/superpowers-zh/issues/119)）
-> - 🛡️ **堵上「拿代码测代码」的测试盲区** —— Aider 那个 bug 能在 90 项全绿下活着，是因为测试 `mkdir .aider` 再断言认出 Aider。已补真实标记 + Kiro 两条硬回归守卫（90 → 101 pass）
-> - 🐛 **Hermes 用户请重装** —— 之前我们只装项目级 `.hermes/skills/`，而 Hermes 根本不读那个目录，等于**装了完全不生效**。现在改用 `npx superpowers-zh --global --tool hermes` 装到 `~/.hermes/skills/`（[#45](https://github.com/jnMetaCode/superpowers-zh/issues/45)）
-> - 🔍 **定位核查** —— 逐层比对上游，修掉 5 处「不是增量」的偏离；新增 audit 检查强制 fork 增量必须显式声明
+> 🆕 **v1.7.10 更新亮点** —— **Aider / Kiro / Hermes 用户请重装**（此前装了等于没装）：
+>
+> - 🐛 **Aider** —— 真实 Aider 项目从来没被自动检测到过（它不创建 `.aider/` 目录），且 `CONVENTIONS.md` **不会**被自动加载（官方要求 `--read`）。现在检测认真实标记，装完打印激活命令
+> - 🐛 **Kiro** —— `.kiro/steering/` 下的文件**每轮对话全量进上下文**，而我们把 20 个 skill 正文全塞了进去：实测 **335 KB/轮**。改为索引式后 **4.4 KB**（76 倍），重装会自动清旧布局
+> - 🐛 **Hermes** —— 之前只装项目级 `.hermes/skills/`，而 Hermes 根本不读那个目录。现在改用 `npx superpowers-zh --global --tool hermes` 装到 `~/.hermes/skills/`
 > - 🆕 **新增 Crush**（工具数 22 → 23）—— 若你已为 CC / Cursor / Codex 装过，Crush 其实已经能读到，别重复装
-> - 🎯 **上游 v6.2.0 对齐完成** —— audit 的结构漂移告警清零；C 块盘点时发现其中 3 项不是风格改动而是实质新规则
-> - 🐛 **两个 worktree / Gemini 的真问题** —— 修掉 worktree 清理静默空转；更正「Gemini 不支持子智能体」的错误说法（原说法会让 3 个 skill 在 Gemini CLI 上瘸腿）
-> - 🔄 **测试参考重构** —— `testing-anti-patterns` → `writing-good-tests`：从 5 个反模式清单改为两条原则 + 变异检查
-> - 🔄 **SDD 同步上游 v6.2.0** —— plan 作用域工作区（一份过期账本再也不会让控制者跳过整段任务）+ 五轮上限的唤回式修复循环与熔断裁定
-> - 🪟 **Windows bootstrap 修复** —— SessionStart hook 改经 Git Bash 分发（同步上游），hook 不加载 skill 就是死重
-> - 🧩 新增 **Cline** 与 **Kilo Code** 两款 VS Code 扩展（工具数 20 → 22）—— 按 rules 常驻开销做了专门设计，索引仅 4.5 KB
-> - 🔧 检测落空时会扫 PATH 给出**可直接复制的 `--tool` 命令**，不再只报「未检测到」
-> - 📦 README 补上 **Plugin Marketplace 安装方式**（`claude plugin marketplace add`，升级只需一条命令）
+>
+> 📋 其余改动（Qoder 工具映射表更正、上游 v6.2.0 对齐、测试盲区补齐、Windows bootstrap 修复、SDD 同步…）见 **[完整 Release Notes →](RELEASE-NOTES.zh.md)**
 
 ### 📊 项目规模
 
