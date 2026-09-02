@@ -16,24 +16,42 @@ Chinese community edition of [superpowers](https://github.com/obra/superpowers) 
 >
 > 🌍 Also available in [English](https://aiolaola.com/en?utm_source=github&utm_campaign=superpowers) · [日本語](https://aiolaola.com/ja?utm_source=github&utm_campaign=superpowers) · [Español](https://aiolaola.com/es?utm_source=github&utm_campaign=superpowers) · [한국어](https://aiolaola.com/ko?utm_source=github&utm_campaign=superpowers) · [繁體中文](https://aiolaola.com/zh-Hant?utm_source=github&utm_campaign=superpowers)
 
-> 🆕 **v1.7.10 更新亮点** —— **Aider / Kiro / Hermes 用户请重装**（此前装了等于没装）：
+> 🆕 **v1.7.11 更新亮点** —— **Codex / VS Code / Windsurf / Qwen Code / DeerFlow / Claw Code 用户请重装**（此前装了等于没装）：
 >
-> - 🐛 **Aider** —— 真实 Aider 项目从来没被自动检测到过（它不创建 `.aider/` 目录），且 `CONVENTIONS.md` **不会**被自动加载（官方要求 `--read`）。现在检测认真实标记，装完打印激活命令
-> - 🐛 **Kiro** —— `.kiro/steering/` 下的文件**每轮对话全量进上下文**，而我们把 20 个 skill 正文全塞了进去：实测 **335 KB/轮**。改为索引式后 **4.4 KB**（76 倍），重装会自动清旧布局
-> - 🐛 **Hermes** —— 之前只装项目级 `.hermes/skills/`，而 Hermes 根本不读那个目录。现在改用 `npx superpowers-zh --global --tool hermes` 装到 `~/.hermes/skills/`
-> - 🆕 **新增 Crush**（工具数 22 → 23）—— 若你已为 CC / Cursor / Codex 装过，Crush 其实已经能读到，别重复装
+> - 🐛 **Codex CLI** —— 项目级装到 `.codex/skills`，而官方扫描清单里**从来没有这个目录**。改为 `.agents/skills`，重装会自动清旧位置
+> - 🐛 **VS Code (Copilot)** —— 装的 20 个文件 Copilot 一个都不读，且不写任何引导。现在生成 `.github/instructions/superpowers-zh.instructions.md`（`applyTo: "**"`）
+> - 🐛 **Windsurf** —— `--global` 装到 `~/.windsurf/skills`，官方用户级路径是 `~/.codeium/windsurf/skills/`。全局装过的请重装
+> - 🆕 **Qwen Code / Claw Code 补 bootstrap，CodeBuddy / CodeArts 补 `--global`**（全局支持 9 → 11 款）
 >
-> 📋 其余改动（Qoder 工具映射表更正、上游 v6.2.0 对齐、测试盲区补齐、Windows bootstrap 修复、SDD 同步…）见 **[完整 Release Notes →](RELEASE-NOTES.zh.md)**
+> 📋 其余改动（DeerFlow 检测标记、4 条死链含 2 条编造的仓库地址、官网工具墙 20 → 23、5 条新门禁…）见 **[完整 Release Notes →](RELEASE-NOTES.zh.md)**
 
 ### 📊 项目规模
 
-| 📦 翻译 Skills | 🇨🇳 中国特色 Skills | 🤖 支持工具 |
+| 📦 翻译 Skills | 🇨🇳 中国原创 Skills | 🤖 支持工具 |
 |:---:|:---:|:---:|
-| **14** | **6** | **Claude Code / Copilot CLI / Hermes Agent / Cursor / Windsurf / Kiro / Gemini CLI / Codex / Aider / Trae / VS Code (Copilot) / DeerFlow / OpenCode / OpenClaw / Qwen Code / Antigravity / Claw Code / Qoder / CodeBuddy（腾讯）/ CodeArts（华为云码道）/ Cline / Kilo Code / Crush** |
+| **14** | **4**<br><sub>另有 2 个上游历史保留</sub> | **Claude Code / Copilot CLI / Hermes Agent / Cursor / Windsurf / Kiro / Gemini CLI / Codex / Aider / Trae / VS Code (Copilot) / DeerFlow / OpenCode / OpenClaw / Qwen Code / Antigravity / Claw Code / Qoder / CodeBuddy（腾讯）/ CodeArts（华为云码道）/ Cline / Kilo Code / Crush** |
 
 ---
 
 ## ❤️ 赞助商 &nbsp;<sub>🙏 想出现在这里？联系 **jnMetaCode@qq.com** 赞助</sub>
+
+<p align="center">
+  <a href="https://www.infistar.cc/register?aff=PDVTM2VS&ref_source=link">
+    <img src="assets/sponsors/infistar.jpg" alt="Infistar.cc 无限星河 —— 全模型 API 服务，一个 API Key 接入 Claude、ChatGPT、Gemini、Kimi、GLM、DeepSeek，价格低至官方渠道 1 折" width="100%">
+  </a>
+</p>
+
+**superpowers-zh × [Infistar.cc 无限星河](https://www.infistar.cc/register?aff=PDVTM2VS&ref_source=link)｜全模型 API · 为 AI 编程注入稳定动力**
+
+感谢 Infistar.cc 无限星河 赞助并为 superpowers-zh 用户提供模型服务支持！
+
+- ⚡ **稳定承载复杂开发任务**：提供高可用模型通道与多节点冗余，价格低至官方渠道 **1 折**，稳定支持需求分析、方案规划、TDD、调试及代码审查等长任务。
+- 🧠 **一个 API Key 接入主流模型**：全面支持 Claude、ChatGPT、Gemini、Kimi、GLM、DeepSeek 等模型，适配 Claude Code、Codex、Cursor、Windsurf、Kiro 等 AI 编程工具。
+- 🛠️ **赋能完整开发工作流**：结合 superpowers-zh 的系统化 Skills，让 AI 更好地完成头脑风暴、计划执行、问题排查和质量检查。
+
+🎁 **superpowers-zh 用户专属福利：通过[此链接](https://www.infistar.cc/register?aff=PDVTM2VS&ref_source=link)注册并完成首次调用，即可领取 5 美元等值测试额度！**
+
+<hr>
 
 <table>
 <tr>
@@ -143,7 +161,7 @@ AI：在开始实现之前，我需要了解几个关键问题：
 | [OpenCode](https://opencode.ai) | CLI | `npx superpowers-zh` | `.opencode/skills/` |
 | [OpenClaw](https://github.com/openclaw/openclaw) | CLI | `npx superpowers-zh` | `skills/` |
 | [Qwen Code](https://github.com/QwenLM/qwen-code) | CLI | `npx superpowers-zh` | `.qwen/skills/` + `QWEN.md` |
-| [Antigravity](https://antigravity.google) | CLI | `npx superpowers-zh` | `.agents/skills/` |
+| [Antigravity](https://antigravity.google) | IDE | `npx superpowers-zh` | `.agents/skills/` |
 | [Claw Code](https://github.com/ultraworkers/claw-code) | CLI (Rust) | `npx superpowers-zh` | `.claw/skills/` |
 | [Qoder](https://qoder.com) (阿里 AI IDE) | IDE | `npx superpowers-zh` | `.qoder/skills/` + `.qoder/rules/` |
 | [CodeBuddy](https://copilot.tencent.com) (腾讯 AI IDE) | IDE | `npx superpowers-zh` | `.codebuddy/skills/` + `CODEBUDDY.md` |
@@ -173,10 +191,12 @@ AI：在开始实现之前，我需要了解几个关键问题：
 | **编写 Skills** (writing-skills) | 创建新 skill 的方法论 |
 | **使用 Superpowers** (using-superpowers) | 元技能：如何调用和优先使用 skills |
 
-### 🇨🇳 中国特色 Skills（6 个）
+### 🇨🇳 中国原创 Skills（4 个）· 上游历史保留（2 个）
 
 > ⚠️ **下表前 4 个 chinese-\* 为「手动调用」skill**——不会自动触发，需在对话中显式输入 `/chinese-xxx` 才会加载。
 > 设计为参考资料而非工作流，避免污染上游 skill 的自动调度（如 `requesting-code-review`、`brainstorming` 等）。
+>
+> ⚠️ **表格最后两个（mcp-builder / workflow-runner）不是中国原创** —— 它们来自上游，上游后来移除了，本 fork 保留下来继续维护。全仓 20 个 skill = 14 翻译 + 4 中国原创 + 2 上游历史保留。
 
 | Skill | 用途 | 调用方式 | 上游有吗？ |
 |-------|------|---------|:---:|
@@ -184,8 +204,8 @@ AI：在开始实现之前，我需要了解几个关键问题：
 | **中文 Git 工作流** (chinese-git-workflow) | 适配 Gitee/Coding/极狐 GitLab/CNB | `/chinese-git-workflow`（手动） | 无 |
 | **中文技术文档** (chinese-documentation) | 中文排版规范、中英混排、告别机翻味 | `/chinese-documentation`（手动） | 无 |
 | **中文提交规范** (chinese-commit-conventions) | 适配国内团队的 commit message 规范 | `/chinese-commit-conventions`（手动） | 无 |
-| **MCP 服务器构建** (mcp-builder) | 构建生产级 MCP 工具，扩展 AI 能力边界 | 自动 | 无 |
-| **工作流执行器** (workflow-runner) | 在 AI 工具内运行多角色 YAML 工作流 | 自动 | 无 |
+| **MCP 服务器构建** (mcp-builder) | 构建生产级 MCP 工具，扩展 AI 能力边界 | 自动 | 曾有，上游已移除 |
+| **工作流执行器** (workflow-runner) | 在 AI 工具内运行多角色 YAML 工作流 | 自动 | 曾有，上游已移除 |
 
 ---
 
@@ -211,7 +231,7 @@ npx superpowers-zh --global --tool claude   # 或指定工具
 
 全局安装把 skills 装到工具的**用户级目录**（如 `~/.claude/skills`），一次安装所有项目自动可用，更新时也只需重装一次。**项目级优先、全局兜底**，二者可共存。
 
-支持通用全局安装的工具（均为 docs 已证实的用户级加载路径）：**Claude Code · Codex CLI · Qoder · Windsurf · Qwen Code · OpenClaw · OpenCode · Crush · Hermes Agent · CodeBuddy**。其中 **Codex CLI** 全局装到 `~/.agents/skills`（Codex 启动扫描目录）。其余工具（Cursor / Kiro / Trae / Aider / DeerFlow / VS Code / Claw / Cline / Kilo Code / CodeArts）规则是项目级或存于应用内设置，`--global` 会提示改用项目级；**Gemini CLI / Antigravity** 有各自专属的全局方式（Gemini 走扩展目录），见对应 `docs/README.*.md`。
+支持通用全局安装的工具（均为 docs 已证实的用户级加载路径）：**Claude Code · Codex CLI · Qoder · Windsurf · Qwen Code · OpenClaw · OpenCode · Crush · Hermes Agent · CodeBuddy · CodeArts**。其中 **Codex CLI** 全局装到 `~/.agents/skills`（Codex 启动扫描目录）。其余工具（Cursor / Kiro / Trae / Aider / DeerFlow / VS Code / Claw / Cline / Kilo Code）规则是项目级或存于应用内设置，`--global` 会提示改用项目级；**Gemini CLI / Antigravity** 有各自专属的全局方式（Gemini 走扩展目录），见对应 `docs/README.*.md`。
 
 | | 项目级（默认） | 全局（`--global`） |
 |---|---|---|

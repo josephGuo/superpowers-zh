@@ -344,6 +344,30 @@ if [ "$rows" = "$EXPECTED_TOOLS" ]; then ok; else
   bad "README 工具表有 $rows 行，应为 $EXPECTED_TOOLS 行（漏加/多加了表格行）"
 fi
 
+# ── 结构性检查：官网工具墙 / 安装命令下拉的条目数 ──
+# 计数文案对了不代表列表对了：v1.7.10 时三处文案都写着 23，而 site/build.mjs 的
+# TOOLS 只有 20 条 —— 首页统计块显示「20 支持工具」、下拉里根本找不到
+# Cline / Kilo Code / Crush。这条专门卡列表本身。
+site_tools=$(sed -n '/^const TOOLS = \[/,/^\];/p' site/build.mjs | grep -cE "^  \{ name: '")
+if [ "$site_tools" = "$EXPECTED_TOOLS" ]; then ok; else
+  bad "官网 TOOLS 有 ${site_tools} 条，应为 ${EXPECTED_TOOLS} 条（site/build.mjs 漏加工具）"
+fi
+
+# ── 一致性检查：官网 FAQ 的「支持全局」清单必须与 installer 的 global 目标一致 ──
+# 同理：CodeArts / Crush / Hermes / CodeBuddy 陆续拿到 --global，官网 FAQ 一直停在 7 款。
+global_targets=$(sed -n '/^const TARGETS = \[/,/^\];/p' "$INSTALLER" | grep -E "^  \{ name: '" | grep 'global:' | sed -E "s/^  \{ name: '([^']+)'.*/\1/")
+global_n=$(echo "$global_targets" | grep -c .)
+faq_line=$(grep -n '支持全局的工具' site/build.mjs | head -1 | cut -d: -f2-)
+missing=""
+while IFS= read -r g; do
+  case "$faq_line" in *"$g"*) ;; *) missing="$missing $g";; esac
+done <<< "$global_targets"
+if [ -n "$missing" ]; then
+  bad "官网 FAQ 全局清单漏了：${missing}（installer 共 ${global_n} 款支持 --global）"
+else
+  ok
+fi
+
 # ── 自检：Category 2 测的工具数应等于宣称数（宣称了就必须测） ──
 tools_tested=$(grep -oE '^declare -a TOOLS=\(.*\)' "$0" | sed -E 's/^declare -a TOOLS=\(//; s/\)$//' | wc -w | tr -d ' ')
 if [ "$tools_tested" = "$EXPECTED_TOOLS" ]; then ok; else

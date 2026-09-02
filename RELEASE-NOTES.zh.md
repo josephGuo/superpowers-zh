@@ -6,6 +6,139 @@
 
 ---
 
+## v1.7.11 (2026-08-28)
+
+**Codex CLI / VS Code / Windsurf / Qwen Code / DeerFlow / Claw Code 用户请重新安装。**
+
+v1.7.10 那次核查查出三款装错，当时的结论是「既然错过一次，就该问一句还有几个」。这一版把**剩下没查过的全部查完了** —— 逐款对官方文档（拿不到文档的对源码），一款一款过。
+
+结果：又是四款「装了完全不生效」。都是我们自己写的路径，都没查过官方文档。
+
+### 🐛 Codex CLI：项目级装到了 Codex 从不扫描的目录
+
+[官方 skills 文档](https://developers.openai.com/codex/skills)给出的扫描目录**完整清单**：
+
+    $CWD/.agents/skills、$CWD/../.agents/skills、$REPO_ROOT/.agents/skills
+    $HOME/.agents/skills、/etc/codex/skills、内置 skill
+
+**没有 `.codex/skills`。** 而我们项目级正是装到那里。
+
+讽刺的是全局（`~/.agents/skills`）一直是对的，原注释还专门写明「不是 `~/.codex/skills`」—— 说明当初查过全局，却没顺手核一下项目级。
+
+已改为 `.agents/skills`，并在安装时清理旧位置（只清我们装的，用户自己放在 `.codex/skills` 下的不动，已实测）。与 Antigravity 共用 `.agents/skills` 是 Agent Skills 开放约定，不是冲突。
+
+**这个改动还牵出一个既有 bug：自动检测有顺序依赖。** 检测原来是边装边判的 —— Codex 装完会创建 `.agents/`，循环走到 Antigravity（`detect: '.agents'`）时它就被误判成「项目里有这个工具」，于是多装一份。任何「装了 A 会创建 B 的检测标记」的组合都会中招。改为**先把所有工具的检测结果一次算完再开始装**：检测必须基于安装前的项目状态。
+
+### 🐛 VS Code (Copilot)：装的 20 个文件，Copilot 一个都不读
+
+[官方文档](https://code.visualstudio.com/docs/copilot/customization/custom-instructions)明确 Copilot 只自动读这几处：
+
+    .github/copilot-instructions.md / AGENTS.md / CLAUDE.md   （始终生效）
+    .github/instructions/*.instructions.md                    （按 applyTo 匹配）
+
+我们把 20 个 skill 拷进 `.github/superpowers/` —— **不在其中**，而且装完什么引导都不写。
+
+旧文档更说明问题：它写着「建议你创建 `.github/copilot-instructions.md` 引用这些 skills」并给了示例 —— **我们知道需要引导，却让用户自己动手**，而绝大多数人不会照做。
+
+现在自动生成 `.github/instructions/superpowers-zh.instructions.md`（`applyTo: "**"`，约 4.5 KB 的索引），正文仍留在 `.github/superpowers/` 按需读取 —— 与 Cline / Kilo / Kiro 同一套「常驻只放索引」的思路。**刻意不动用户的 `copilot-instructions.md`**，那是他们的文件。
+
+### 🐛 Windsurf：`--global` 装在 Windsurf 不读的地方
+
+[官方文档](https://docs.windsurf.com/windsurf/cascade/skills)写明两个路径**不同构**：
+
+| | 路径 |
+|---|---|
+| 项目级 | `.windsurf/skills/<name>/` ✅ 我们是对的 |
+| 用户级 | `~/.codeium/windsurf/skills/<name>/` ❌ 我们装到了 `~/.windsurf/skills` |
+
+**测试为什么没抓到：只验退出码，不验落盘位置。** 装到错目录退出码照样是 0 —— 「跑通了」不等于「装对了」。已补 `GLOBAL_DIR` 断言：每款全局工具逐个断言 skill 真落在官方读的那个目录，外加一条自检（以后加全局工具不能漏断言）。双向验证过：把路径改回旧值立刻报错。
+
+### 🐛 DeerFlow：检测标记根本不存在（Aider 同款）
+
+安装路径 `skills/custom/` 是对的（官方文档确认自动扫描 `["skills/public", "skills/custom"]` 两个写死的目录）。但 `detect` 写的是 `deer_flow` —— 用 GitHub API 列了 deer-flow main 分支顶层目录：
+
+    .agent .github backend contracts deploy docker docs frontend plans
+    pr-build scripts skills tests
+
+**没有 `deer_flow`。** 与 Aider 的 `.aider` 是同一个毛病：真实检出从来没被自动检测到过。改认 `skills/public`（skills 机制本身、随仓库版本控制，任何检出都有），`deer_flow` 保留作 1.x 兼容。
+
+顺带删掉文档里那段 `export DEERFLOW_SKILLS_DIR=...` —— **官方文档里没有这个环境变量**，目录是写死的。
+
+### 🐛 Qwen Code：缺 bootstrap（skill 是死重）+ 我们把产品搞混了
+
+路径是对的，但两个问题：
+
+**① 产品搞混。** 文档标题写「Qwen Code (通义灵码)」、链接指向 `tongyi.aliyun.com`。实际 Qwen Code 是 [QwenLM/qwen-code](https://github.com/QwenLM/qwen-code) 这个**命令行工具**（Gemini CLI 的 fork）；通义灵码是阿里的 IDE 插件，**是另一个产品**，路径完全不同 —— 照我们的文档去配通义灵码是配不通的。与 [#119](https://github.com/jnMetaCode/superpowers-zh/issues/119) 的 Qoder 表是同一类错误：把两个产品面混成一份说明。
+
+**② 只装 skills、不写 bootstrap。** Claude 写 `CLAUDE.md`、Gemini 写 `GEMINI.md`，而 Qwen Code 的对应物 `QWEN.md` 我们完全没用。按上游的原则：没有 bootstrap，skill 就是死重 —— 文件在磁盘上但很少被调用。已补（项目级写 `./QWEN.md`，全局写 `~/.qwen/QWEN.md`，已有文件用哨兵注释追加而非覆盖），并补上全局卸载的残留缺口。
+
+### 🆕 Claw Code：补 bootstrap + 补文档（23 款里唯一没有安装文档的一款）
+
+路径拿到了源码级证据（`ultraworkers/claw-code` 的 `rust/crates/plugins/src/lib.rs` 明写发现 `.claw/skills`、`.omc/skills`、`.agents/skills`；`USAGE.md` 列出指令文件优先级 `CLAUDE.md > CLAW.md > AGENTS.md`）。补上 `CLAW.md` bootstrap 与 `docs/README.claw.md`，并写明一条实用提醒：claw 也扫 `.agents/skills`，装过 Antigravity 的项目其实已经能读到，重复装会加载两份。
+
+### 🆕 CodeBuddy / CodeArts 补 `--global`（全局支持 9 → 11 款）
+
+两款的用户级路径此前都写着「尚未验证」，现已拿到官方出处：
+
+| 工具 | 用户级路径 | 出处 |
+|---|---|---|
+| CodeBuddy（腾讯） | `~/.codebuddy/skills/` + `~/.codebuddy/CODEBUDDY.md` | [codebuddy.cn/docs/cli/codebuddy-dir](https://www.codebuddy.cn/docs/cli/codebuddy-dir) |
+| CodeArts（华为云码道） | `~/.codeartsdoer/skills/` | 华为云官方用户指南 |
+
+支持通用全局安装的工具由 9 款增至 **11 款**：Claude Code · Codex CLI · Qoder · Windsurf · Qwen Code · OpenClaw · OpenCode · Crush · Hermes Agent · CodeBuddy · CodeArts。
+
+### 🐛 4 条死链，其中 2 条是编造出来的仓库地址
+
+核查 OpenClaw 时发现文档链的是 `github.com/anthropics/openclaw` —— **那个仓库不存在**。顺手全仓扫了一遍外链，45 条里 4 条是死的：
+
+| 原链接 | 状态 | 改为 |
+|---|---|---|
+| github.com/anthropics/openclaw | 404，仓库不存在 | github.com/openclaw/openclaw |
+| github.com/anthropics/antigravity | 404，且 Antigravity 是**谷歌**的产品 | antigravity.google |
+| huaweicloud.com/product/codeartsdoer.html | 404，产品页改版 | codearts.huaweicloud.com |
+| docs.codeium.com/windsurf | Windsurf 已迁走 | docs.windsurf.com/… |
+
+前两条是**编造出来的出处**。这比没有出处更坏：它让人以为核实过了。已固化成外链验活门禁（两遍制：并行快扫出嫌疑名单，再串行复核，两遍都判死才算死 —— 一个会误报的门禁比没有门禁更糟，人会学会忽略它）。
+
+### 🌐 官网：工具墙停在 20 款，三处文案自己打自己
+
+首页统计块写「20 支持工具」，同一屏的标题写「23 款工具通用」，FAQ 又枚举了 23 款。根因是文案计数跟着 installer 改到了 23，而 `site/build.mjs` 的工具数组从来没人补 —— **Cline / Kilo Code / Crush 的用户在安装命令下拉里找不到自己的工具**。
+
+- 工具列表 20 → 23，统计块改成从列表长度算，不再硬编码
+- 修 4 条错的：Claw Code 已能自动检出（不必再 `--tool claw`）、Hermes 改给 `--global`（项目级给了等于给「装了不生效」）、Qwen Code 类型 IDE → CLI、Antigravity 类型 CLI → IDE
+- FAQ「支持全局」清单 7 → 11 款（三语同步）
+- skill 详情页 **6 条死链**：`SKILL.md` 里指向兄弟文件的相对链接（`implementer-prompt.md`、`../requesting-code-review/code-reviewer.md` 等）站点上没有这些 `.md`，`../` 开头的 404，其余被渲染器打成 `href="#"` —— 点了没反应，比 404 还难查。现在解析到 GitHub 源文件
+- 新增赞助商独立页，导航栏补当前页高亮
+
+### 🛡️ 测试与门禁
+
+这一版查出的问题，旧门禁一个都发现不了。逐条补上，并全部做过**反向验证**（把问题造回去，必须报错）：
+
+| 新增门禁 | 堵的是 |
+|---|---|
+| 全局工具落盘位置断言 | Windsurf 那类「退出码 0 但装错目录」 |
+| 外链验活（两遍制） | 编造出来的仓库地址 |
+| 官网工具列表条目数 = TARGETS + 1 | 官网列表跟不上 installer |
+| 官网全局清单必须覆盖每个 `global:` 目标 | FAQ 停在 7 款 |
+| `grep -P` / 全角括号吞变量名 两条 shell 坑 | 我自己写出来的静默失效检查 |
+
+`verify-release.sh` 101 → **115 pass**；`audit.sh` → **170 pass**。
+
+### 📋 这一轮六款，六种失效方式
+
+| 工具 | 路径对吗 | 失效方式 |
+|---|---|---|
+| Codex CLI | ❌ 项目级 | 装到从不被扫描的目录 |
+| VS Code | ❌ | 位置不在官方读取清单里，且不写引导 |
+| Windsurf | ❌ 仅全局 | 用户级路径与项目级不同构 |
+| DeerFlow | ✅ | 检测标记不存在，从没被自动检测到 |
+| Qwen Code | ✅ | 无 bootstrap，skill 是死重；文档搞混产品 |
+| Claw Code | ✅ | 无 bootstrap、无文档 |
+
+**共同点：全部是我们自己写的，全部没查过官方文档。** 现在每条路径在代码注释里都带出处链接与核对结论 —— 下次改之前先看那行注释。
+
+---
+
 ## v1.7.10 (2026-08-12)
 
 **Aider 和 Kiro 用户请重新安装。** 本版本源于一次对「我们自己那层工具支持」的系统核查 —— 起因是 v1.7.9 修 Hermes 时发现：我们从支持它起就装错了目录。既然错过一次，就该问一句**还有几个**。
