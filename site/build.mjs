@@ -23,6 +23,8 @@ const PKG = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8'));
 // 绕过 Cloudflare 边缘缓存，确保 CSS/JS 改动立即生效；内容不变则继续命中缓存。
 const cssVer = createHash('sha256').update(readFileSync(join(TEMPLATE, 'styles.css'))).digest('hex').slice(0, 10);
 const jsVer = createHash('sha256').update(readFileSync(join(TEMPLATE, 'app.js'))).digest('hex').slice(0, 10);
+// og 图的内容 hash：社交平台会长期缓存分享图，URL 不变就永远抓不到新图
+const ogVer = createHash('sha256').update(readFileSync(join(ROOT, 'assets', 'og-image.jpg'))).digest('hex').slice(0, 10);
 
 // 从 RELEASE-NOTES.zh.md 读最新版本条目。
 // 动机：v1.7.11 的全部意义是「六款工具此前装了不生效，请重装」，而官网此前
@@ -45,7 +47,7 @@ const REINSTALL_TOOLS = ['Codex CLI', 'VS Code', 'Windsurf', 'Qwen Code', 'DeerF
 // 页脚二维码的真实像素尺寸，构建时从文件读取（见 imageSize 的注释）
 const QR = {
   wechat: imageSize(join(TEMPLATE, 'assets', 'qr-wechat.jpg')),
-  douyin: imageSize(join(TEMPLATE, 'assets', 'qr-douyin.jpg')),
+  douyin: imageSize(join(TEMPLATE, 'assets', 'qr-douyin.png')),
   x:      imageSize(join(TEMPLATE, 'assets', 'qr-x.png')),
 };
 
@@ -349,6 +351,8 @@ const T = {
     heroLead: '{n} 个经过实战验证的工作方法论 skill —— 从头脑风暴到 TDD，从系统化调试到代码审查。<br>一条命令，自动识别项目里的工具并安装。',
     heroBtn1: '查看安装命令', heroBtn2: 'GitHub 源码',
     stats: ['Skills', '中国原创', '支持工具', '当前版本'],
+    ogAlt: 'superpowers-zh —— AI 编程超能力中文增强版，一条 npx 命令为 23 款 AI 编程工具装上系统化工作方法论',
+    ogLocale: 'zh_CN',
     releaseNote: '{tools} 用户请重新安装 —— 此前版本装了不生效。查看完整更新说明',
     toolDocHint: '{name} 的专属安装指南',
     whyTitle: '为什么选择 superpowers-zh？',
@@ -483,6 +487,8 @@ const T = {
     heroLead: '{n} battle-tested workflow skills — from brainstorming to TDD, systematic debugging to code review.<br>One command auto-detects your tool and installs.',
     heroBtn1: 'Get the command', heroBtn2: 'GitHub',
     stats: ['Skills', 'China-native', 'Tools', 'Version'],
+    ogAlt: 'superpowers-zh — battle-tested AI coding skills, Chinese-enhanced; one npx command for 23 AI coding tools',
+    ogLocale: 'en_US',
     releaseNote: '{tools} users should reinstall — earlier versions installed to the wrong place. Read the full release notes',
     toolDocHint: 'Install guide for {name}',
     whyTitle: 'Why superpowers-zh?',
@@ -617,6 +623,8 @@ const T = {
     heroLead: '{n} 個經過實戰驗證的工作方法論 skill —— 從頭腦風暴到 TDD，從系統化除錯到程式碼審查。<br>一條命令，自動識別專案裡的工具並安裝。',
     heroBtn1: '查看安裝命令', heroBtn2: 'GitHub 原始碼',
     stats: ['Skills', '中國原創', '支援工具', '目前版本'],
+    ogAlt: 'superpowers-zh —— AI 編程超能力中文增強版，一條 npx 命令為 23 款 AI 編程工具裝上系統化工作方法論',
+    ogLocale: 'zh_TW',
     releaseNote: '{tools} 使用者請重新安裝 —— 此前版本裝了不生效。檢視完整更新說明',
     toolDocHint: '{name} 的專屬安裝指南',
     whyTitle: '為什麼選擇 superpowers-zh？',
@@ -813,10 +821,17 @@ ${altLinks}
 <meta property="og:description" content="${esc(desc)}">
 <meta property="og:type" content="website">
 <meta property="og:url" content="${SITE_URL}${canonical}">
-<meta property="og:image" content="${SITE_URL}/assets/app-icon.png">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="${SITE_URL}/assets/og-image.jpg?v=${ogVer}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="${esc(t.ogAlt)}">
+<meta property="og:site_name" content="superpowers-zh">
+<meta property="og:locale" content="${t.ogLocale}">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="${esc(title)}">
 <meta name="twitter:description" content="${esc(desc)}">
+<meta name="twitter:image" content="${SITE_URL}/assets/og-image.jpg?v=${ogVer}">
+<meta name="theme-color" content="#0a0b10">
 <link rel="icon" href="/assets/app-icon.png">
 <link rel="stylesheet" href="/styles.css?v=${cssVer}">
 <script>(function(){try{var m=localStorage.getItem('sp-theme');if(m==='light')document.documentElement.setAttribute('data-theme','light');}catch(e){}})();</script>
@@ -846,7 +861,7 @@ ${body}
     <h4 class="qr-title">${t.followUs}</h4>
     <div class="qr-row">
       <figure class="qr-card"><img src="/assets/qr-wechat.jpg" alt="${esc(t.qrWechat)}" width="${QR.wechat.w}" height="${QR.wechat.h}" loading="lazy"><figcaption>${t.qrWechat}</figcaption></figure>
-      <figure class="qr-card"><img src="/assets/qr-douyin.jpg" alt="${esc(t.qrDouyin)}" width="${QR.douyin.w}" height="${QR.douyin.h}" loading="lazy"><figcaption>${t.qrDouyin}</figcaption></figure>
+      <figure class="qr-card"><img src="/assets/qr-douyin.png" alt="${esc(t.qrDouyin)}" width="${QR.douyin.w}" height="${QR.douyin.h}" loading="lazy"><figcaption>${t.qrDouyin}</figcaption></figure>
       <figure class="qr-card"><a href="https://x.com/jnMetaCode" target="_blank" rel="noopener"><img src="/assets/qr-x.png" alt="${esc(t.qrX)}" width="${QR.x.w}" height="${QR.x.h}" loading="lazy"></a><figcaption><a href="https://x.com/jnMetaCode" target="_blank" rel="noopener">${t.qrX}</a></figcaption></figure>
     </div>
   </div>
@@ -1131,6 +1146,79 @@ ${flagSection}${moreSection}
 <script>window.__I18N__={copy:${JSON.stringify(t.copy)},copied:${JSON.stringify(t.copied)},expand:${JSON.stringify(sp.expand)},collapse:${JSON.stringify(sp.collapse)}};</script>`;
 }
 
+// ---- JSON-LD 结构化数据 ----
+// 站上有 7 条 FAQ、完整的软件信息与 20 个 skill 文档页，却没有任何结构化标记：
+// 搜索引擎拿不到富摘要，AI 抓取时只能从正文里猜。
+//
+// 关于 CSP：ld+json 是**数据块不是可执行脚本**，浏览器不会执行它，爬虫读的也是
+// HTML 源码而非执行结果 —— 所以不需要进 script-src 的 hash 白名单。
+//
+// 关于 </script> 逃逸：JSON.stringify 不转义 '<'，正文里若出现 </script> 就会
+// 提前闭合标签。统一把 < 转成 \u003c，这是 JSON 字符串里的合法写法。
+function ldJson(obj) {
+  return `<script type="application/ld+json">${JSON.stringify(obj).replace(/</g, '\\u003c')}</script>`;
+}
+
+function homeSchema(lang, t, skills) {
+  const url = SITE_URL + (lang === 'zh' ? '/' : lang === 'en' ? '/en/' : '/zh-Hant/');
+  return ldJson({
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'WebSite', '@id': url + '#website', url, name: 'superpowers-zh',
+        description: t.desc, inLanguage: t.htmlLang,
+      },
+      {
+        '@type': 'SoftwareApplication', '@id': url + '#software',
+        name: 'superpowers-zh', description: t.desc, url,
+        applicationCategory: 'DeveloperApplication',
+        operatingSystem: 'macOS, Windows, Linux',
+        softwareVersion: PKG.version,
+        image: `${SITE_URL}/assets/og-image.jpg`,
+        license: 'https://opensource.org/licenses/MIT',
+        codeRepository: 'https://github.com/jnMetaCode/superpowers-zh',
+        downloadUrl: 'https://www.npmjs.com/package/superpowers-zh',
+        offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+        author: { '@type': 'Person', name: 'jnMetaCode', url: 'https://github.com/jnMetaCode' },
+      },
+      {
+        '@type': 'FAQPage', '@id': url + '#faq',
+        mainEntity: t.faq.map(f => ({
+          '@type': 'Question', name: f.q,
+          acceptedAnswer: { '@type': 'Answer', text: f.a },
+        })),
+      },
+    ],
+  });
+}
+
+function skillSchema(skill, lang, t) {
+  const base = SITE_URL + (lang === 'zh' ? '' : lang === 'en' ? '/en' : '/zh-Hant');
+  return ldJson({
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'TechArticle',
+        headline: lang === 'en' ? skill.titleEn : skill.title,
+        description: lang === 'zh' ? skill.desc : (skill.descEn || skill.desc),
+        url: `${base}/skills/${skill.name}`,
+        inLanguage: 'zh-CN',                       // 正文一律中文，英文站也是（页面顶部有提示）
+        isPartOf: { '@id': base + '/#website' },
+        license: 'https://opensource.org/licenses/MIT',
+        author: { '@type': 'Person', name: 'jnMetaCode' },
+      },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'superpowers-zh', item: base + '/' },
+          { '@type': 'ListItem', position: 2, name: t.nav.skills, item: base + '/#skills' },
+          { '@type': 'ListItem', position: 3, name: lang === 'en' ? skill.titleEn : skill.title },
+        ],
+      },
+    ],
+  });
+}
+
 // ---- skill 详情(操作文档)页正文 ----
 function renderDetail(skill, lang) {
   const t = T[lang];
@@ -1177,9 +1265,10 @@ function build() {
   copyFileSync(join(TEMPLATE, 'styles.css'), join(DIST, 'styles.css'));
   copyFileSync(join(TEMPLATE, 'app.js'), join(DIST, 'app.js'));
   copyFileSync(join(ROOT, 'assets', 'app-icon.png'), join(DIST, 'assets', 'app-icon.png'));
+  copyFileSync(join(ROOT, 'assets', 'og-image.jpg'), join(DIST, 'assets', 'og-image.jpg'));
   copyFileSync(join(ROOT, 'assets', 'superpowers-small.svg'), join(DIST, 'assets', 'superpowers-small.svg'));
   copyFileSync(join(TEMPLATE, 'assets', 'qr-wechat.jpg'), join(DIST, 'assets', 'qr-wechat.jpg'));
-  copyFileSync(join(TEMPLATE, 'assets', 'qr-douyin.jpg'), join(DIST, 'assets', 'qr-douyin.jpg'));
+  copyFileSync(join(TEMPLATE, 'assets', 'qr-douyin.png'), join(DIST, 'assets', 'qr-douyin.png'));
   copyFileSync(join(TEMPLATE, 'assets', 'qr-x.png'), join(DIST, 'assets', 'qr-x.png'));
   mkdirSync(join(DIST, 'assets', 'sponsors'), { recursive: true });
   for (const s of SPONSORS) {
@@ -1200,6 +1289,7 @@ function build() {
     writeFileSync(join(DIST, ...dirParts, 'index.html'), layout({
       lang: L.code, base: homeBase, title: t.title, desc: t.desc,
       body: renderLanding(skills, L.code), pageClean: '', pageFile: '',
+      extraHead: homeSchema(L.code, t, skills) + '\n',
     }));
     // 赞助商页（每种语言一份，与首页同级）
     writeFileSync(join(DIST, ...dirParts, 'sponsors.html'), layout({
@@ -1215,6 +1305,7 @@ function build() {
         title: `${title} · superpowers-zh`, desc,
         body: renderDetail(s, L.code),
         pageClean: `skills/${s.name}`, pageFile: `skills/${s.name}.html`,
+        extraHead: skillSchema(s, L.code, t) + '\n',
       }));
     }
   }
@@ -1258,6 +1349,24 @@ function build() {
     urls.map(u => `  <url><loc>${SITE_URL}${u}</loc><lastmod>${today}</lastmod><changefreq>weekly</changefreq><priority>${u === '/' ? '1.0' : (u.endsWith('/') ? '0.8' : '0.7')}</priority></url>`).join('\n') +
     '\n</urlset>\n';
   writeFileSync(join(DIST, 'sitemap.xml'), sitemap);
+
+  // 结构化数据一旦转义写错（引号、</script>、CJK），浏览器和爬虫都只是**静默忽略**，
+  // 页面看不出任何异常。所以构建时逐页把它 JSON.parse 一遍，坏了就直接失败。
+  const validateLd = (dir) => {
+    let n = 0;
+    for (const ent of readdirSync(dir, { withFileTypes: true })) {
+      const f = join(dir, ent.name);
+      if (ent.isDirectory()) { n += validateLd(f); continue; }
+      if (!ent.name.endsWith('.html')) continue;
+      const html = readFileSync(f, 'utf8');
+      for (const m of html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)) {
+        try { JSON.parse(m[1]); n++; }
+        catch (e) { throw new Error(`${f} 里的 JSON-LD 不是合法 JSON：${e.message}`); }
+      }
+    }
+    return n;
+  };
+  const ldCount = validateLd(DIST);
 
   // 收集所有生成页面里的内联 <script> 内容，算 SHA-256 作为 CSP hash 白名单。
   // 本站脚本由本生成器产出（可信），用 hash 即可严格禁用 'unsafe-inline'/'unsafe-eval'
@@ -1313,6 +1422,7 @@ function build() {
     '/app.js\n  Cache-Control: public, max-age=31536000, immutable\n');
 
   const pages = LANGS.length * (2 + skills.length);
+  console.log(`   结构化数据：${ldCount} 个 JSON-LD 块，均通过 JSON.parse 校验`);
   console.log(`✅ 生成 ${pages} 个页面：${LANGS.length} 语言（${LANGS.map(l => l.code).join('/')}）× (首页 + 赞助商页 + ${skills.length} 个 skill 详情页) → ${DIST}`);
 }
 
