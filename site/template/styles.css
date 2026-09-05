@@ -186,7 +186,6 @@ section { max-width: var(--maxw); margin: 0 auto; padding: 80px 24px; }
   background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px;
   color: var(--text); font-size: 15px;
 }
-#search:focus { outline: none; border-color: var(--accent); }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
 .chip {
   padding: 7px 15px; border-radius: 100px; font-size: 13px; cursor: pointer;
@@ -357,6 +356,30 @@ footer { border-top: 1px solid var(--border-soft); margin-top: 40px; padding: 40
 .flag-body h3 { font-size: 19px; font-weight: 700; }
 .flag-tag { font-size: 13.5px; color: var(--accent-2); font-weight: 600; margin: 6px 0 12px; }
 .flag-desc { font-size: 14px; color: var(--text-dim); line-height: 1.75; }
+/* 跳到主要内容：键盘用户不必每页 Tab 过整个导航。平时移出视口，获得焦点时落回来 */
+.skip-link { position: absolute; left: 12px; top: -60px; z-index: 999;
+  padding: 10px 16px; border-radius: 0 0 10px 10px;
+  background: var(--accent); color: #0b0d14; font-size: 14px; font-weight: 600;
+  text-decoration: none; transition: top .16s; }
+.skip-link:focus { top: 0; }
+
+/* 焦点可见：#search 原来写了 outline:none，键盘用户看不到焦点落在哪（WCAG 2.4.7）。
+   改成只在键盘导航时（:focus-visible）画环，鼠标点击不出现，兼顾观感与可达性。 */
+:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; border-radius: 4px; }
+#search:focus { outline: none; border-color: var(--accent); }
+#search:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
+
+/* 尊重「减少动效」偏好：站上有 18 处 transition 与 14 处 transform，
+   前庭障碍用户需要能关掉。 */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 /* hero 下方的版本提示条：本版最重要的一句话（谁该重装）此前官网完全没有 */
 .release-note { display: inline-flex; align-items: center; gap: 10px; flex-wrap: wrap;
   max-width: 720px; margin: 20px auto 0; padding: 9px 16px; border-radius: 999px;

@@ -351,6 +351,7 @@ const T = {
     heroLead: '{n} 个经过实战验证的工作方法论 skill —— 从头脑风暴到 TDD，从系统化调试到代码审查。<br>一条命令，自动识别项目里的工具并安装。',
     heroBtn1: '查看安装命令', heroBtn2: 'GitHub 源码',
     stats: ['Skills', '中国原创', '支持工具', '当前版本'],
+    skipToMain: '跳到主要内容',
     ogAlt: 'superpowers-zh —— AI 编程超能力中文增强版，一条 npx 命令为 23 款 AI 编程工具装上系统化工作方法论',
     ogLocale: 'zh_CN',
     releaseNote: '{tools} 用户请重新安装 —— 此前版本装了不生效。查看完整更新说明',
@@ -487,6 +488,7 @@ const T = {
     heroLead: '{n} battle-tested workflow skills — from brainstorming to TDD, systematic debugging to code review.<br>One command auto-detects your tool and installs.',
     heroBtn1: 'Get the command', heroBtn2: 'GitHub',
     stats: ['Skills', 'China-native', 'Tools', 'Version'],
+    skipToMain: 'Skip to main content',
     ogAlt: 'superpowers-zh — battle-tested AI coding skills, Chinese-enhanced; one npx command for 23 AI coding tools',
     ogLocale: 'en_US',
     releaseNote: '{tools} users should reinstall — earlier versions installed to the wrong place. Read the full release notes',
@@ -623,6 +625,7 @@ const T = {
     heroLead: '{n} 個經過實戰驗證的工作方法論 skill —— 從頭腦風暴到 TDD，從系統化除錯到程式碼審查。<br>一條命令，自動識別專案裡的工具並安裝。',
     heroBtn1: '查看安裝命令', heroBtn2: 'GitHub 原始碼',
     stats: ['Skills', '中國原創', '支援工具', '目前版本'],
+    skipToMain: '跳到主要內容',
     ogAlt: 'superpowers-zh —— AI 編程超能力中文增強版，一條 npx 命令為 23 款 AI 編程工具裝上系統化工作方法論',
     ogLocale: 'zh_TW',
     releaseNote: '{tools} 使用者請重新安裝 —— 此前版本裝了不生效。檢視完整更新說明',
@@ -837,6 +840,7 @@ ${altLinks}
 <script>(function(){try{var m=localStorage.getItem('sp-theme');if(m==='light')document.documentElement.setAttribute('data-theme','light');}catch(e){}})();</script>
 ${extraHead}</head>
 <body>
+<a class="skip-link" href="#main">${t.skipToMain}</a>
 <header class="nav">
   <a class="brand" href="${base}index.html">
     <img src="/assets/superpowers-small.svg" alt="" width="26" height="26">
@@ -922,7 +926,7 @@ function renderLanding(skills, lang) {
   const faqs = t.faq.map(f => `<details class="faq-item"><summary>${esc(f.q)}</summary><div class="faq-a">${esc(f.a)}</div></details>`).join('');
 
   return `
-<main id="top">
+<main id="main">
   <section class="hero">
     <div class="badge">${t.heroBadge}</div>
     <h1>${t.heroH1}</h1>
@@ -1101,7 +1105,7 @@ function renderSponsors(lang) {
 ` : '';
 
   return `
-<main id="top">
+<main id="main">
   <section class="hero sp-hero">
     <div class="badge">${sp.badge}</div>
     <h1>${esc(sp.h1)}</h1>
@@ -1226,13 +1230,13 @@ function renderDetail(skill, lang) {
   // 传入该 skill 在仓库里的目录 URL：SKILL.md 里指向兄弟文件的相对链接
   // （implementer-prompt.md、../requesting-code-review/code-reviewer.md 等）
   // 站点上并不存在，必须解析成 GitHub 地址，否则全是死链。
-  const bodyHtml = renderMarkdown(skill.raw, `${GH_BLOB}/skills/${skill.name}/`);
+  const bodyHtml = renderMarkdown(skill.raw, `${GH_BLOB}/skills/${skill.name}/`, 1);
   const cnNotice = lang === 'en'
     ? '<div class="doc-notice">📖 This skill\'s content is written in Chinese — superpowers-zh is a Chinese-localized toolkit.</div>'
     : '';
   const srcUrl = `${GH_BLOB}/skills/${skill.name}/SKILL.md`;
   return `
-<main class="doc">
+<main id="main" class="doc">
   <a class="doc-back" href="../index.html#skills">${t.backToSkills}</a>
   <header class="doc-head">
     <div class="doc-titles">
@@ -1321,7 +1325,7 @@ function build() {
     desc: '你访问的页面不存在或已被移动。',
     extraHead: '<meta name="robots" content="noindex">\n',
     pageClean: '', pageFile: '',
-    body: `<main class="doc" style="max-width:640px;margin:0 auto;padding:80px 20px;text-align:center">
+    body: `<main id="main" class="doc" style="max-width:640px;margin:0 auto;padding:80px 20px;text-align:center">
   <div style="font-size:64px;font-weight:800;letter-spacing:2px;opacity:.85">404</div>
   <h1 style="margin:12px 0 8px">这个页面找不到了</h1>
   <p style="opacity:.75;margin:0 0 28px">链接可能已过期或被移动。下面几个入口也许是你要找的：</p>
