@@ -9,6 +9,7 @@
 #
 # 覆盖：
 #   A. 22 款工具：装 -> 断言 skill 数落盘 -> 二次装幂等 -> 卸载零残留 + 无嵌套
+#   C. 11 款全局：落盘位置 + 卸载零残留 + **不误删用户自有文件**（三项各自断言）
 #   B. 每个检测标记只触发预期工具（防新增工具时误触发既有工具）
 #   C. --global 白名单成功 / 其余明确拒绝且退出码 1
 #   D. --global 拒绝信息引用的 docs 文件真实存在（防死链）
@@ -113,7 +114,7 @@ for entry in "${DETECT[@]}"; do
 done
 
 echo ""
-echo "─── C. --global：11 款应成功，其余应明确拒绝且退出码 1 ───"
+echo "─── C. --global：11 款应成功（落盘位置 / 卸载零残留 / 不误删用户文件），其余应明确拒绝 ───"
 declare -a GLOBAL_OK=(claude codex openclaw windsurf opencode qwen qoder crush hermes codebuddy codearts)
 declare -a GLOBAL_NO=(cursor kiro trae aider deerflow vscode claw gemini antigravity cline kilocode)
 # 全局落盘位置断言。原来这里只看退出码 —— 而 Windsurf 的 --global 曾装到
@@ -126,16 +127,34 @@ declare -a GLOBAL_DIR=(
   "hermes:.hermes/skills"        "codebuddy:.codebuddy/skills"
   "codearts:.codeartsdoer/skills"
 )
+# 卸载有两个反方向的坑，两个都得测，而且此前**只测了 qwen 一款**：
+#   ① 卸不干净 —— 残留留在用户主目录里，看不见、跨项目污染
+#   ② 卸过头 —— 把用户自己放在同一目录下的 skill / 引导文件一并删掉。这个更严重：
+#      残留只是脏，误删是数据事故。所以每款都先放一份「用户自己的东西」再装再卸。
 for entry in "${GLOBAL_DIR[@]}"; do
   tool="${entry%%:*}"; gdir="${entry#*:}"
   H=$(mktemp -d)
+  # 预置用户自有内容：一个同目录下的自建 skill
+  mkdir -p "$H/$gdir/my-own-skill"
+  echo '# 用户自己的 skill' > "$H/$gdir/my-own-skill/SKILL.md"
   if HOME="$H" node "$INS" --global --tool "$tool" >/dev/null 2>&1; then
     n=$(ls -d "$H/$gdir"/*/ 2>/dev/null | wc -l | tr -d ' ')
-    if [ "$n" = "$EXPECT_SKILLS" ]; then ok; else
-      bad "--global ${tool}: ${gdir} 里是 ${n} 个 skill，期望 ${EXPECT_SKILLS} —— 装到别处了？"
+    # 我们装 EXPECT_SKILLS 个，加上用户自己那个
+    if [ "$n" = "$((EXPECT_SKILLS + 1))" ]; then ok; else
+      bad "--global ${tool}: ${gdir} 里是 ${n} 个 skill，期望 $((EXPECT_SKILLS + 1))（含用户自建 1 个）—— 装到别处了？"
     fi
   else
     bad "--global ${tool} 应成功但失败"
+  fi
+  # ① 卸载后除用户自有内容外零残留
+  HOME="$H" node "$INS" --global --uninstall >/dev/null 2>&1
+  left=$(find "$H" -type f ! -path "*/my-own-skill/*" 2>/dev/null | wc -l | tr -d ' ')
+  if [ "$left" = "0" ]; then ok; else
+    bad "--global ${tool} 卸载后残留 ${left} 个文件: $(find "$H" -type f ! -path '*/my-own-skill/*' | head -2 | tr '\n' ' ')"
+  fi
+  # ② 用户自己的 skill 必须原样还在
+  if [ -f "$H/$gdir/my-own-skill/SKILL.md" ]; then ok; else
+    bad "--global ${tool} 卸载时误删了用户自建的 ${gdir}/my-own-skill/"
   fi
   rm -rf "$H"
 done
