@@ -217,9 +217,42 @@ else
       ok
     elif [ "$delta" -gt "$declared" ]; then
       bad "未声明的 fork 增量: ${s} 比上游多 ${delta} 节，但只声明了 ${declared} 节 —— 给增量节加上「${FORK_MARK}」标记，或回归上游"
+    else
+      # delta < declared = 上游加了章节而我们没跟。
+      # 这一支原来既不 ok 也不 bad —— 什么都不计。于是上游一发新版，PASS 总数就
+      # 悄悄少一条，而「少的是哪一节」没有任何人看得见（v6.3.0 给 brainstorming
+      # 加了 2 节，就是这么溜过去的）。3c 的漂移检查容忍 ≤3 节，正好把这种小幅
+      # 落后一起放过 —— 两道网都漏。现在明确报出来。
+      warn "落后上游: ${s} 比上游少 $((declared - delta)) 节（上游 H=${up}, 我们 H=${our}, 已声明 fork 增量 ${declared} 节）—— 上游新增内容待同步"
     fi
-    # delta < declared 由 3c 的漂移检查覆盖，此处不重复报
   done
+
+  # 3e. 正文级上游漂移：自上次同步基线以来，上游动了哪些我们镜像的文件
+  #
+  # 3c/3c-bis 只比标题数 —— 上游把一节正文重写 50 行、标题数不变，我们这边完全
+  # 看不见。v6.3.0 给 subagent-driven-development 加了 113 行就是这么溜过去的。
+  # .upstream-sync.json 记着上次同步对齐到的 commit，据此把「欠同步的量」算成数字。
+  # 报 warn 不报 fail：同步是有计划的内容工作，不该卡住每一次构建。
+  SYNC_FILE="$ROOT/.upstream-sync.json"
+  if [ -f "$SYNC_FILE" ] && command -v node >/dev/null 2>&1; then
+    base=$(node -p "require('$SYNC_FILE').commit" 2>/dev/null)
+    basever=$(node -p "require('$SYNC_FILE').version" 2>/dev/null)
+    if [ -n "$base" ] && git cat-file -e "$base^{commit}" 2>/dev/null; then
+      drift=$(git diff --numstat "$base" upstream/main -- skills hooks 2>/dev/null \
+              | awk '{a+=$1; d+=$2; n++} END {printf "%d %d %d", n+0, a+0, d+0}')
+      set -- $drift; nfiles=$1; nadd=$2; ndel=$3
+      if [ "${nfiles:-0}" = "0" ]; then
+        ok   # 与上游完全同步
+      else
+        warn "欠同步: 自 ${basever} 基线以来上游改了 ${nfiles} 个镜像文件（+${nadd} / -${ndel} 行）—— 明细: git diff --stat ${base} upstream/main -- skills hooks"
+      fi
+    else
+      warn "无法解析 .upstream-sync.json 的基线 commit（${base:-空}）—— 同步漂移检查已跳过"
+    fi
+  else
+    warn ".upstream-sync.json 缺失 —— 无法计算与上游的正文级漂移"
+  fi
+
 
   # 3d. requesting-code-review/code-reviewer.md 结构（v5.1.0 self-contained）
   up=$(git show upstream/main:skills/requesting-code-review/code-reviewer.md 2>/dev/null | count_headings || echo 0)

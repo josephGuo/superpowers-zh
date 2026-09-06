@@ -8,6 +8,7 @@
 #   bash scripts/verify-release.sh
 #
 # 覆盖：
+#   I. Windows 专属全局路径（platform 打桩跑真实代码）
 #   A. 22 款工具：装 -> 断言 skill 数落盘 -> 二次装幂等 -> 卸载零残留 + 无嵌套
 #   C. 11 款全局：落盘位置 + 卸载零残留 + **不误删用户自有文件**（三项各自断言）
 #   B. 每个检测标记只触发预期工具（防新增工具时误触发既有工具）
@@ -317,6 +318,34 @@ else
   echo "  (无网络，跳过外链验活)"
   ok
 fi
+
+echo ""
+echo "─── I. Windows 平台专属全局路径（在 macOS 上以 platform=win32 跑真实代码）───"
+# Crush 的 README 写明 Windows 走 %LOCALAPPDATA%\\crush\\skills，而我们两个平台
+# 曾经都装 ~/.config/crush/skills —— docs 早就写对了，代码没跟上。这类「只在某个
+# 平台不生效」的 bug 在 macOS 上跑再多次也测不出来，只能把 platform 打成 win32
+# 去跑**真实 installer**（不是它的副本）。
+WINSTUB=$(mktemp -d)/as-win.mjs
+mkdir -p "$(dirname "$WINSTUB")"
+cat > "$WINSTUB" <<'STUB'
+Object.defineProperty(process, 'platform', { value: 'win32' });
+await import(process.env.INS_PATH);
+STUB
+H=$(mktemp -d)
+INS_PATH="$INS" HOME="$H" node "$WINSTUB" --global --tool crush >/dev/null 2>&1
+n_win=$(ls -d "$H/AppData/Local/crush/skills"/*/ 2>/dev/null | wc -l | tr -d ' ')
+n_unix=$(ls -d "$H/.config/crush/skills"/*/ 2>/dev/null | wc -l | tr -d ' ')
+if [ "$n_win" = "$EXPECT_SKILLS" ]; then ok; else
+  bad "win32 下 crush --global 应装到 AppData/Local/crush/skills，实际那里有 ${n_win} 个"
+fi
+if [ "$n_unix" = "0" ]; then ok; else
+  bad "win32 下 crush --global 不应再装到 ~/.config/crush/skills，实际有 ${n_unix} 个"
+fi
+# 卸载也必须走同一条平台分支，否则装得对、卸不掉
+INS_PATH="$INS" HOME="$H" node "$WINSTUB" --global --uninstall >/dev/null 2>&1
+left=$(find "$H" -type f 2>/dev/null | wc -l | tr -d ' ')
+if [ "$left" = "0" ]; then ok; else bad "win32 下 crush 全局卸载残留 ${left} 个文件"; fi
+rm -rf "$H" "$(dirname "$WINSTUB")"
 
 echo ""
 echo "─── G. 自检：本脚本的覆盖清单不得落后于 installer ───"

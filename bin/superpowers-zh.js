@@ -164,10 +164,25 @@ const TARGETS = [
   // 因此若用户已为 Claude Code / Cursor / Codex 装过，Crush 其实已经能读到 ——
   // docs 里写明了别重复装，否则 Crush 会加载两份。
   // 全局：~/.config/crush/skills 是官方 docs 确认的用户级路径。
-  { name: 'Crush',         dir: '.crush/skills',             detect: ['.crush', 'crush.json', '.crush.json'], global: { dir: '.config/crush/skills', detect: '.config/crush' } },
+  { name: 'Crush',         dir: '.crush/skills',             detect: ['.crush', 'crush.json', '.crush.json'], global: { dir: '.config/crush/skills', dirWin: 'AppData/Local/crush/skills', detect: '.config/crush' } },
   { name: 'Cline',         dir: '.cline/skills',             detect: '.clinerules' },
   { name: 'Kilo Code',     dir: '.kilocode/skills',          detect: ['.kilocode', '.kilo', 'kilo.jsonc'] },
 ];
+
+// 全局 skills 目录：少数工具在 Windows 上不走 ~/ 下的同名路径。
+// Crush 是已证实的一例 —— 其 README「Agent Skills」一节写明：
+//   Unix:    ~/.config/crush/skills/
+//   Windows: %LOCALAPPDATA%\\crush\\skills\\（README 给 Windows 用户的上手命令
+//            就是 mkdir "$env:LOCALAPPDATA\\crush\\skills"）
+// 我们原来两个平台都装 ~/.config/crush/skills，Windows 上那是 C:\\Users\\<name>\\.config\\…，
+// 不是官方指给 Windows 的位置 —— 又一个「装了不生效」，只是只在 Windows 上犯。
+// 其余工具的 global.dir 两平台同构，保持单一字符串不变。
+function globalRelDir(target) {
+  const g = target.global;
+  if (!g) return null;
+  if (process.platform === 'win32' && g.dirWin) return g.dirWin;
+  return g.dir;
+}
 
 function countDirs(dir) {
   if (!existsSync(dir)) return 0;
@@ -1026,7 +1041,7 @@ function showHelp() {
 }
 
 function installForTarget(target, baseDir, isGlobal) {
-  const relDir = isGlobal ? target.global.dir : target.dir;
+  const relDir = isGlobal ? globalRelDir(target) : target.dir;
   const dest = resolve(baseDir, relDir);
   const srcCount = countDirs(SKILLS_SRC);
   mkdirSync(dest, { recursive: true });
@@ -1235,7 +1250,7 @@ const GLOBAL_BOOTSTRAP_DELETE = ['.qoder/rules/superpowers-zh.md'];
 const GLOBAL_BOOTSTRAP_CLEAN_SECTION = ['.claude/CLAUDE.md', '.qwen/QWEN.md', '.codebuddy/CODEBUDDY.md'];
 
 function uninstallForTarget(target, srcSkillNames, baseDir, isGlobal) {
-  const relDir = isGlobal ? (target.global && target.global.dir) : target.dir;
+  const relDir = isGlobal ? globalRelDir(target) : target.dir;
   if (!relDir) return 0;
   const dest = resolve(baseDir, relDir);
   if (!existsSync(dest)) return 0;
@@ -1293,7 +1308,7 @@ function uninstall(isGlobal) {
   for (const target of pool) {
     const removed = uninstallForTarget(target, srcSkillNames, baseDir, isGlobal);
     if (removed > 0) {
-      const relDir = isGlobal ? target.global.dir : target.dir;
+      const relDir = isGlobal ? globalRelDir(target) : target.dir;
       console.log(`  ✅ ${target.name}: 移除 ${removed} 个 skills <- ${resolve(baseDir, relDir)}`);
       totalSkills += removed;
     }
