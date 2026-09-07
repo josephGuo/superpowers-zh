@@ -227,6 +227,21 @@ else
     fi
   done
 
+  # 3f. skill 正文里不得出现上游的 `superpowers:` 技能前缀
+  #
+  # 本插件在 .claude-plugin/plugin.json 里叫 superpowers-zh，Claude Code 按
+  # 「<插件名>:<技能名>」注册插件技能 —— 照抄上游的 `superpowers:xxx` 会得到
+  # 「Unknown skill」（#124，插件市场用户实测）。而 npx 装进 .claude/skills/ 时是
+  # 项目级技能、按**裸名**调用（安装器生成的 bootstrap 列的就是裸名）。
+  # 结论：正文一律用裸技能名，两种分发模式都能解析。
+  #
+  # 这条门禁不能省：上游正文里全是 `superpowers:`，每次同步都会把它带回来。
+  stale_prefix=$(grep -rno "superpowers:[a-z][a-z-]*" "$ROOT/skills" 2>/dev/null | grep -v "superpowers-zh:" | wc -l | tr -d ' ')
+  if [ "${stale_prefix:-0}" = "0" ]; then ok; else
+    bad "skill 正文里有 ${stale_prefix} 处上游前缀 superpowers: —— 插件模式下会 Unknown skill（#124）。改成裸技能名：grep -rn 'superpowers:[a-z]' skills/"
+  fi
+
+
   # 3e. 正文级上游漂移：自上次同步基线以来，上游动了哪些我们镜像的文件
   #
   # 3c/3c-bis 只比标题数 —— 上游把一节正文重写 50 行、标题数不变，我们这边完全
@@ -280,19 +295,30 @@ while IFS= read -r link; do
   fi
 done < <(grep -oE '\(docs/README\.[a-z-]+\.md\)' README.md)
 
-# 4b. Skill 间引用（superpowers:xxx）
+# 4b. Skill 间引用完整性
+#
+# 原来靠 `superpowers:xxx` 前缀发现引用。#124 之后正文改用**裸技能名**（插件名是
+# superpowers-zh，照抄上游前缀会 Unknown skill），前缀一去这个检查就一条也匹配不到 ——
+# 25 条断言静默消失、PASS 从 170 掉到 145 而 FAIL 仍是 0。
+#
+# 重写时还踩了第二个坑：第一版拿「现有技能名清单」当匹配模式，于是只可能匹配到
+# 存在的技能、再断言它存在 —— 同义反复，永远不会失败。现在改成先按**语法位置**
+# 抽出被引用的名字（「使用 X 技能」/「必需子技能：使用 X」），再验证 X 是否存在，
+# 这样引用一个不存在的技能才会被抓到。
+#
+# 含冒号的跳过：那是别的插件的技能（如 elements-of-style:xxx），不归我们校验。
 while IFS= read -r line; do
   skill_file=$(echo "$line" | cut -d: -f1)
-  refs=$(echo "$line" | grep -oE '\bsuperpowers:[a-z-]+\b' | sort -u)
-  for ref in $refs; do
-    name=${ref#superpowers:}
+  refs=$(echo "$line" \
+    | grep -oE '使用 `?[a-z][a-z0-9-]*`? 技能|必需子技能：\*\* 使用 `?[a-z][a-z0-9-]*`?|必需子技能：使用 `?[a-z][a-z0-9-]*`?' \
+    | sed -E 's/.*使用 //; s/ 技能$//' | tr -d '`' | grep -v ':' | sort -u)
+  for name in $refs; do
     if [ -d "skills/$name" ]; then ok; else
       src=$(basename $(dirname "$skill_file"))
       bad "Skill 引用断: $src 引用了不存在的 skills/$name"
     fi
   done
-done < <(grep -rln 'superpowers:' skills/*/SKILL.md 2>/dev/null | \
-         xargs -I{} grep -H 'superpowers:' {} 2>/dev/null)
+done < <(grep -rHn -E '使用 `?[a-z][a-z0-9-]*`? 技能|必需子技能：' skills/*/SKILL.md 2>/dev/null)
 
 # 4c. 装完后 .claude/skills/using-superpowers/SKILL.md 路径必须存在（hook 依赖）
 TMP=$(mktemp -d)

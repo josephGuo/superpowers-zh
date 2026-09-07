@@ -16,14 +16,14 @@ Chinese community edition of [superpowers](https://github.com/obra/superpowers) 
 
 > 📖 **免費配套學習** → [從零學會 AI 編程](https://aiolaola.com/?utm_source=github&utm_campaign=superpowers)：180 節免費實操課 + 《AI 編程實戰三卷書》線上閱讀 + 實戰社群 · superpowers 裝好後配上方法論效率翻倍 · 永久免費
 
-> 🆕 **v1.7.11 更新亮點** —— **Codex / VS Code / Windsurf / Qwen Code / DeerFlow / Claw Code 使用者請重裝**（此前裝了等於沒裝）：
+> 🆕 **v1.7.12 更新亮點** —— **透過 Claude Code 外掛市集安裝的使用者請更新**（此前技能之間互相呼叫會失敗）：
 >
-> - 🐛 **Codex CLI** —— 專案級裝到 `.codex/skills`，而官方掃描清單裡**從來沒有這個目錄**。改為 `.agents/skills`，重裝會自動清舊位置
-> - 🐛 **VS Code (Copilot)** —— 裝的 20 個檔案 Copilot 一個都不讀，且不寫任何引導。現在產生 `.github/instructions/superpowers-zh.instructions.md`（`applyTo: "**"`）
-> - 🐛 **Windsurf** —— `--global` 裝到 `~/.windsurf/skills`，官方使用者級路徑是 `~/.codeium/windsurf/skills/`。全域裝過的請重裝
-> - 🆕 **Qwen Code / Claw Code 補 bootstrap，CodeBuddy / CodeArts 補 `--global`**（全域支援 9 → 11 款）
+> - 🐛 **外掛模式下跨技能呼叫全部失敗**（[#124](https://github.com/jnMetaCode/superpowers-zh/issues/124)）—— 正文照抄了上游的 `superpowers:` 前綴，而本外掛叫 `superpowers-zh`，於是 `Skill("superpowers:systematic-debugging")` 回傳 Unknown skill。32 處已改為**裸技能名**（兩種分發模式都能解析）
+> - 🐛 **Crush 在 Windows 上裝錯目錄** —— 官方是 `%LOCALAPPDATA%\crush\skills`，我們兩個平台都裝 `~/.config`。文件早寫對了，程式碼沒跟上
+> - 🐛 **render-graphs.js** —— 取上游的安全加固與 Windows 修復，但**不跟它改 ESM**（那會在 Node 20 的普通專案裡直接載入失敗）
+> - 🛡️ **5 條新門禁**（前綴回歸、Windows 路徑、解除安裝不誤刪使用者檔案、上游漂移計量…），`verify-release` 115 → 140
 >
-> 📋 其餘改動（DeerFlow 偵測標記、4 條死連結含 2 條編造的儲存庫地址、官網工具牆 20 → 23、5 條新門禁…）見 **[完整 Release Notes →](RELEASE-NOTES.zh.md)**
+> 📋 官網側改動（版本提示條、22 份工具文件入口、結構化資料、分享大圖、無障礙、sitemap…）見 **[完整 Release Notes →](RELEASE-NOTES.zh.md)**
 
 ### 📊 專案規模
 

@@ -58,7 +58,7 @@ if (LATEST.version !== PKG.version) {
 }
 
 // 本版需要重装的工具（三语共用；产品名不翻译）。改这里时同步改 release notes 正文。
-const REINSTALL_TOOLS = ['Codex CLI', 'VS Code', 'Windsurf', 'Qwen Code', 'DeerFlow', 'Claw Code'];
+const REINSTALL_TOOLS = ['Claude Code 插件市场安装', 'Crush（Windows）'];
 
 // 页脚二维码的真实像素尺寸，构建时从文件读取（见 imageSize 的注释）
 const QR = {
@@ -370,7 +370,7 @@ const T = {
     skipToMain: '跳到主要内容',
     ogAlt: 'superpowers-zh —— AI 编程超能力中文增强版，一条 npx 命令为 23 款 AI 编程工具装上系统化工作方法论',
     ogLocale: 'zh_CN',
-    releaseNote: '{tools} 用户请重新安装 —— 此前版本装了不生效。查看完整更新说明',
+    releaseNote: '{tools} 的用户请更新 —— 此前版本里技能之间互相调用会失败。查看完整更新说明',
     toolDocHint: '{name} 的专属安装指南',
     whyTitle: '为什么选择 superpowers-zh？',
     whySub: '不是又一套提示词模板 —— 是让 AI 真正按工程方法干活的系统化能力。',
@@ -507,7 +507,7 @@ const T = {
     skipToMain: 'Skip to main content',
     ogAlt: 'superpowers-zh — battle-tested AI coding skills, Chinese-enhanced; one npx command for 23 AI coding tools',
     ogLocale: 'en_US',
-    releaseNote: '{tools} users should reinstall — earlier versions installed to the wrong place. Read the full release notes',
+    releaseNote: 'Using {tools}? Update — in earlier versions skills could not invoke one another. Read the full release notes',
     toolDocHint: 'Install guide for {name}',
     whyTitle: 'Why superpowers-zh?',
     whySub: 'Not another prompt-template pack — real engineering methodology that makes AI work properly.',
@@ -644,7 +644,7 @@ const T = {
     skipToMain: '跳到主要內容',
     ogAlt: 'superpowers-zh —— AI 編程超能力中文增強版，一條 npx 命令為 23 款 AI 編程工具裝上系統化工作方法論',
     ogLocale: 'zh_TW',
-    releaseNote: '{tools} 使用者請重新安裝 —— 此前版本裝了不生效。檢視完整更新說明',
+    releaseNote: '{tools} 的使用者請更新 —— 此前版本裡技能之間互相呼叫會失敗。檢視完整更新說明',
     toolDocHint: '{name} 的專屬安裝指南',
     whyTitle: '為什麼選擇 superpowers-zh？',
     whySub: '不是又一套提示詞範本 —— 是讓 AI 真正按工程方法幹活的系統化能力。',

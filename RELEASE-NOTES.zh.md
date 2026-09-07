@@ -6,6 +6,86 @@
 
 ---
 
+## v1.7.12 (2026-09-07)
+
+**通过 Claude Code 插件市场安装的用户请更新。** 本版修的是一个「装了，但技能之间互相调不动」的问题。
+
+### 🐛 插件模式下跨技能调用全部失败（[#116 之外最实的一条：#124](https://github.com/jnMetaCode/superpowers-zh/issues/124)）
+
+报告人给的证据完整到可以直接复现（v1.7.10 / 插件市场安装 / Windows）：
+
+    Skill("superpowers:systematic-debugging")     -> Unknown skill
+    Skill("superpowers-zh:systematic-debugging")  -> 正常加载
+
+Claude Code 按「**<插件名>:<技能名>**」注册插件技能，而本插件在
+`.claude-plugin/plugin.json` 里叫 `superpowers-zh`。可我们的 skill 正文里照抄了上游的
+`superpowers:` 前缀 —— 实测全仓 `superpowers-zh:` **0 处**、`superpowers:` **32 处**，
+分布在 11 个文件。凡是 skill A 让你去用 skill B 的地方，插件用户都会撞上 Unknown skill。
+
+**但没有按报告里建议的换成 `superpowers-zh:`。** 本 fork 有两条分发路径，命名空间不同：
+
+| 分发方式 | 技能怎么调 |
+|---|---|
+| 插件市场 | `superpowers-zh:<name>` |
+| `npx superpowers-zh` → `.claude/skills/` | **裸名**（项目级技能） |
+
+证据是安装器自己生成的 bootstrap —— 它列的就是裸名。也就是说那 32 处**在两种模式下
+都是错的**；只改成 `superpowers-zh:` 等于修好插件模式、又给主分发路径挖一个反向的坑。
+
+改成**裸技能名**：npx 模式直接正确；插件模式下模型按后缀匹配得到
+`superpowers-zh:xxx`，而不是照着一个确定不存在的全限定名去调。
+
+另有 1 处特例：`copilot-tools.md` 里那句是举例说明「插件智能体」的命名形式，且
+`code-reviewer` 在本 fork 根本不是技能，改成通用写法 `<插件名>:<智能体名>`。
+
+### 🐛 Crush 在 Windows 上装到了它不扫描的目录
+
+[Crush README](https://github.com/charmbracelet/crush) 的 Agent Skills 一节写明
+Windows 走 `%LOCALAPPDATA%\crush\skills\`（它给 Windows 用户的上手命令就是
+`mkdir "$env:LOCALAPPDATA\crush\skills"`），而我们两个平台都装 `~/.config/crush/skills`。
+
+**而我们自己的 `docs/README.crush.md` 早就写对了** —— 又一次「文档描述的是意图，
+代码做的是另一回事」，与 v1.7.10 修 Aider 时同一句话。
+
+`global` 支持可选的 `dirWin`，按平台选路。OpenCode 的 `.config/` **没动**：其官方文档
+没有任何 Windows 专属说明，没证据就不猜路径。
+
+### 🐛 render-graphs.js：取上游的两处修复，但不跟它改 ESM
+
+上游 v6.3.0 改了三处，我们只取两处：
+
+| 上游改动 | 我们 | 理由 |
+|---|---|---|
+| `execSync('dot -Tsvg')` → `execFileSync('dot', [...])` | ✅ | 安全加固，不过 shell |
+| `execSync('which dot')` → `execFileSync('dot', ['-V'])` | ✅ | **Windows 修复** —— `which` 在 Windows 上不是命令 |
+| CommonJS → ESM | ❌ | 这脚本会被拷进**用户项目**执行，Node 判定模块类型看用户项目的 package.json。Node 22.7+ 有 ESM 自动探测所以看不出问题，但本仓 engines 是 `node>=20`，Node 20 无探测，在普通 CommonJS 项目里直接加载失败 |
+
+实测（`--no-experimental-detect-command` 模拟 Node 20）：上游版报
+`To load an ES module, set "type": "module"` + SyntaxError，我们改后版本正常执行。
+
+### 🛡️ 这一版新增 / 修好的门禁
+
+每条都做过反向验证（把问题造回去，必须报错）：
+
+| 门禁 | 堵的是 |
+|---|---|
+| skill 正文禁止出现 `superpowers:` 前缀 | 上游正文里全是它，每次同步都会带回来 |
+| Windows 专属全局路径（platform 打桩跑真实代码） | 「只在某个平台不生效」的 bug，在 macOS 上跑一万次也测不出 |
+| 11 款全局工具卸载零残留 + **不误删用户自有文件** | 此前只测了 1 款；「误删」一款都没测过 |
+| 上游同步基线 `.upstream-sync.json` + 正文级漂移计量 | 上游改了 415 行正文，旧门禁一个字都没说 |
+| audit 3c-bis 的静默分支改为显式 warn | 上游一发新版，检查条数就悄悄少一条 |
+
+`verify-release` 115 → **140 pass**。
+
+### 🌐 官网（不影响安装包）
+
+本版官网侧改动较多，逐条见提交历史：版本提示条（此前站上对「谁该重装」零表述）、
+22 份工具文档入口、JSON-LD 结构化数据、1200×630 分享大图、可访问性修复
+（57 个页面两个 h1 / 搜索框焦点被抹掉 / 全站无 skip link）、sitemap 的 lastmod
+不再谎报「今天改的」、抖音二维码 177 KB → 31 KB。
+
+---
+
 ## v1.7.11 (2026-08-28)
 
 **Codex CLI / VS Code / Windsurf / Qwen Code / DeerFlow / Claw Code 用户请重新安装。**
