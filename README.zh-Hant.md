@@ -2,9 +2,9 @@
 
 🌐 [简体中文](README.md) | **繁體中文** | [English (upstream)](https://github.com/obra/superpowers)
 
-> 🦸 **superpowers（250k+ ⭐）完整漢化 + 4 個中國原創 skills** — 讓 Claude Code / Copilot CLI / Hermes Agent / Cursor / Windsurf / Kiro / Gemini CLI / Qoder 等 **23 款 AI 編程工具**真正會幹活。從頭腦風暴到程式碼審查，從 TDD 到除錯，每個 skill 都是經過實戰驗證的工作方法論。
+> 🦸 **superpowers（250k+ ⭐）完整漢化 + 4 個中國原創 skills** — 讓 Claude Code / Copilot CLI / Hermes Agent / Cursor / Windsurf / Kiro / Gemini CLI / Qoder 等 **26 款 AI 編程工具**真正會幹活。從頭腦風暴到程式碼審查，從 TDD 到除錯，每個 skill 都是經過實戰驗證的工作方法論。
 
-Chinese community edition of [superpowers](https://github.com/obra/superpowers) — 20 skills across 23 AI coding tools, including full translations and China-specific development skills.
+Chinese community edition of [superpowers](https://github.com/obra/superpowers) — 20 skills across 26 AI coding tools, including full translations and China-specific development skills.
 
 [![官網 sp.aiolaola.com](https://img.shields.io/badge/🌐_官網-sp.aiolaola.com-F59E0B)](https://sp.aiolaola.com)
 [![GitHub stars](https://img.shields.io/github/stars/jnMetaCode/superpowers-zh?style=social)](https://github.com/jnMetaCode/superpowers-zh)
@@ -15,15 +15,6 @@ Chinese community edition of [superpowers](https://github.com/obra/superpowers) 
 > 📖 **免費配套學習** → [從零學會 AI 編程](https://aiolaola.com/zh-Hant?utm_source=github&utm_campaign=superpowers-tw)(180 節)＋ [AI 智能體課程](https://aiolaola.com/zh-Hant/course/agents?utm_source=github&utm_campaign=superpowers-tw)(40 節)— 繁體中文實作課程,免費
 
 > 📖 **免費配套學習** → [從零學會 AI 編程](https://aiolaola.com/?utm_source=github&utm_campaign=superpowers)：180 節免費實操課 + 《AI 編程實戰三卷書》線上閱讀 + 實戰社群 · superpowers 裝好後配上方法論效率翻倍 · 永久免費
-
-> 🆕 **v1.7.12 更新亮點** —— **透過 Claude Code 外掛市集安裝的使用者請更新**（此前技能之間互相呼叫會失敗）：
->
-> - 🐛 **外掛模式下跨技能呼叫全部失敗**（[#124](https://github.com/jnMetaCode/superpowers-zh/issues/124)）—— 正文照抄了上游的 `superpowers:` 前綴，而本外掛叫 `superpowers-zh`，於是 `Skill("superpowers:systematic-debugging")` 回傳 Unknown skill。32 處已改為**裸技能名**（兩種分發模式都能解析）
-> - 🐛 **Crush 在 Windows 上裝錯目錄** —— 官方是 `%LOCALAPPDATA%\crush\skills`，我們兩個平台都裝 `~/.config`。文件早寫對了，程式碼沒跟上
-> - 🐛 **render-graphs.js** —— 取上游的安全加固與 Windows 修復，但**不跟它改 ESM**（那會在 Node 20 的普通專案裡直接載入失敗）
-> - 🛡️ **5 條新門禁**（前綴回歸、Windows 路徑、解除安裝不誤刪使用者檔案、上游漂移計量…），`verify-release` 115 → 140
->
-> 📋 官網側改動（版本提示條、22 份工具文件入口、結構化資料、分享大圖、無障礙、sitemap…）見 **[完整 Release Notes →](RELEASE-NOTES.zh.md)**
 
 ### 📊 專案規模
 
@@ -67,7 +58,6 @@ Chinese community edition of [superpowers](https://github.com/obra/superpowers) 
 </td>
 </tr>
 </table>
-
 <table>
 <tr>
 <td width="25%">
@@ -78,6 +68,20 @@ Chinese community edition of [superpowers](https://github.com/obra/superpowers) 
 <td width="75%" valign="middle">
 
 感謝 [Cubence](https://cubence.com/signup?code=SCW29JP9) 對本專案的支持。Cubence 是一家致力為客戶提供穩定、高效的 API 中轉服務商。從 25 年 9 月營運至今，提供了 Claude Code、Codex、Gemini 等多種模型支援。🎁 **Cubence 為本開源專案的使用者提供了特別的專屬優惠碼 `AGENCY`，透過[此連結](https://cubence.com/signup?code=SCW29JP9)註冊的使用者，首次購買即可享受 9 折優惠！**
+
+</td>
+</tr>
+</table>
+<table>
+<tr>
+<td width="25%">
+  <a href="https://go.apimart.ai/gh-superpowers-zh">
+    <img src="assets/sponsors/apimart.jpg" alt="APIMart —— 專注 AI 圖片/影片生成的低價 API 平台，GPT-Image-2 低至 $0.006/張，1 美元可出圖 160+ 張" width="100%">
+  </a>
+</td>
+<td width="75%" valign="middle">
+
+感謝 [APIMart](https://go.apimart.ai/gh-superpowers-zh) 贊助了本專案！APIMart 是專注 AI 圖片/影片生成的低價 API 平台，**GPT-Image-2 低至 $0.006/張**，1 美元可出圖 160+ 張。圖片、影片一套非同步 API 通吃，提交任務拿 ID、回呼取結果，跑批萬張不逾時、換模型不改程式碼。按量付費、無月費，🎁 **透過[此連結](https://go.apimart.ai/gh-superpowers-zh)註冊即可開用！**
 
 </td>
 </tr>
@@ -125,7 +129,7 @@ AI：在開始實作之前，我需要了解幾個關鍵問題：
 | ⭐ Star 數 | 250k+ | — |
 | 📦 Skills 總數 | 14 | **20**（14 翻譯 + 4 國產原創 + 2 上游歷史保留） |
 | 🌐 語言 | 英文 | 中文（技術術語保留英文） |
-| 🤖 **支援工具** | **6 款**：Claude Code / Cursor / Codex / OpenCode / Copilot CLI / Gemini CLI | **23 款**：上述 6 款 + Hermes Agent / Trae / Kiro / Qwen Code / OpenClaw / Claw Code / Antigravity / DeerFlow / VS Code / Windsurf / Aider / Qoder / CodeBuddy（騰訊） / CodeArts（華為雲碼道） / Cline / Kilo Code / Crush |
+| 🤖 **支援工具** | **6 款**：Claude Code / Cursor / Codex / OpenCode / Copilot CLI / Gemini CLI | **26 款**：上述 6 款 + Hermes Agent / Trae / Kiro / Qwen Code / OpenClaw / Claw Code / Antigravity / DeerFlow / VS Code / Windsurf / Aider / Qoder / CodeBuddy（騰訊） / CodeArts（華為雲碼道） / Cline / Kilo Code / Crush / ZCode（智譜）/ DeepSeek Harness / Reasonix |
 | ⚡ **安裝方式** | 按工具分別裝（每款一條不同的 plugin marketplace 命令） | **`npx superpowers-zh` 一條命令自動識別專案裡的工具並安裝**；識別不出可 `--tool <name>` 顯式指定 |
 | 🇨🇳 Git 平台 | GitHub 為主 | GitHub + Gitee + Coding + 極狐 GitLab + **CNB（騰訊雲原生建置）** |
 | 🇨🇳 CI/CD 範例 | GitHub Actions | GitHub Actions + Gitee Go + Coding CI + 極狐 CI + `.cnb.yml` |
@@ -140,9 +144,9 @@ AI：在開始實作之前，我需要了解幾個關鍵問題：
 | 💬 社群 | Discord | 微信公眾號「AI不止語」+ 微信群 + QQ 群 |
 | 📜 License | MIT | MIT |
 
-**一句話總結：** 英文上游 = 方法論核心；中文增強版 = 方法論核心 **+** 23 款工具一鍵適配 **+** 國內 Git/CI 生態 **+** 中文化表達習慣。
+**一句話總結：** 英文上游 = 方法論核心；中文增強版 = 方法論核心 **+** 26 款工具一鍵適配 **+** 國內 Git/CI 生態 **+** 中文化表達習慣。
 
-### 🤖 支援 23 款主流 AI 編程工具
+### 🤖 支援 26 款主流 AI 編程工具
 
 | 工具 | 類型 | 一鍵安裝 | 手動安裝 |
 |------|------|:---:|:---:|
@@ -169,6 +173,9 @@ AI：在開始實作之前，我需要了解幾個關鍵問題：
 | [Cline](https://cline.bot) | IDE 外掛 | `npx superpowers-zh --tool cline` | `.cline/skills/` + `.clinerules/` |
 | [Kilo Code](https://kilo.ai) | IDE 外掛 | `npx superpowers-zh --tool kilocode` | `.kilocode/skills/` + `.kilocode/rules/` |
 | [Crush](https://github.com/charmbracelet/crush) | CLI | `npx superpowers-zh` | `.crush/skills/` |
+| [ZCode](https://zcode.z.ai/) (智譜 ADE) | IDE | `npx superpowers-zh --global --tool zcode` | `~/.zcode/skills/`（僅全域，專案級路徑官方未公開） |
+| [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) (dsh) | CLI | `npx superpowers-zh` | `.dsh/skills/` + `AGENTS.md` |
+| [Reasonix](https://reasonix.io/) | CLI | `npx superpowers-zh` | `.reasonix/skills/` + `REASONIX.md`（全域 Windows 為 `%APPDATA%\reasonix\skills`） |
 
 > 執行 `npx superpowers-zh` 會自動偵測你專案中使用的工具，將 20 個 skills 安裝到正確位置。
 
@@ -231,7 +238,7 @@ npx superpowers-zh --global --tool claude   # 或指定工具
 
 全域安裝把 skills 裝到工具的**使用者級目錄**（如 `~/.claude/skills`），一次安裝所有專案自動可用，更新時也只需重裝一次。**專案級優先、全域兜底**，二者可共存。
 
-支援通用全域安裝的工具（均為 docs 已證實的使用者級載入路徑）：**Claude Code · Codex CLI · Qoder · Windsurf · Qwen Code · OpenClaw · OpenCode · Crush · Hermes Agent · CodeBuddy · CodeArts**。其中 **Codex CLI** 全域裝到 `~/.agents/skills`（Codex 啟動掃描目錄）；**Crush** 在 Windows 上裝到 `%LOCALAPPDATA%\crush\skills`（其 README 明確 Windows 走這裡，不是 `~/.config`）。其餘工具（Cursor / Kiro / Trae / Aider / DeerFlow / VS Code / Claw / Cline / Kilo Code）規則是專案級或存於應用內設定，`--global` 會提示改用專案級；**Gemini CLI / Antigravity** 有各自專屬的全域方式（Gemini 走擴充目錄），見對應 `docs/README.*.md`。
+支援通用全域安裝的工具（均為 docs 已證實的使用者級載入路徑）：**Claude Code · Codex CLI · Qoder · Windsurf · Qwen Code · OpenClaw · OpenCode · Crush · Hermes Agent · CodeBuddy · CodeArts · ZCode · DeepSeek Harness · Reasonix**。其中 **Codex CLI** 全域裝到 `~/.agents/skills`（Codex 啟動掃描目錄）；**Crush** 在 Windows 上裝到 `%LOCALAPPDATA%\crush\skills`（其 README 明確 Windows 走這裡，不是 `~/.config`）。其餘工具（Cursor / Kiro / Trae / Aider / DeerFlow / VS Code / Claw / Cline / Kilo Code）規則是專案級或存於應用內設定，`--global` 會提示改用專案級；**Gemini CLI / Antigravity** 有各自專屬的全域方式（Gemini 走擴充目錄），見對應 `docs/README.*.md`。
 
 | | 專案級（預設） | 全域（`--global`） |
 |---|---|---|
@@ -439,9 +446,26 @@ MIT License — 自由使用，商業或個人均可。
 
 ---
 
+## 📌 最近更新
+
+> 🆕 **v1.7.12 更新亮點** —— **透過 Claude Code 外掛市集安裝的使用者請更新**（此前技能之間互相呼叫會失敗）：
+>
+> - 🐛 **外掛模式下跨技能呼叫全部失敗**（[#124](https://github.com/jnMetaCode/superpowers-zh/issues/124)）—— 正文照抄了上游的 `superpowers:` 前綴，而本外掛叫 `superpowers-zh`，於是 `Skill("superpowers:systematic-debugging")` 回傳 Unknown skill。32 處已改為**裸技能名**（兩種分發模式都能解析）
+> - 🐛 **Crush 在 Windows 上裝錯目錄** —— 官方是 `%LOCALAPPDATA%\crush\skills`，我們兩個平台都裝 `~/.config`。文件早寫對了，程式碼沒跟上
+> - 🐛 **render-graphs.js** —— 取上游的安全加固與 Windows 修復，但**不跟它改 ESM**（那會在 Node 20 的普通專案裡直接載入失敗）
+> - 🆕 **新增 DeepSeek Harness 支援**（[#122](https://github.com/jnMetaCode/superpowers-zh/issues/122)）—— 專案級 `.dsh/skills/` + 全域 `~/.dsh/skills/`，引導寫 `AGENTS.md`；四條路徑全部有官方出處
+> - 🐛 **在管理員 PowerShell 裡跑會把 skills 裝進 `C:\Windows\System32`**（[#125](https://github.com/jnMetaCode/superpowers-zh/issues/125)）—— 管理員終端的預設工作目錄就是那裡。補系統目錄護欄，且不提供 `--force` 繞過
+> - 🆕 **新增 Reasonix 支援**（[#42](https://github.com/jnMetaCode/superpowers-zh/issues/42)）—— 專案級 `.reasonix/skills/` + `REASONIX.md`；**Windows 全域是 `%APPDATA%\reasonix\skills`**，與 Unix 不同構
+> - 🆕 **新增 ZCode（智譜）支援**（工具數 23 → 26）—— 只做全域安裝：官方文件只公開了 `~/.zcode/skills/`，專案級是應用內 UI 匯入、不暴露磁碟路徑，所以專案級會被明確拒絕而不是猜路徑裝進去
+> - 🛡️ **6 條新門禁**（前綴回歸、Windows 路徑、解除安裝不誤刪使用者檔案、全域-only 工具專案級必拒、上游漂移計量…），`verify-release` 115 → 144
+>
+> 📋 官網側改動（版本提示條、22 份工具文件入口、結構化資料、分享大圖、無障礙、sitemap…）見 **[完整 Release Notes →](RELEASE-NOTES.zh.md)**
+
+---
+
 <div align="center">
 
-**🦸 AI 編程超能力：讓 Claude Code / Hermes Agent / Cursor / Claw Code / Qoder 等 23 款工具真正會幹活**
+**🦸 AI 編程超能力：讓 Claude Code / Hermes Agent / Cursor / Claw Code / Qoder 等 26 款工具真正會幹活**
 
 [Star 本專案](https://github.com/jnMetaCode/superpowers-zh) · [提交 Issue](https://github.com/jnMetaCode/superpowers-zh/issues) · [貢獻程式碼](https://github.com/jnMetaCode/superpowers-zh/pulls)
 

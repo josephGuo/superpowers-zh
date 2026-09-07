@@ -114,11 +114,27 @@ if [ "$QUICK" != "1" ]; then
 hdr "Category 2: Installer 功能测试（23 款工具）"
 #==============================================================================
 
-declare -a TOOLS=(claude cursor codex kiro deerflow trae antigravity vscode openclaw windsurf gemini aider opencode qwen hermes claw copilot qoder codebuddy codearts cline kilocode crush)
+declare -a TOOLS=(claude cursor codex kiro deerflow trae antigravity vscode openclaw windsurf gemini aider opencode qwen hermes claw copilot qoder codebuddy codearts cline kilocode crush zcode dsh reasonix)
+
+# 只有用户级路径有官方出处的工具（项目级路径官方未公开，我们不猜）——
+# 对它们，项目级安装**必须被明确拒绝**，而不是装到一个猜出来的目录里。
+declare -a GLOBAL_ONLY=(zcode)
 
 for tool in "${TOOLS[@]}"; do
   TMP=$(mktemp -d)
   pushd "$TMP" >/dev/null
+
+  # 全局-only 工具：断言「拒绝 + 退出码非 0 + 项目里零写入」，然后跳过后续项目级断言
+  case " ${GLOBAL_ONLY[*]} " in
+    *" $tool "*)
+      out=$(node "$INSTALLER" --tool "$tool" 2>&1); rc=$?
+      wrote=$(find . -type f | wc -l | tr -d ' ')
+      if [ "$rc" != "0" ] && echo "$out" | grep -q "不支持项目级安装" && [ "$wrote" = "0" ]; then ok; else
+        bad "Installer: $tool 是全局-only，项目级应明确拒绝（退出码非 0、零写入），实际 rc=$rc 写入 $wrote 个文件"
+      fi
+      popd >/dev/null; rm -rf "$TMP"; continue
+      ;;
+  esac
 
   if ! node "$INSTALLER" --tool "$tool" >/dev/null 2>&1; then
     bad "Installer: $tool 安装失败"

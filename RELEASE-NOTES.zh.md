@@ -8,7 +8,8 @@
 
 ## v1.7.12 (2026-09-07)
 
-**通过 Claude Code 插件市场安装的用户请更新。** 本版修的是一个「装了，但技能之间互相调不动」的问题。
+**通过 Claude Code 插件市场安装的用户请更新。** 本版修的是一个「装了，但技能之间互相调不动」的问题，
+并新增三款工具支持：**ZCode（智谱）**、**DeepSeek Harness** 与 **Reasonix**，工具数 23 → 26。
 
 ### 🐛 插件模式下跨技能调用全部失败（[#116 之外最实的一条：#124](https://github.com/jnMetaCode/superpowers-zh/issues/124)）
 
@@ -63,6 +64,111 @@ Windows 走 `%LOCALAPPDATA%\crush\skills\`（它给 Windows 用户的上手命�
 实测（`--no-experimental-detect-command` 模拟 Node 20）：上游版报
 `To load an ES module, set "type": "module"` + SyntaxError，我们改后版本正常执行。
 
+### 🆕 新增 ZCode（智谱）支持 —— 只做全局，因为项目级路径官方从未公开（[#95](https://github.com/jnMetaCode/superpowers-zh/issues/95) [#120](https://github.com/jnMetaCode/superpowers-zh/issues/120)）
+
+```bash
+npx superpowers-zh --global --tool zcode     # -> ~/.zcode/skills/
+```
+
+[#120](https://github.com/jnMetaCode/superpowers-zh/issues/120) 附了一份完整补丁，写着装到
+`.zcode/skills` + 写 `.zcode/AGENTS.md`。**没有采纳** —— 提交者自己写明那是「让 AI 按
+zcode 的目录结构适配」生成的，而官方文档里查无此路径。
+
+[ZCode 官方技能文档](https://zcode.z.ai/docs/skill)（中英文版一致）只给出一个磁盘路径：
+
+    ZCode Agent 的用户级技能目录：~/.zcode/skills/<skill-name>/SKILL.md
+
+项目级在文档里是**应用内的 UI 导入动作**（设置 → 技能 → 导入，可选「链接到来源目录」或
+「复制成 ZCode 内部副本」，导入目标可选「全局」或「当前项目」），**从不暴露项目级磁盘
+路径**。`.zcode/AGENTS.md` 同样查无实据 —— AGENTS.md 在 ZCode 里确实是六类扩展之一，
+但位置与作用域文档页没写明。
+
+所以项目级安装被**明确拒绝**（退出码 1、项目里零写入），并指向 `--global`：
+
+    ❌ ZCode 不支持项目级安装。
+      其官方文档只给出用户级技能目录，项目级导入是应用内的 UI 动作、不暴露磁盘路径。
+      猜一个路径装进去只会「装了不生效」，所以这里直接拒绝。
+
+猜路径的代价这仓已经付过三次（Codex 项目级、Windsurf 全局、VS Code），这次不付第四次。
+
+技能装好后在 ZCode 里用 `$skill-name` 调用（设置 → 技能 里可查看与启停）。因为不写
+bootstrap，**不会自动触发**，需要显式调用 —— 这个限制写在 `docs/README.zcode.md` 里。
+若你查到 ZCode 的项目级路径或 AGENTS.md 的确切位置，欢迎开 issue，我们会补上。
+
+工具数 23 → **24**，支持全局安装的工具 11 → **12**。
+
+### 🆕 新增 DeepSeek Harness（dsh）支持（[#122](https://github.com/jnMetaCode/superpowers-zh/issues/122)）
+
+```bash
+npx superpowers-zh                          # 自动检测 .dsh/
+npx superpowers-zh --global --tool dsh      # -> ~/.dsh/skills/ + ~/.dsh/AGENTS.md
+```
+
+与 ZCode 相反，这款**四条路径全部有一手出处**，所以项目级与全局都支持：
+
+| 内容 | 路径 | 出处 |
+|---|---|---|
+| skills（项目级） | `.dsh/skills/` | `docs/subsystems/skills.md` 的 Local discovery priority 表 rank 100 |
+| skills（全局） | `~/.dsh/skills/` | shell-env 文档：`dshHome \| $DSH_HOME, then ~/.dsh` |
+| 引导（项目级） | 项目根 `AGENTS.md` | `instructionFileCandidates` 默认 `['AGENTS.md', 'CLAUDE.md']` |
+| 引导（全局） | `~/.dsh/AGENTS.md` | user-global 指令文件为 `$DSH_HOME/AGENTS.md` |
+
+**装过 Antigravity 或 Codex 的项目其实已经被覆盖一半**：dsh 的技能发现 rank 200 是
+`.agents/skills`，正是那两款用的目录。文档里写明了别重复装。同理 dsh 也读 `CLAUDE.md`，
+装过 Claude Code 的项目引导那半已生效 —— 但 `.claude/skills` 不在 dsh 的技能根列表里，
+技能仍需单独装。
+
+### 🆕 新增 Reasonix 支持（[#42](https://github.com/jnMetaCode/superpowers-zh/issues/42)）
+
+```bash
+npx superpowers-zh                           # 自动检测 .reasonix/ 或 reasonix.toml
+npx superpowers-zh --global --tool reasonix
+```
+
+[Reasonix](https://reasonix.io/)（esengine/DeepSeek-Reasonix）是 DeepSeek 原生的终端 coding
+agent。#42 的 issue 模板整个没填，但产品是真实存在的，官方文档也齐全：
+
+| 内容 | 路径 | 出处 |
+|---|---|---|
+| skills（项目级） | `.reasonix/skills/` | `docs/CONFIG_PATHS.zh-CN.md`：项目本地 settings / skills / commands 位于项目 `.reasonix/` |
+| skills（全局 macOS/Linux） | `~/.reasonix/skills/` | 同上：全局 skills = `<Reasonix home>/skills/` |
+| skills（全局 **Windows**） | `%APPDATA%\reasonix\skills\` | 同上 Reasonix home 表：Windows 为 `%APPDATA%\reasonix`，**与 Unix 不同构** |
+| 引导（项目级） | 项目根 `REASONIX.md` | `docs/GUIDE.zh-CN.md`：常驻指令分层加载 `REASONIX.md` / `AGENTS.md` / `CLAUDE.md` |
+
+Windows 路径走上一版为 Crush 加的 `dirWin` 机制。**全局安装不写引导文件**：官方说
+「用户全局文件先加载」但没写明那个文件的确切路径，不确认就不写 —— 全局仍装 skills，
+只是不自动触发，想要自动触发用项目级安装。
+
+### 🐛 在管理员 PowerShell 里跑，会把 skills 装进 C:\Windows\System32（[#125](https://github.com/jnMetaCode/superpowers-zh/issues/125)）
+
+issue 正文只有一张截图、模板全空。但那张截图把事情说清楚了：
+
+    PS C:\Windows\system32> npx superpowers-zh --tool trae
+      模式: 项目级
+      目标: C:\Windows\System32
+      ✅ Trae [项目]: 20 个 skills -> C:\Windows\System32\.trae\skills
+      ✅ Trae: bootstrap rule -> C:\Windows\System32\.trae\rules\superpowers-zh.md
+
+**管理员权限打开的 PowerShell，默认工作目录就是 `C:\Windows\System32`。** 用户在那里
+直接跑 npx，我们就老老实实把 20 个 skill 目录写进了 Windows 系统目录。
+
+我们本来就有「拒绝装进用户主目录」的护栏（`--force` 可绕过），却从没拦过系统目录。
+现在补上，且**不提供 --force 绕过** —— 装到系统目录没有任何正当用途，给个开关只会
+让人照着开关走。
+
+    ⚠️  当前目录是系统目录: C:\Windows\System32
+      常见原因：**用管理员权限打开的 PowerShell / cmd，默认工作目录就是
+      C:\Windows\System32**，直接在里面跑 npx 就会装到这里（issue #125）。
+      正确做法 —— 先切到你的项目目录： cd D:\path\to\your\project
+
+覆盖 Windows（`%SystemRoot%`、`%ProgramFiles%`、`%ProgramData%`、盘符根）与
+Unix（`/`、`/usr`、`/etc`、`/bin`、`/sbin`、`/var`、`/opt`、`/System`、`/Library`）。
+主目录与系统临时目录豁免（各有自己的处理）。
+
+> 关于截图里那个「检测到当前版本文件损坏」弹窗：那是 TRAE 自己的完整性检查提示，
+> **我们没有证据表明它是本次安装导致的**，所以不宣称因果。能确认并已修的是：
+> 我们不该往系统目录写东西。
+
 ### 🛡️ 这一版新增 / 修好的门禁
 
 每条都做过反向验证（把问题造回去，必须报错）：
@@ -73,9 +179,11 @@ Windows 走 `%LOCALAPPDATA%\crush\skills\`（它给 Windows 用户的上手命�
 | Windows 专属全局路径（platform 打桩跑真实代码） | 「只在某个平台不生效」的 bug，在 macOS 上跑一万次也测不出 |
 | 11 款全局工具卸载零残留 + **不误删用户自有文件** | 此前只测了 1 款；「误删」一款都没测过 |
 | 上游同步基线 `.upstream-sync.json` + 正文级漂移计量 | 上游改了 415 行正文，旧门禁一个字都没说 |
+| 全局-only 工具的项目级必须明确拒绝（rc≠0 + 零写入） | 猜一个项目级路径装进去 = 第四次「装了不生效」 |
+| 系统目录护栏（Unix + win32 打桩双向验证） | 管理员终端默认 cwd 就是 System32（#125） |
 | audit 3c-bis 的静默分支改为显式 warn | 上游一发新版，检查条数就悄悄少一条 |
 
-`verify-release` 115 → **140 pass**。
+`verify-release` 115 → **160 pass**。
 
 ### 🌐 官网（不影响安装包）
 
