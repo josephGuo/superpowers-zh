@@ -84,7 +84,23 @@ const TARGETS = [
   // 检出从来没被自动检测到过。改认 skills/public：它是 skills 机制本身、随仓库版本
   // 控制，任何 DeerFlow 检出都有；deer_flow 保留作 1.x 兼容。
   { name: 'DeerFlow',      dir: 'skills/custom',             detect: ['skills/public', 'deer_flow'] },
+  // Trae 的项目级路径国际版与国内版**相同**（docs.trae.cn/ide/skills「技能所在目录」：
+  //   「项目技能：项目所在路径下的 .trae/skills/ 目录」），所以项目级一条覆盖两版。
+  // 全局则**不同构，且只有国内版有一手路径**：
+  //   docs.trae.cn/ide/skills：macOS/Linux `~/.trae-cn/skills`，Windows `%userprofile%/.trae-cn/skills`
+  //   （%userprofile% 就是 home，所以两平台同为 home 下的 .trae-cn/skills，不需要 dirWin）
+  //   国际版 docs.trae.ai/ide/skills **没有给出全局路径** —— 不猜，因此国际版无全局。
+  // 于是全局单独成一条 global-only 条目「TRAE CN」，而不是挂到 Trae 上：挂上去会让
+  // 国际版用户 --global 装进一个 TRAE 不扫的目录，正是 issue #35 想避免的那种「装了不生效」。
   { name: 'Trae',          dir: '.trae/skills',              detect: '.trae' },
+  { name: 'TRAE CN',       dir: null,                        detect: [],                                editionOf: 'Trae', global: { dir: '.trae-cn/skills',        detect: '.trae-cn' },
+    // 这一条只承担「全局」。TRAE CN 的项目级路径不是没有，而是与国际版同构
+    // （都是 .trae/skills/），已由上面的 Trae 条目覆盖 —— 所以拒绝理由必须说实话，
+    // 不能套用 ZCode 那句「项目级不暴露磁盘路径」。
+    noProjectReason: `        TRAE CN 的项目级技能目录与国际版 TRAE 相同（.trae/skills/），
+        已经由 Trae 这一条覆盖，请直接用：
+          npx superpowers-zh --tool trae
+        本条目只用于 TRAE CN 独有的**全局**目录（~/.trae-cn/skills）。` },
   // Antigravity 无 global：其全局 skills 加载路径未在 docs 证实（全局规则走 ~/.gemini/GEMINI.md），
   // 不确认能生效就不写，避免「装了不生效」。用户用项目级安装。
   { name: 'Antigravity',   dir: '.agents/skills',            detect: '.agents' },
@@ -1101,6 +1117,9 @@ const TOOL_ALIASES = {
   'kiro':         'Kiro',
   'deerflow':     'DeerFlow',
   'trae':         'Trae',
+  'trae-cn':      'TRAE CN',
+  'traecn':       'TRAE CN',
+  'trae-china':   'TRAE CN',
   'antigravity':  'Antigravity',
   'vscode':       'VS Code',
   'vs-code':      'VS Code',
@@ -1633,8 +1652,8 @@ function install(forceToolName, force, isGlobal) {
       console.log(`
       ❌ ${target.name} 不支持项目级安装。
 
-        其官方文档只给出用户级技能目录，项目级导入是应用内的 UI 动作、不暴露磁盘路径。
-        猜一个路径装进去只会「装了不生效」，所以这里直接拒绝。
+${target.noProjectReason || `        其官方文档只给出用户级技能目录，项目级导入是应用内的 UI 动作、不暴露磁盘路径。
+        猜一个路径装进去只会「装了不生效」，所以这里直接拒绝。`}
         请改用全局安装：
           npx superpowers-zh --global --tool ${shortestAlias(target.name) || target.name.toLowerCase()}
     `);

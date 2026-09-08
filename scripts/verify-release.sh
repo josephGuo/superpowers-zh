@@ -283,6 +283,11 @@ if curl -sS -o /dev/null --max-time 5 https://github.com 2>/dev/null; then
   # 第一遍并行快扫。注意这一遍**会误报** —— 实测 docs.codeium.com 在 8s 上限下
   # 偶发超时，而它其实活着。一个会误报的门禁比没有门禁更糟：人会学会忽略它。
   # 所以第一遍只产出「嫌疑名单」，不下结论。
+  # 带浏览器 User-Agent 探测。docs.trae.cn 对默认 curl UA 一律返回 400、带 UA 返回 200，
+  # 页面确实存在（issue #35 引用的 TRAE CN 技能文档就在上面）。这不是放宽判活口径 ——
+  # 400 仍然算死链，只是不再因为「对方不接待 curl」而误判。真正的 404/410 照样失败。
+  UA_STR="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+  export UA_STR
   # 扫描范围含 site/build.mjs：官网的外链此前完全没人验活，而其中三条是**付费展位**的
   # 推广链接（旗舰 + 两个常规位）—— 赞助链接挂掉是要赔的，比文档死链更该守。
   # 正则含 ?=& ：推广链接的 aff / referral 参数在 query 里，截断了就等于没验真正那条。
@@ -294,7 +299,7 @@ if curl -sS -o /dev/null --max-time 5 https://github.com 2>/dev/null; then
   grep -rhoE "https://[a-zA-Z0-9./_?=&-]+" "$REPO"/docs/*.md "$REPO"/README.md "$REPO"/README.zh-Hant.md "$REPO"/site/build.mjs 2>/dev/null \
     | grep -viE "jnmetacode|aiolaola|user-images|shields\.io|opensource\.org|makeapullrequest|npmjs\.com|claude\.ai/code|googletagmanager|google-analytics" \
     | sed 's/[.,)]*$//' | sort -u \
-    | xargs -P 10 -I{} sh -c 'c=$(curl -sS -o /dev/null -w "%{http_code}" -L --max-time 8 "$1" 2>/dev/null); case "$c" in 2*|3*|401|403|405|429) ;; *) echo "$1" ;; esac' _ {} \
+    | xargs -P 10 -I{} sh -c 'c=$(curl -sS -o /dev/null -w "%{http_code}" -L --max-time 8 -A "$UA_STR" "$1" 2>/dev/null); case "$c" in 2*|3*|401|403|405|429) ;; *) echo "$1" ;; esac' _ {} \
     > "$LINKTMP" 2>/dev/null
   # 第二遍：只对嫌疑名单串行复核，放宽超时并让 curl 自己重试。两遍都判死才算死。
   suspects=$(wc -l < "$LINKTMP" | tr -d ' ')
@@ -302,7 +307,7 @@ if curl -sS -o /dev/null --max-time 5 https://github.com 2>/dev/null; then
   if [ "$suspects" != "0" ]; then
     while read -r u; do
       [ -z "$u" ] && continue
-      c=$(curl -sS -o /dev/null -w "%{http_code}" -L --max-time 25 --retry 2 --retry-delay 1 "$u" 2>/dev/null)
+      c=$(curl -sS -o /dev/null -w "%{http_code}" -L --max-time 25 --retry 2 --retry-delay 1 -A "$UA_STR" "$u" 2>/dev/null)
       # 判活口径 = 「服务器答复了」，而不是「答复是 200」：
       #   401 要登录、403 拒爬虫、405 不认 HEAD/GET 的方式、429 限流
       #   —— 这四种都证明 URL 存在，只是不欢迎自动化访问。
@@ -421,18 +426,26 @@ echo "─── J. 全局-only 工具：项目级必须明确拒绝（不能猜�
 # ZCode 的项目级磁盘路径官方从未公开（导入是应用内 UI 动作）。猜一个装进去就是
 # 「装了不生效」—— 本仓在 Codex / Windsurf / VS Code 上已经栽过三次。
 # 断言三件事：退出码非 0、提示里说明原因、项目目录里零写入。
-for tool in $(sed -n '/^const TARGETS = \[/,/^\];/p' "$INS" \
-              | grep -E "^  \{ name: '[^']+', +dir: null" \
-              | sed -nE "s/^  \{ name: '([^']+)'.*/\1/p" | tr 'A-Z' 'a-z'); do
+# 注意：工具名可能含空格（如「TRAE CN」），必须逐行读，不能靠 $( ) 的词分割 ——
+# 否则 "TRAE CN" 会被拆成 trae + cn 两个不存在的目标，门禁自己制造假失败。
+# 名字 -> --tool 别名：去空格 + 转小写（TRAE CN -> traecn，ZCode -> zcode）。
+GONLY=$(mktemp)
+sed -n '/^const TARGETS = \[/,/^\];/p' "$INS" \
+  | grep -E "^  \{ name: '[^']+', +dir: null" \
+  | sed -nE "s/^  \{ name: '([^']+)'.*/\1/p" > "$GONLY"
+while IFS= read -r toolname; do
+  [ -n "$toolname" ] || continue
+  tool=$(echo "$toolname" | tr -d ' ' | tr 'A-Z' 'a-z')
   T=$(mktemp -d); pushd "$T" >/dev/null
   out=$(node "$INS" --tool "$tool" 2>&1); rc=$?
   wrote=$(find . -type f | wc -l | tr -d ' ')
   popd >/dev/null
   if [ "$rc" != "0" ] && echo "$out" | grep -q "不支持项目级安装" && [ "$wrote" = "0" ]; then ok; else
-    bad "${tool}: 全局-only 工具的项目级安装应明确拒绝（rc!=0、零写入），实际 rc=${rc}、写入 ${wrote} 个文件"
+    bad "${toolname}: 全局-only 工具的项目级安装应明确拒绝（rc!=0、零写入），实际 rc=${rc}、写入 ${wrote} 个文件"
   fi
   rm -rf "$T"
-done
+done < "$GONLY"
+rm -f "$GONLY"
 
 echo ""
 echo "─── G. 自检：本脚本的覆盖清单不得落后于 installer ───"
