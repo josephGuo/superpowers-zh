@@ -296,8 +296,11 @@ if curl -sS -o /dev/null --max-time 5 https://github.com 2>/dev/null; then
   #   npmjs / shields / user-images / opensource / makeapullrequest —— 已知对爬虫不友好或纯徽章
   #   googletagmanager / google-analytics —— 它们在 build.mjs 里是 **CSP 白名单条目**不是链接；
   #     裸域 googletagmanager.com 本身返回 404，纳入就是凭空造一条误报
+  #   cloudflareinsights —— 同理，是 Cloudflare Web Analytics 的 CSP 白名单条目：
+  #     static.cloudflareinsights.com 裸域无首页（522），cloudflareinsights.com/cdn-cgi/rum
+  #     只收 POST（GET 返回 404）。两者都不是「链接」，验活对它们没有意义。
   grep -rhoE "https://[a-zA-Z0-9./_?=&-]+" "$REPO"/docs/*.md "$REPO"/README.md "$REPO"/README.zh-Hant.md "$REPO"/site/build.mjs 2>/dev/null \
-    | grep -viE "jnmetacode|aiolaola|user-images|shields\.io|opensource\.org|makeapullrequest|npmjs\.com|claude\.ai/code|googletagmanager|google-analytics" \
+    | grep -viE "jnmetacode|aiolaola|user-images|shields\.io|opensource\.org|makeapullrequest|npmjs\.com|claude\.ai/code|googletagmanager|google-analytics|cloudflareinsights" \
     | sed 's/[.,)]*$//' | sort -u \
     | xargs -P 10 -I{} sh -c 'c=$(curl -sS -o /dev/null -w "%{http_code}" -L --max-time 8 -A "$UA_STR" "$1" 2>/dev/null); case "$c" in 2*|3*|401|403|405|429) ;; *) echo "$1" ;; esac' _ {} \
     > "$LINKTMP" 2>/dev/null

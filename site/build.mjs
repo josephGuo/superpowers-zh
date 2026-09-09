@@ -1388,6 +1388,58 @@ function build() {
   writeFileSync(join(DIST, 'robots.txt'),
     'User-agent: *\nAllow: /\n\nSitemap: ' + SITE_URL + '/sitemap.xml\n');
 
+  // ---- AEO: llms.txt + llms-full.txt ----
+  // 为什么做这个：本站的读者一大半不是人，是 AI 助手 —— 有人在 Claude / ChatGPT 里
+  // 问「superpowers-zh 是什么、怎么装」，助手就来抓。它现在得爬 66 个页面才能拼出
+  // 全貌，多数情况下只抓首页就走，于是回答里缺一半信息。
+  // llms.txt（llmstxt.org 约定）给它一份「一次读完就懂」的索引；llms-full.txt 直接
+  // 把 20 个 SKILL.md 正文拼全，让它不用逐页爬。
+  // Cloudflare 的「面向代理的 Markdown」是同一件事的付费版（Pro 套餐），这里自己做。
+  // 注意：robots.txt 必须放行这两个文件 —— 上面那份是 Allow: / ，已覆盖。
+  const skillLine = s => `- [${s.title}](${SITE_URL}/skills/${s.name}): ${s.desc.replace(/\s+/g, ' ').slice(0, 180)}`;
+  const byGroup = g => skills.filter(s => s.group === g);
+  const llms = [
+    '# superpowers-zh',
+    '',
+    '> Anthropic superpowers 的中文增强 fork：20 个塑造 AI 编程助手行为的 skill（15 个译自上游 + 5 个本 fork 新增，其中 4 个为中国特色），一条 npx 命令适配 26 款 IDE / CLI。',
+    '',
+    '安装（自动检测当前项目使用的工具）：',
+    '',
+    '```bash',
+    'npx superpowers-zh              # 项目级',
+    'npx superpowers-zh --global     # 全局，所有项目共享',
+    '```',
+    '',
+    'skill 不是文档，是**行为塑造代码**：装好后由工具的 bootstrap 自动触发，',
+    '例如用户说「做个 react todo list」时会先触发 brainstorming，而不是直接写代码。',
+    '',
+    '仓库：https://github.com/jnMetaCode/superpowers-zh',
+    'npm：https://www.npmjs.com/package/superpowers-zh',
+    '全文（所有 skill 正文）：' + SITE_URL + '/llms-full.txt',
+    '',
+    '从这里开始：[使用 Superpowers · 引导](' + SITE_URL + '/skills/using-superpowers) —— 它说明其余 19 个 skill 各自何时触发。',
+    '',
+  ];
+  for (const g of GROUPS) {
+    const list = byGroup(g.id);
+    if (!list.length) continue;
+    llms.push('## ' + g.zh, '');
+    for (const sk of list) llms.push(skillLine(sk));
+    llms.push('');
+  }
+  llms.push('## 其他', '', `- [赞助商](${SITE_URL}/sponsors): 支持本项目的公司与优惠`, `- [English](${SITE_URL}/en/): English version`, '');
+  writeFileSync(join(DIST, 'llms.txt'), llms.join('\n'));
+
+  // llms-full.txt：索引 + 全部 SKILL.md 正文。去掉 frontmatter（对读者无意义），
+  // 每篇前加一个 H1 分隔，便于模型定位。
+  const full = [llms.join('\n'), '', '---', '', '# 全部 skill 正文', ''];
+  for (const sk of skills) {
+    full.push('', '---', '', `# ${sk.title}（${sk.name}）`, '',
+      `来源：${SITE_URL}/skills/${sk.name}`, '',
+      sk.raw.replace(/^---\n[\s\S]*?\n---\n?/, '').trim(), '');
+  }
+  writeFileSync(join(DIST, 'llms-full.txt'), full.join('\n'));
+
   const today = new Date().toISOString().slice(0, 10);
   // 每条 URL 记下它「内容来自哪些源文件」，据此取 lastmod：
   //   skill 详情页 -> 该 skill 目录；首页 / 赞助页 -> 生成器与模板（文案都写在里面）
@@ -1442,15 +1494,24 @@ function build() {
   // 严格 CSP：脚本仅允许 'self' + 本站内联脚本的 hash（含 GA 内联配置块，自动收集）；
   // 样式仅 'self'；禁用插件/内联事件；锁死 base-uri 与 frame 祖先。
   // Google Analytics (gtag) 需放行 googletagmanager（加载器）与 analytics（上报）域名。
+  // Cloudflare Web Analytics 的 beacon 是 **Cloudflare 在边缘注入的**，不是我们写进
+  // 页面的 —— 所以它照样受本站 CSP 约束。此前 script-src 没放行它，浏览器直接拒绝
+  // 执行，统计一条数据都收不到：面板开着，实际全黑。
+  //   加载器 https://static.cloudflareinsights.com/beacon.min.js
+  //   上报   https://cloudflareinsights.com/cdn-cgi/rum （POST / sendBeacon）
+  // 为什么要救它而不是关掉它：本站主力受众在国内，而 GA 的 google-analytics.com
+  // 在国内不可达 —— 只留 GA 等于对主要用户群没有任何数据。两个都留，互为兜底。
+  const CF_SCRIPT = 'https://static.cloudflareinsights.com';
+  const CF_CONNECT = 'https://cloudflareinsights.com';
   const GA_SCRIPT = 'https://www.googletagmanager.com';
   const GA_CONNECT = 'https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com';
   const csp = [
     "default-src 'self'",
-    "script-src 'self' " + GA_SCRIPT + ' ' + [...scriptHashes].join(' '),
+    "script-src 'self' " + GA_SCRIPT + ' ' + CF_SCRIPT + ' ' + [...scriptHashes].join(' '),
     "style-src 'self'",
     "img-src 'self' data: https://www.google-analytics.com https://www.googletagmanager.com",
     "font-src 'self'",
-    "connect-src 'self' " + GA_CONNECT,
+    "connect-src 'self' " + GA_CONNECT + ' ' + CF_CONNECT,
     "object-src 'none'",
     "base-uri 'self'",
     "frame-ancestors 'none'",
