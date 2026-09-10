@@ -12,7 +12,7 @@ Chinese community edition of [superpowers](https://github.com/obra/superpowers) 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://makeapullrequest.com)
 
-> 📖 **免费配套学习** → [从零学会 AI 编程](https://aiolaola.com/?utm_source=github&utm_campaign=superpowers)（180 节）＋ [从零构建 AI 智能体](https://aiolaola.com/course/ai-agent?utm_source=github&utm_campaign=superpowers)（40 节）：两门免费实操课 + 实战社区，superpowers 装好后配上方法论效率翻倍
+> 📖 **免费配套学习** → [从零学会 AI 编程](https://aiolaola.com/?utm_source=github&utm_campaign=superpowers)（182 节）＋ [从零构建 AI 智能体](https://aiolaola.com/course/ai-agent?utm_source=github&utm_campaign=superpowers)（40 节）：两门免费实操课 + 实战社区，superpowers 装好后配上方法论效率翻倍（站上共 13 门课、648 节，**全部 ¥0**——另有 AI 绘画 / 写小说 / 漫剧 / 量化 / DeepSeek / 深度专注 等）
 >
 > 🌍 Also available in [English](https://aiolaola.com/en?utm_source=github&utm_campaign=superpowers) · [日本語](https://aiolaola.com/ja?utm_source=github&utm_campaign=superpowers) · [Español](https://aiolaola.com/es?utm_source=github&utm_campaign=superpowers) · [한국어](https://aiolaola.com/ko?utm_source=github&utm_campaign=superpowers) · [繁體中文](https://aiolaola.com/zh-Hant?utm_source=github&utm_campaign=superpowers)
 
@@ -273,7 +273,7 @@ claude plugin update superpowers-zh@superpowers-zh       # 再升级 plugin（�
 claude plugin uninstall superpowers-zh@superpowers-zh    # 卸载
 ```
 
-> **和方式一怎么选？** marketplace 装的是**完整 plugin**（skills + hooks + bootstrap 由 Claude Code 统一托管、随版本更新），但只服务 Claude Code 一款工具。要装给其余 19 款工具，仍然用方式一的 `npx superpowers-zh`。两者可以共存，但同一个项目里别重复装 Claude Code，否则 skills 会出现两份。
+> **和方式一怎么选？** marketplace 装的是**完整 plugin**（skills + hooks + bootstrap 由 Claude Code 统一托管、随版本更新），但只服务 Claude Code 一款工具。要装给其余 25 款工具，仍然用方式一的 `npx superpowers-zh`。两者可以共存，但同一个项目里别重复装 Claude Code，否则 skills 会出现两份。
 
 ### 方式三：手动安装（low-fidelity，仅作备选）
 
@@ -403,30 +403,31 @@ npx superpowers-zh@latest --uninstall
 
 ## 🌟 相关项目生态
 
-**八个项目组合使用，覆盖 AI 编程 + AI 视频创作 + 桌面陪伴的完整链路。**
+**九个项目组合使用，覆盖 AI 编程 + AI 视频创作 + 桌面陪伴的完整链路。**
 
 | 项目 | 定位 | 一句话 |
 |------|------|-------|
 | **[superpowers-zh](https://github.com/jnMetaCode/superpowers-zh)**（本项目） ![](https://img.shields.io/github/stars/jnMetaCode/superpowers-zh?style=flat&label=⭐) | 🧠 工作方法论 | 20 个 skills 教 AI 怎么干活（TDD / 调试 / 代码审查等） |
-| **[agency-agents-zh](https://github.com/jnMetaCode/agency-agents-zh)** ![](https://img.shields.io/github/stars/jnMetaCode/agency-agents-zh?style=flat&label=⭐) | 🎭 专家角色库 | 211 个**即插即用** AI 专家，含 46 中国原创（小红书 / 抖音 / 飞书 / 钉钉） |
-| **[agency-orchestrator](https://github.com/jnMetaCode/agency-orchestrator)** | 🚀 编排引擎 | 一句话 → 211 专家协作，**几分钟出方案**（9 家 LLM / 6 免费） |
-| **[ai-coding-guide](https://github.com/jnMetaCode/ai-coding-guide)** | 📖 实战教程 | 66 个 Claude Code 技巧 + 9 款工具最佳实践 + 配置模板 |
+| **[agency-agents-zh](https://github.com/jnMetaCode/agency-agents-zh)** ![](https://img.shields.io/github/stars/jnMetaCode/agency-agents-zh?style=flat&label=⭐) | 🎭 专家角色库 | 277 个**即插即用** AI 专家，含 64 中国原创（小红书 / 抖音 / 飞书 / 钉钉 / Qt 上位机 / 机械设计） |
+| **[agency-orchestrator](https://github.com/jnMetaCode/agency-orchestrator)** ![](https://img.shields.io/github/stars/jnMetaCode/agency-orchestrator?style=flat&label=%E2%AD%90) | 🚀 编排引擎 | 一句话 → 276 专家协作，**几分钟出方案**（15 种大模型 / 11 种免 key） |
+| **[ai-coding-guide](https://github.com/jnMetaCode/ai-coding-guide)** | 📖 实战教程 | 66 个 Claude Code 技巧 + 10 款工具最佳实践 + 配置模板 |
 | **[shellward](https://github.com/jnMetaCode/shellward)** | 🛡️ 安全中间件 | 8 层防御 + DLP 数据流 + 注入检测，**零依赖**（含 MCP Server） |
 | 🆕 **[ai-shortfilm-prompts](https://github.com/jnMetaCode/ai-shortfilm-prompts)** | 🎬 视频提示词 | Mx-Shell《丧尸清道夫》5 段式方法论 + Skill，Seedance / 小云雀 / Sora / 可灵 / 即梦通用 |
 | 🆕 **[local-agent-toolkit](https://github.com/jnMetaCode/local-agent-toolkit)** | 🛠️ Agent 本地三件套 | 给 agent 配上**记忆 / 技能管理 / 运行追踪**，零依赖、数据不出本机；本仓库 skills 可用 `npx @jnmetacode/skillet add jnMetaCode/superpowers-zh/skills/<名称>` 一键安装 |
 | 🆕 **[codepet](https://github.com/jnMetaCode/codepet)** | 🐾 桌面养成桌宠 | 码宠 CodePet —— 你写代码 / 用 Claude Code，它就涨经验、升级、换状态、跳舞。**全本地、隐私优先、开源** |
+| 🆕 **[openshorts](https://github.com/jnMetaCode/openshorts)** | 🎥 短视频生产线 | 开片 —— 文案进，成片出：脚本 / 配音 / 字幕 / 成片 / 发布包一条龙，**0 元 0 key 跑通第一条**，本地优先 |
 
 ---
 
-### 🔥 重点推荐：[agency-orchestrator](https://github.com/jnMetaCode/agency-orchestrator) — 一句话调度 211 个 AI 专家协作，几分钟交付完整方案
+### 🔥 重点推荐：[agency-orchestrator](https://github.com/jnMetaCode/agency-orchestrator) — 一句话调度 276 个 AI 专家协作，几分钟交付完整方案
 
 以前写个方案：你当指挥官，把 AI 轮流扮演 5 个角色，复制粘贴 10 次，1 小时没了。
 
 **现在：** 丢一句话进去 `"做一个电商退款流程"`，**产品 → 架构 → 安全 → 测试 → DBA 自动接力**，几分钟完整方案落地。
 
-- 🎭 **211+ 专家角色**（含 46 个中国市场原创：小红书 / 抖音 / 微信 / 飞书 / 钉钉）
+- 🎭 **276+ 专家角色**（含 64 个中国市场原创：小红书 / 抖音 / 微信 / 飞书 / 钉钉）
 - 🧩 **零代码 YAML**，一行 prompt 就能跑
-- 💰 **9 家 LLM 可选**（DeepSeek / Claude / OpenAI / Ollama 等，**6 家免费**）
+- 💰 **15 种大模型可选**（DeepSeek / Claude / OpenAI / Ollama 等，**11 种免 key**）
 - 🔗 **与 superpowers-zh 互补**：本项目管"**怎么做**"（方法论），orchestrator 管"**谁来做**"（角色协作）
 
 👉 **[立即体验 agency-orchestrator →](https://github.com/jnMetaCode/agency-orchestrator)**
