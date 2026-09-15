@@ -262,9 +262,9 @@ const SPONSORS = [
       zht: '優雲智算 by UCloud — 熱門國產模型按次調用套餐包，低至 49 元/月起',
     },
     desc: {
-      zh: 'UCloud 旗下 AI 云平台，主打包月 / 按次的高性价比国模 Agent Plan 套餐，支持 GLM-5.2，低至 49 元/月起。同时提供官转稳定海外模型，支持接入 Claude Code、Codex 及 API 调用；企业高并发、7×24 技术支持、自助开票。',
-      en: 'UCloud\u2019s AI cloud platform. Cost-effective monthly / pay-per-call Agent Plans for Chinese models (incl. GLM-5.2) from ¥49/month, plus stable access to overseas models. Works with Claude Code, Codex and direct API calls; enterprise concurrency, 24/7 support, self-service invoicing.',
-      zht: 'UCloud 旗下 AI 雲平台，主打包月 / 按次的高性價比國模 Agent Plan 套餐，支援 GLM-5.2，低至 49 元/月起。同時提供官轉穩定海外模型，支援接入 Claude Code、Codex 及 API 呼叫；企業高併發、7×24 技術支援、自助開票。',
+      zh: 'UCloud 旗下 AI 云平台，主打包月 / 按次的高性价比国模 Agent Plan 套餐，支持 GLM-5.2，低至 49 元/月起。最新上线 H3 视频生成套餐包，768P 低至 8 分/秒，支持 2K 画质，最长 30s 视频生成；企业高并发、7×24 技术支持、自助开票。',
+      en: 'UCloud\u2019s AI cloud platform. Cost-effective monthly / pay-per-call Agent Plans for Chinese models (incl. GLM-5.2) from ¥49/month. New H3 video-generation packs: 768P from ¥0.08/sec, up to 2K quality and 30-second clips. Enterprise concurrency, 24/7 support, self-service invoicing.',
+      zht: 'UCloud 旗下 AI 雲平台，主打包月 / 按次的高性價比國模 Agent Plan 套餐，支援 GLM-5.2，低至 49 元/月起。最新上線 H3 影片生成套餐包，768P 低至 8 分/秒，支援 2K 畫質，最長 30s 影片生成；企業高併發、7×24 技術支援、自助開票。',
     },
     perk: {
       zh: '🎁 通过本页链接注册，可得免费 5 元平台体验金',
@@ -327,6 +327,34 @@ const SPONSORS = [
       en: 'Pay-as-you-go, no monthly fee, from $0.006/image',
       zht: '按量付費無月費，GPT-Image-2 低至 $0.006/張',
     },
+  },
+  {
+    tier: 'standard',
+    img: 'volcengine.png', w: 840, h: 200, code: '',
+    logo: 'logo-volcengine-icon.png',
+    url: 'https://www.volcengine.com/activity/ai618?utm_source=OWO&utm_medium=devrel-1&utm_campaign=hw&utm_term=superpowers-zh&utm_content=hw',
+    name: { zh: '字节火山引擎', en: 'Volcano Engine by ByteDance', zht: '字節火山引擎' },
+    tagline: {
+      zh: '火山方舟 Agent/Coding Plan 国模套餐首购 9.9 元起',
+      en: 'Volcano Ark Agent/Coding Plans for Chinese models from ¥9.9 (first purchase)',
+      zht: '火山方舟 Agent/Coding Plan 國模套餐首購 9.9 元起',
+    },
+    alt: {
+      zh: '字节火山引擎 —— 火山方舟 Agent/Coding Plan 国模套餐首购 9.9 元起',
+      en: 'Volcano Engine by ByteDance — Volcano Ark Agent/Coding Plans for Chinese models from ¥9.9 (first purchase)',
+      zht: '字節火山引擎 —— 火山方舟 Agent/Coding Plan 國模套餐首購 9.9 元起',
+    },
+    desc: {
+      zh: '火山方舟 Agent/Coding Plan 国模套餐首购 9.9，支持 GLM-5.3、Kimi-K3、DeepSeek、MiniMax、Doubao 等，注册免费领 2500w Token，统一 API，适配编码与智能体开发。',
+      en: 'Volcano Ark Agent/Coding Plans for Chinese models at ¥9.9 on first purchase, covering GLM-5.3, Kimi-K3, DeepSeek, MiniMax, Doubao and more. Get 25M free tokens on sign-up. One unified API, built for coding and agent development.',
+      zht: '火山方舟 Agent/Coding Plan 國模套餐首購 9.9，支援 GLM-5.3、Kimi-K3、DeepSeek、MiniMax、Doubao 等，註冊免費領 2500w Token，統一 API，適配編碼與智慧體開發。',
+    },
+    perk: {
+      zh: '🎁 注册即免费领 2500 万 Token，立即前往火山引擎活动页面',
+      en: '🎁 Get 25 million free tokens on sign-up — head to the Volcano Engine campaign page',
+      zht: '🎁 註冊即免費領 2500 萬 Token，立即前往火山引擎活動頁面',
+    },
+    perkShort: { zh: '注册即免费领 2500 万 Token', en: '25M free tokens on sign-up', zht: '註冊即免費領 2500 萬 Token' },
   },
 ];
 
