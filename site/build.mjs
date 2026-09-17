@@ -335,14 +335,14 @@ const SPONSORS = [
     url: 'https://www.volcengine.com/activity/ai618?utm_source=OWO&utm_medium=devrel-1&utm_campaign=hw&utm_term=superpowers-zh&utm_content=hw',
     name: { zh: '字节火山引擎', en: 'Volcano Engine by ByteDance', zht: '字節火山引擎' },
     tagline: {
-      zh: '火山方舟 Agent/Coding Plan 国模套餐首购 9.9 元起',
-      en: 'Volcano Ark Agent/Coding Plans for Chinese models from ¥9.9 (first purchase)',
-      zht: '火山方舟 Agent/Coding Plan 國模套餐首購 9.9 元起',
+      zh: '火山方舟 Agent/Coding Plan 国模套餐首购 9.9',
+      en: 'Volcano Ark Agent/Coding Plans for Chinese models at ¥9.9 (first purchase)',
+      zht: '火山方舟 Agent/Coding Plan 國模套餐首購 9.9',
     },
     alt: {
-      zh: '字节火山引擎 —— 火山方舟 Agent/Coding Plan 国模套餐首购 9.9 元起',
-      en: 'Volcano Engine by ByteDance — Volcano Ark Agent/Coding Plans for Chinese models from ¥9.9 (first purchase)',
-      zht: '字節火山引擎 —— 火山方舟 Agent/Coding Plan 國模套餐首購 9.9 元起',
+      zh: '字节火山引擎 —— 火山方舟 Agent/Coding Plan 国模套餐首购 9.9，注册免费领 2500w Token',
+      en: 'Volcano Engine by ByteDance — Volcano Ark Agent/Coding Plans for Chinese models at ¥9.9 (first purchase), with 25M free tokens on sign-up',
+      zht: '字節火山引擎 —— 火山方舟 Agent/Coding Plan 國模套餐首購 9.9，註冊免費領 2500w Token',
     },
     desc: {
       zh: '火山方舟 Agent/Coding Plan 国模套餐首购 9.9，支持 GLM-5.3、Kimi-K3、DeepSeek、MiniMax、Doubao 等，注册免费领 2500w Token，统一 API，适配编码与智能体开发。',
@@ -350,11 +350,39 @@ const SPONSORS = [
       zht: '火山方舟 Agent/Coding Plan 國模套餐首購 9.9，支援 GLM-5.3、Kimi-K3、DeepSeek、MiniMax、Doubao 等，註冊免費領 2500w Token，統一 API，適配編碼與智慧體開發。',
     },
     perk: {
-      zh: '🎁 注册即免费领 2500 万 Token，立即前往火山引擎活动页面',
-      en: '🎁 Get 25 million free tokens on sign-up — head to the Volcano Engine campaign page',
-      zht: '🎁 註冊即免費領 2500 萬 Token，立即前往火山引擎活動頁面',
+      zh: '🎁 注册免费领 2500w Token，立即前往火山引擎活动页面',
+      en: '🎁 Get 25M free tokens on sign-up — head to the Volcano Engine campaign page',
+      zht: '🎁 註冊免費領 2500w Token，立即前往火山引擎活動頁面',
     },
-    perkShort: { zh: '注册即免费领 2500 万 Token', en: '25M free tokens on sign-up', zht: '註冊即免費領 2500 萬 Token' },
+    perkShort: { zh: '注册免费领 2500w Token', en: '25M free tokens on sign-up', zht: '註冊免費領 2500w Token' },
+  },
+  {
+    tier: 'standard',
+    code: '',
+    logo: 'logo-fluxionai-icon.png',
+    url: 'https://fluxionai.space/register?source=github&campaign=superpowers&promo=SUPERPOWERS',
+    name: { zh: 'Fluxion AI', en: 'Fluxion AI', zht: 'Fluxion AI' },
+    tagline: {
+      zh: '一个入口，接入并管理全球主流 AI 模型',
+      en: 'One entry point to access and manage the world’s mainstream AI models',
+      zht: '一個入口，接入並管理全球主流 AI 模型',
+    },
+    alt: {
+      zh: 'Fluxion AI —— 一个入口，接入并管理全球主流 AI 模型',
+      en: 'Fluxion AI — one entry point to access and manage the world’s mainstream AI models',
+      zht: 'Fluxion AI —— 一個入口，接入並管理全球主流 AI 模型',
+    },
+    desc: {
+      zh: '面向个人开发者、技术团队与企业，通过统一 API 接入并管理全球主流 AI 模型；通过多线路动态调度提升可用性，模型表现、响应时间与费用透明可查。根据不同模型与线路，API 调用成本较官方或基准价格可降低 40%—98%。',
+      en: 'For individual developers, engineering teams and enterprises: access and manage the world’s mainstream AI models through one unified API. Multi-route dynamic scheduling improves availability, with transparent model performance, latency and cost. Depending on the model and route, API costs can be 40%–98% lower than official or benchmark pricing.',
+      zht: '面向個人開發者、技術團隊與企業，透過統一 API 接入並管理全球主流 AI 模型；透過多線路動態調度提升可用性，模型表現、回應時間與費用透明可查。依不同模型與線路，API 呼叫成本較官方或基準價格可降低 40%—98%。',
+    },
+    perk: {
+      zh: '🎁 通过本页链接注册即可获得 $3 API 额度',
+      en: '🎁 Sign up via this link to get $3 in API credit',
+      zht: '🎁 透過本頁連結註冊即可獲得 $3 API 額度',
+    },
+    perkShort: { zh: '注册即得 $3 API 额度', en: '$3 API credit on sign-up', zht: '註冊即得 $3 API 額度' },
   },
 ];
 

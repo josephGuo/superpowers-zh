@@ -89,12 +89,26 @@ Chinese community edition of [superpowers](https://github.com/obra/superpowers) 
 <tr>
 <td width="25%">
   <a href="https://www.volcengine.com/activity/ai618?utm_source=OWO&utm_medium=devrel-1&utm_campaign=hw&utm_term=superpowers-zh&utm_content=hw">
-    <img src="assets/sponsors/volcengine.png" alt="字節火山引擎 —— 火山方舟 Agent/Coding Plan 國模套餐首購 9.9 元起" width="100%">
+    <img src="assets/sponsors/volcengine.png" alt="字節火山引擎 —— 火山方舟 Agent/Coding Plan 國模套餐首購 9.9，註冊免費領 2500w Token" width="100%">
   </a>
 </td>
 <td width="75%" valign="middle">
 
 感謝 [字節火山引擎](https://www.volcengine.com/activity/ai618?utm_source=OWO&utm_medium=devrel-1&utm_campaign=hw&utm_term=superpowers-zh&utm_content=hw) 贊助本專案！火山方舟 Agent/Coding Plan 國模套餐首購 **9.9**，支援 GLM-5.3、Kimi-K3、DeepSeek、MiniMax、Doubao 等，**註冊免費領 2500w Token**，統一 API，適配編碼與智慧體開發。👉 **[立即前往](https://www.volcengine.com/activity/ai618?utm_source=OWO&utm_medium=devrel-1&utm_campaign=hw&utm_term=superpowers-zh&utm_content=hw)**
+
+</td>
+</tr>
+</table>
+<table>
+<tr>
+<td width="25%" align="center">
+  <a href="https://fluxionai.space/register?source=github&campaign=superpowers&promo=SUPERPOWERS">
+    <img src="assets/sponsors/logo-fluxionai-icon.png" alt="Fluxion AI —— 一個入口，接入並管理全球主流 AI 模型" width="100%">
+  </a>
+</td>
+<td width="75%" valign="middle">
+
+感謝 [Fluxion AI](https://fluxionai.space/register?source=github&campaign=superpowers&promo=SUPERPOWERS) 贊助本專案！一個入口，接入並管理全球主流 AI 模型。Fluxion AI 面向個人開發者、技術團隊與企業，透過統一 API 接入並管理全球主流 AI 模型；透過多線路動態調度提升可用性，模型表現、回應時間與費用透明可查。依不同模型與線路，API 呼叫成本較官方或基準價格可降低 **40%—98%**。🎁 **透過[此連結](https://fluxionai.space/register?source=github&campaign=superpowers&promo=SUPERPOWERS)註冊即可獲得 $3 API 額度！**
 
 </td>
 </tr>
