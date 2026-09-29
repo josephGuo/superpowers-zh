@@ -49,13 +49,19 @@ Chinese community edition of [superpowers](https://github.com/obra/superpowers) 
 <table>
 <tr>
 <td width="25%">
-  <a href="https://passport.compshare.cn/register?referral_code=ETD3L5JBM13CtKARkMORot&ytag=GPU_YY_YX_git_superpowers-zh">
-    <img src="assets/sponsors/compshare.jpg" alt="优云智算 by UCloud — 热门国产模型按次调用套餐包，低至 49 元/月起" width="100%">
+  <a href="https://88api.ai/sign-up?aff=MvTX">
+    <img src="assets/sponsors/88api.jpg" alt="88API Token聚合平台 —— 聚合语言、编程、图片、视频与语音模型的一站式 AI API 平台" width="100%">
   </a>
 </td>
 <td width="75%" valign="middle">
 
-感谢 [优云智算](https://passport.compshare.cn/register?referral_code=ETD3L5JBM13CtKARkMORot&ytag=GPU_YY_YX_git_superpowers-zh) 赞助本项目！优云智算是 UCloud 旗下 AI 云平台，主打包月、按次的高性价比国模 Agent Plan 套餐，支持 GLM-5.2，低至 **49 元/月**起。最新上线 H3 视频生成套餐包，768P 低至 8 分/秒，支持 2K 画质，最长 30s 视频生成。支持企业高并发、7×24 技术支持、自助开票。🎁 **通过[此链接](https://passport.compshare.cn/register?referral_code=ETD3L5JBM13CtKARkMORot&ytag=GPU_YY_YX_git_superpowers-zh)注册的用户，可得免费 5 元平台体验金！**
+[88API Token聚合平台](https://88api.ai/sign-up?aff=MvTX)<br>
+🧠 聚合 GPT、Claude、Gemini、Grok、DeepSeek、Kimi、GLM 等语言与编程模型；<br>
+🎨 图片模型：GPT-Image、Gemini、Grok 等；<br>
+🎬 视频模型：Seedance、Veo、MiniMax H3、Kling、Grok 等；<br>
+🎙️ 语音能力：Whisper、TTS 等。从文案、出图、改图，到视频生成与配音<br>
+🎁新用户注册送体验额度，可以检测模型能力。站内有人工客服值守！<br>
+👉香港正规企业运营 稳定供应 全绿满血 不降智 提供发票
 
 </td>
 </tr>
@@ -112,6 +118,20 @@ Chinese community edition of [superpowers](https://github.com/obra/superpowers) 
 <td width="75%" valign="middle">
 
 感谢 [Fluxion AI](https://fluxionai.space/register?source=github&campaign=superpowers&promo=SUPERPOWERS) 赞助本项目！一个入口，接入并管理全球主流 AI 模型。Fluxion AI 面向个人开发者、技术团队与企业，通过统一 API 接入并管理全球主流 AI 模型；通过多线路动态调度提升可用性，模型表现、响应时间与费用透明可查。根据不同模型与线路，API 调用成本较官方或基准价格可降低 **40%—98%**。🎁 **通过[此链接](https://fluxionai.space/register?source=github&campaign=superpowers&promo=SUPERPOWERS)注册即可获得 $3 API 额度！**
+
+</td>
+</tr>
+</table>
+<table>
+<tr>
+<td width="25%">
+  <a href="https://passport.compshare.cn/register?referral_code=ETD3L5JBM13CtKARkMORot&ytag=GPU_YY_YX_git_superpowers-zh">
+    <img src="assets/sponsors/compshare.jpg" alt="优云智算 by UCloud — 热门国产模型按次调用套餐包，低至 49 元/月起" width="100%">
+  </a>
+</td>
+<td width="75%" valign="middle">
+
+感谢 [优云智算](https://passport.compshare.cn/register?referral_code=ETD3L5JBM13CtKARkMORot&ytag=GPU_YY_YX_git_superpowers-zh) 赞助本项目！优云智算是 UCloud 旗下 AI 云平台，主打包月、按次的高性价比国模 Agent Plan 套餐，支持 GLM-5.2，低至 **49 元/月**起。最新上线 H3 视频生成套餐包，768P 低至 8 分/秒，支持 2K 画质，最长 30s 视频生成。支持企业高并发、7×24 技术支持、自助开票。🎁 **通过[此链接](https://passport.compshare.cn/register?referral_code=ETD3L5JBM13CtKARkMORot&ytag=GPU_YY_YX_git_superpowers-zh)注册的用户，可得免费 5 元平台体验金！**
 
 </td>
 </tr>

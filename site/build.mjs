@@ -248,31 +248,35 @@ const SPONSORS = [
   },
   {
     tier: 'standard',
-    img: 'compshare.jpg', w: 800, h: 368, code: '',
-    logo: 'logo-compshare-icon.png',
-    url: 'https://passport.compshare.cn/register?referral_code=ETD3L5JBM13CtKARkMORot&ytag=GPU_YY_YX_git_superpowers-zh',
-    name: { zh: '优云智算', en: 'CompShare by UCloud', zht: '優雲智算' },
-    tagline: {
-      zh: 'UCloud 旗下 AI 云平台 · 国产模型 Agent Plan 套餐低至 49 元/月',
-      en: 'UCloud\u2019s AI cloud · Agent Plans for Chinese models from ¥49/month',
-      zht: 'UCloud 旗下 AI 雲平台 · 國產模型 Agent Plan 套餐低至 49 元/月',
-    },
+    img: '88api.jpg', w: 1254, h: 1254, code: '',
+    logo: '88api.jpg',
+    url: 'https://88api.ai/sign-up?aff=MvTX',
+    name: { zh: '88API Token聚合平台', en: '88API Token Aggregation Platform', zht: '88API Token 聚合平台' },
     alt: {
-      zh: '优云智算 by UCloud — 热门国产模型按次调用套餐包，低至 49 元/月起',
-      en: 'CompShare by UCloud — pay-per-call plans for popular Chinese models, from ¥49/month',
-      zht: '優雲智算 by UCloud — 熱門國產模型按次調用套餐包，低至 49 元/月起',
+      zh: '88API Token聚合平台 —— 聚合语言、编程、图片、视频与语音模型的一站式 AI API 平台',
+      en: '88API Token Aggregation Platform — one-stop AI APIs for language, coding, image, video and speech models',
+      zht: '88API Token 聚合平台 —— 聚合語言、編程、圖片、影片與語音模型的一站式 AI API 平台',
     },
     desc: {
-      zh: 'UCloud 旗下 AI 云平台，主打包月 / 按次的高性价比国模 Agent Plan 套餐，支持 GLM-5.2，低至 49 元/月起。最新上线 H3 视频生成套餐包，768P 低至 8 分/秒，支持 2K 画质，最长 30s 视频生成；企业高并发、7×24 技术支持、自助开票。',
-      en: 'UCloud\u2019s AI cloud platform. Cost-effective monthly / pay-per-call Agent Plans for Chinese models (incl. GLM-5.2) from ¥49/month. New H3 video-generation packs: 768P from ¥0.08/sec, up to 2K quality and 30-second clips. Enterprise concurrency, 24/7 support, self-service invoicing.',
-      zht: 'UCloud 旗下 AI 雲平台，主打包月 / 按次的高性價比國模 Agent Plan 套餐，支援 GLM-5.2，低至 49 元/月起。最新上線 H3 影片生成套餐包，768P 低至 8 分/秒，支援 2K 畫質，最長 30s 影片生成；企業高併發、7×24 技術支援、自助開票。',
+      zh: '🧠 聚合 GPT、Claude、Gemini、Grok、DeepSeek、Kimi、GLM 等语言与编程模型；\n🎨 图片模型：GPT-Image、Gemini、Grok 等；\n🎬 视频模型：Seedance、Veo、MiniMax H3、Kling、Grok 等；\n🎙️ 语音能力：Whisper、TTS 等。从文案、出图、改图，到视频生成与配音',
+      en: '🧠 GPT, Claude, Gemini, Grok, DeepSeek, Kimi, GLM and other language and coding models;\n🎨 Image models: GPT-Image, Gemini, Grok and more;\n🎬 Video models: Seedance, Veo, MiniMax H3, Kling, Grok and more;\n🎙️ Speech: Whisper, TTS and more—from copywriting, image generation and editing to video generation and voice-over',
+      zht: '🧠 聚合 GPT、Claude、Gemini、Grok、DeepSeek、Kimi、GLM 等語言與編程模型；\n🎨 圖片模型：GPT-Image、Gemini、Grok 等；\n🎬 影片模型：Seedance、Veo、MiniMax H3、Kling、Grok 等；\n🎙️ 語音能力：Whisper、TTS 等。從文案、出圖、改圖，到影片生成與配音',
     },
     perk: {
-      zh: '🎁 通过本页链接注册，可得免费 5 元平台体验金',
-      en: '🎁 Sign up via this link to get ¥5 free platform credit',
-      zht: '🎁 透過本頁連結註冊，可得免費 5 元平台體驗金',
+      zh: '🎁新用户注册送体验额度，可以检测模型能力。站内有人工客服值守！',
+      en: '🎁New users receive trial credit to evaluate model capabilities. Live human support is available!',
+      zht: '🎁新使用者註冊即送體驗額度，可以檢測模型能力。站內有人工客服值守！',
     },
-    perkShort: { zh: '新用户注册立得 5 元平台体验金', en: '¥5 free platform credit on sign-up', zht: '新使用者註冊立得 5 元平台體驗金' },
+    note: {
+      zh: '👉香港正规企业运营 稳定供应 全绿满血 不降智 提供发票',
+      en: '👉Operated by a registered Hong Kong company · Stable supply · Full-capability models · No quality reduction · Invoices available',
+      zht: '👉香港正規企業營運 穩定供應 全綠滿血 不降智 提供發票',
+    },
+    perkShort: {
+      zh: '新用户注册送体验额度',
+      en: 'Trial credit for new users',
+      zht: '新使用者註冊即送體驗額度',
+    },
   },
   {
     tier: 'standard',
@@ -384,6 +388,34 @@ const SPONSORS = [
       zht: '🎁 透過本頁連結註冊即可獲得 $3 API 額度',
     },
     perkShort: { zh: '注册即得 $3 API 额度', en: '$3 API credit on sign-up', zht: '註冊即得 $3 API 額度' },
+  },
+  {
+    tier: 'standard',
+    img: 'compshare.jpg', w: 800, h: 368, code: '',
+    logo: 'logo-compshare-icon.png',
+    url: 'https://passport.compshare.cn/register?referral_code=ETD3L5JBM13CtKARkMORot&ytag=GPU_YY_YX_git_superpowers-zh',
+    name: { zh: '优云智算', en: 'CompShare by UCloud', zht: '優雲智算' },
+    tagline: {
+      zh: 'UCloud 旗下 AI 云平台 · 国产模型 Agent Plan 套餐低至 49 元/月',
+      en: 'UCloud\u2019s AI cloud · Agent Plans for Chinese models from ¥49/month',
+      zht: 'UCloud 旗下 AI 雲平台 · 國產模型 Agent Plan 套餐低至 49 元/月',
+    },
+    alt: {
+      zh: '优云智算 by UCloud — 热门国产模型按次调用套餐包，低至 49 元/月起',
+      en: 'CompShare by UCloud — pay-per-call plans for popular Chinese models, from ¥49/month',
+      zht: '優雲智算 by UCloud — 熱門國產模型按次調用套餐包，低至 49 元/月起',
+    },
+    desc: {
+      zh: 'UCloud 旗下 AI 云平台，主打包月 / 按次的高性价比国模 Agent Plan 套餐，支持 GLM-5.2，低至 49 元/月起。最新上线 H3 视频生成套餐包，768P 低至 8 分/秒，支持 2K 画质，最长 30s 视频生成；企业高并发、7×24 技术支持、自助开票。',
+      en: 'UCloud\u2019s AI cloud platform. Cost-effective monthly / pay-per-call Agent Plans for Chinese models (incl. GLM-5.2) from ¥49/month. New H3 video-generation packs: 768P from ¥0.08/sec, up to 2K quality and 30-second clips. Enterprise concurrency, 24/7 support, self-service invoicing.',
+      zht: 'UCloud 旗下 AI 雲平台，主打包月 / 按次的高性價比國模 Agent Plan 套餐，支援 GLM-5.2，低至 49 元/月起。最新上線 H3 影片生成套餐包，768P 低至 8 分/秒，支援 2K 畫質，最長 30s 影片生成；企業高併發、7×24 技術支援、自助開票。',
+    },
+    perk: {
+      zh: '🎁 通过本页链接注册，可得免费 5 元平台体验金',
+      en: '🎁 Sign up via this link to get ¥5 free platform credit',
+      zht: '🎁 透過本頁連結註冊，可得免費 5 元平台體驗金',
+    },
+    perkShort: { zh: '新用户注册立得 5 元平台体验金', en: '¥5 free platform credit on sign-up', zht: '新使用者註冊立得 5 元平台體驗金' },
   },
 ];
 
@@ -1167,6 +1199,7 @@ function renderSponsors(lang) {
       <p class="sc-desc">${esc(s.desc[lang])}</p>
       <button class="sc-toggle" type="button" aria-expanded="false" hidden>${esc(sp.expand)}</button>
       <p class="sc-perk">${esc(s.perk[lang])}</p>
+      ${s.note ? `<p class="sc-note">${esc(s.note[lang])}</p>` : ''}
       <a class="sc-go" href="${esc(s.url)}" target="_blank" rel="sponsored nofollow noopener">${esc(sp.goto)}</a>
     </article>`).join('');
 
