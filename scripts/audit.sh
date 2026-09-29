@@ -3,7 +3,7 @@
 #
 # 1. 静态校验：JSON parse / SKILL.md frontmatter / symlink / hook 可执行性
 # 2. Installer 功能：23 款工具装 / 卸载 / 幂等
-# 3. 上游对齐：hooks 3 文件 + brainstorm scripts 3 文件 + 14 翻译 skill 结构层级
+# 3. 上游对齐：hooks 3 文件 + brainstorm scripts 3 文件 + 15 翻译 skill 结构层级
 # 4. 交叉引用：README → docs/ 链接 + skill 间引用 + bootstrap 注入路径
 #
 # 用法：
@@ -187,7 +187,20 @@ else
     if [ "$d" = "0" ]; then ok; else bad "Brainstorm script 漂移: $(basename $f) ($d 行)"; fi
   done
 
-  # 3c. 14 翻译 skill 结构层级（H1-H4 标题数）
+  # 3b-bis. 应与上游逐字一致的运行时文件（fork 没有定制）
+  # OpenCode 插件此前不在任何门禁里，停在 v5.0.7 一年多，给模型的映射表还是
+  # 「Task → @mention」（#131）。脚本类文件同理：跟丢一次就是运行时 bug。
+  # task-brief 有意分歧（识别「任务 N」标题），不在此列。
+  for f in .opencode/plugins/superpowers.js index.js \
+           skills/subagent-driven-development/scripts/sdd-workspace \
+           skills/subagent-driven-development/scripts/review-package \
+           skills/executing-plans/scripts/task-start \
+           skills/executing-plans/scripts/task-done; do
+    d=$(diff <(git show upstream/main:$f 2>/dev/null) "$f" 2>/dev/null | wc -l | tr -d ' ')
+    if [ "$d" = "0" ]; then ok; else bad "运行时文件漂移: $f ($d 行) —— 应与上游逐字一致: git show upstream/main:$f > $f"; fi
+  done
+
+  # 3c. 15 翻译 skill 结构层级（H1-H4 标题数）
   #
   # 必须排除 ``` 围栏内的行：shell 注释（`# 运行测试`）同样匹配 ^#{1,4} ，
   # 会被当成 markdown 标题数进去。用 grep 直接数的话，一个 skill 里多几行
@@ -196,7 +209,7 @@ else
   count_headings() {  # 读 stdin，只数围栏之外的 H1-H4
     awk '/^```/{fence = !fence; next} !fence && /^#{1,4} /{n++} END{print n+0}'
   }
-  declare -a SKILLS=(brainstorming dispatching-parallel-agents executing-plans \
+  declare -a SKILLS=(brainstorming diagnosing-superpowers dispatching-parallel-agents executing-plans \
     finishing-a-development-branch receiving-code-review requesting-code-review \
     subagent-driven-development systematic-debugging test-driven-development \
     using-git-worktrees using-superpowers verification-before-completion \
@@ -282,6 +295,40 @@ else
     fi
   else
     warn ".upstream-sync.json 缺失 —— 无法计算与上游的正文级漂移"
+  fi
+
+
+  # 3g. 标识符漂移：上游正文里出现的命令参数 / 环境变量 / 文件名 / 脚本路径，译文里必须都有
+  #
+  # 3c 只比标题数、3e 只比基线之后的增量 —— 基线**之前**就没译对的内容两者都看不见。
+  # 真实案例：visual-companion.md 的译文长期停在旧版，教人读 `$SCREEN_DIR/.server-info`，
+  # 而脚本早已改写 `$STATE_DIR/server-info`、新增 `--open`；标题数一样，门禁全绿。
+  # 这类标识符不会被翻译，所以「上游有、我们没有」基本就等于正文过期。
+  # 有意的分歧写进 .upstream-sync.json 的 identifierAllow（{ "文件": ["标识符"] }）。
+  if command -v node >/dev/null 2>&1; then
+    id_drift=$(cd "$ROOT" && node -e '
+      const { execSync } = require("child_process");
+      const fs = require("fs");
+      const pat = /(--[a-z][a-z0-9-]{2,}|\$\{?[A-Z_]{3,}\}?|[\w./-]+\.(?:sh|js|mjs|md|json|py|ts|html)\b|scripts\/[\w-]+)/g;
+      let allow = {};
+      try { allow = JSON.parse(fs.readFileSync(".upstream-sync.json", "utf8")).identifierAllow || {}; } catch {}
+      const files = execSync("git ls-tree -r --name-only upstream/main skills").toString().split("\n")
+        .filter(f => f.endsWith(".md") && fs.existsSync(f));
+      const out = [];
+      for (const f of files) {
+        const norm = t => t.replace(/\\/g, "");
+        const up = new Set((norm(execSync("git show upstream/main:" + f).toString()).match(pat)) || []);
+        const ours = new Set((norm(fs.readFileSync(f, "utf8")).match(pat)) || []);
+        const miss = [...up].filter(t => !ours.has(t) && !(allow[f] || []).includes(t));
+        if (miss.length) out.push(f + " 缺 " + miss.slice(0, 5).join(" "));
+      }
+      console.log(out.join("\n"));
+    ' 2>/dev/null)
+    if [ -z "$id_drift" ]; then ok; else
+      while IFS= read -r line; do
+        bad "标识符漂移（译文过期）: $line —— 对照 git show upstream/main:<文件> 重译相应段落"
+      done <<< "$id_drift"
+    fi
   fi
 
 
@@ -463,6 +510,21 @@ fi
 # 分支断掉的图 —— 肉眼看图才发现，代码层面一点动静都没有。
 # 同步上游 v6.3.0 时改了 subagent-driven-development 的两个节点名，正是这个
 # 场景，当时靠手写脚本才验出来，之后就没人再验了。
+hdr "npm 发布一致性"
+# v1.7.13 写了日志、改了版本号、站点也显示新版本，但从没 npm publish（也没打 tag）——
+# 用户跑 `npx superpowers-zh@latest` 一直装到 1.7.12，issue 里「已支持」的功能他们拿不到。
+# 发版的唯一真相源是 RELEASE-NOTES.zh.md 的最新条目（site/build.mjs 也以它为准），
+# 这里核对它在 npm 上确实存在。报 warn：写完日志、还没 publish 的发版窗口里它本来就该亮。
+# RELEASED_VERSION 可覆盖，仅供自测本检查。
+latest_rel=${RELEASED_VERSION:-$(grep -m1 -oE '^## v[0-9]+\.[0-9]+\.[0-9]+' "$ROOT/RELEASE-NOTES.zh.md" | sed 's/^## v//')}
+if command -v npm >/dev/null 2>&1 && npm_versions=$(npm view superpowers-zh versions --json 2>/dev/null); then
+  if echo "$npm_versions" | grep -q "\"${latest_rel}\""; then ok; else
+    warn "RELEASE-NOTES 最新版 v${latest_rel} 不在 npm 上 —— 用户 npx 装不到它。发布：npm publish，再 git tag v${latest_rel} && git push origin v${latest_rel}"
+  fi
+else
+  warn "无法查询 npm（离线？）—— 跳过发布一致性检查"
+fi
+
 hdr "dot 流程图节点/边一致性"
 
 DOT_OUT=$(python3 - "$ROOT" <<'PYEOF'

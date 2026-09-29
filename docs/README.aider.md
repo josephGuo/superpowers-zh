@@ -31,7 +31,7 @@ npx superpowers-zh --tool aider
 
 会做两件事：
 
-1. 把 20 个 skill 复制到 `.aider/skills/`
+1. 把 21 个 skill 复制到 `.aider/skills/`
 2. 生成（或追加）`CONVENTIONS.md`，里面是 skill 索引和触发规则，指向 `.aider/skills/<name>/SKILL.md`
 
 ### 关于自动检测
@@ -64,7 +64,7 @@ read:
   - .aider/skills/systematic-debugging/SKILL.md
 ```
 
-注意每个 SKILL.md 都会完整进入上下文，装 20 个的全文开销很大 —— 这正是我们默认走索引式 `CONVENTIONS.md` 的原因。
+注意每个 SKILL.md 都会完整进入上下文，装 21 个的全文开销很大 —— 这正是我们默认走索引式 `CONVENTIONS.md` 的原因。
 
 ## 故障排查
 

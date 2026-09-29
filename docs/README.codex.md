@@ -43,7 +43,7 @@ codex plugin add superpowers-zh@superpowers-zh
 codex plugin list   # 应显示 superpowers-zh@superpowers-zh  installed, enabled
 ```
 
-安装后 20 个 skills 全部可被发现；插件清单声明了空 `hooks`，不会注册仅适用于 Claude Code 的 SessionStart hook。
+安装后 21 个 skills 全部可被发现；插件清单声明了空 `hooks`，不会注册仅适用于 Claude Code 的 SessionStart hook。
 
 **更新：**
 

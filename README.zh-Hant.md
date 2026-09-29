@@ -4,7 +4,7 @@
 
 > 🦸 **superpowers（250k+ ⭐）完整漢化 + 4 個中國原創 skills** — 讓 Claude Code / Copilot CLI / Hermes Agent / Cursor / Windsurf / Kiro / Gemini CLI / Qoder 等 **26 款 AI 編程工具**真正會幹活。從頭腦風暴到程式碼審查，從 TDD 到除錯，每個 skill 都是經過實戰驗證的工作方法論。
 
-Chinese community edition of [superpowers](https://github.com/obra/superpowers) — 20 skills across 26 AI coding tools, including full translations and China-specific development skills.
+Chinese community edition of [superpowers](https://github.com/obra/superpowers) — 21 skills across 26 AI coding tools, including full translations and China-specific development skills.
 
 [![官網 sp.aiolaola.com](https://img.shields.io/badge/🌐_官網-sp.aiolaola.com-F59E0B)](https://sp.aiolaola.com)
 [![GitHub stars](https://img.shields.io/github/stars/jnMetaCode/superpowers-zh?style=social)](https://github.com/jnMetaCode/superpowers-zh)
@@ -19,7 +19,7 @@ Chinese community edition of [superpowers](https://github.com/obra/superpowers) 
 
 | 📦 翻譯 Skills | 🇨🇳 中國原創 Skills | 🤖 支援工具 |
 |:---:|:---:|:---:|
-| **14** | **4**<br><sub>另有 2 個上游歷史保留</sub> | **Claude Code / Copilot CLI / Hermes Agent / Cursor / Windsurf / Kiro / Gemini CLI / Codex / Aider / Trae / VS Code (Copilot) / DeerFlow / OpenCode / OpenClaw / Qwen Code / Antigravity / Claw Code / Qoder / CodeBuddy（騰訊）/ CodeArts（華為雲碼道）/ Cline / Kilo Code / Crush** |
+| **15** | **4**<br><sub>另有 2 個上游歷史保留</sub> | **Claude Code / Copilot CLI / Hermes Agent / Cursor / Windsurf / Kiro / Gemini CLI / Codex / Aider / Trae / VS Code (Copilot) / DeerFlow / OpenCode / OpenClaw / Qwen Code / Antigravity / Claw Code / Qoder / CodeBuddy（騰訊）/ CodeArts（華為雲碼道）/ Cline / Kilo Code / Crush** |
 
 ---
 
@@ -154,7 +154,7 @@ AI：在開始實作之前，我需要了解幾個關鍵問題：
 | 維度 | superpowers（英文上游） | superpowers-zh（中文增強版） |
 |------|----------------------|---------------------------|
 | ⭐ Star 數 | 250k+ | — |
-| 📦 Skills 總數 | 14 | **20**（14 翻譯 + 4 國產原創 + 2 上游歷史保留） |
+| 📦 Skills 總數 | 15 | **21**（15 翻譯 + 4 國產原創 + 2 上游歷史保留） |
 | 🌐 語言 | 英文 | 中文（技術術語保留英文） |
 | 🤖 **支援工具** | **6 款**：Claude Code / Cursor / Codex / OpenCode / Copilot CLI / Gemini CLI | **26 款**：上述 6 款 + Hermes Agent / Trae / Kiro / Qwen Code / OpenClaw / Claw Code / Antigravity / DeerFlow / VS Code / Windsurf / Aider / Qoder / CodeBuddy（騰訊） / CodeArts（華為雲碼道） / Cline / Kilo Code / Crush / ZCode（智譜）/ DeepSeek Harness / Reasonix |
 | ⚡ **安裝方式** | 按工具分別裝（每款一條不同的 plugin marketplace 命令） | **`npx superpowers-zh` 一條命令自動識別專案裡的工具並安裝**；識別不出可 `--tool <name>` 顯式指定 |
@@ -204,9 +204,9 @@ AI：在開始實作之前，我需要了解幾個關鍵問題：
 | [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) (dsh) | CLI | `npx superpowers-zh` | `.dsh/skills/` + `AGENTS.md` |
 | [Reasonix](https://reasonix.io/) | CLI | `npx superpowers-zh` | `.reasonix/skills/` + `REASONIX.md`（全域 Windows 為 `%APPDATA%\reasonix\skills`） |
 
-> 執行 `npx superpowers-zh` 會自動偵測你專案中使用的工具，將 20 個 skills 安裝到正確位置。
+> 執行 `npx superpowers-zh` 會自動偵測你專案中使用的工具，將 21 個 skills 安裝到正確位置。
 
-### 翻譯的 Skills（14 個）
+### 翻譯的 Skills（15 個）
 
 | Skill | 用途 |
 |-------|------|
@@ -215,6 +215,7 @@ AI：在開始實作之前，我需要了解幾個關鍵問題：
 | **執行計畫** (executing-plans) | 按計畫逐步實施，每步驗證 |
 | **測試驅動開發** (test-driven-development) | 嚴格 TDD：先寫測試，再寫程式碼 |
 | **系統化除錯** (systematic-debugging) | 四階段除錯法：定位→分析→假設→修復 |
+| **診斷 Superpowers** (diagnosing-superpowers) | 會話跑偏時讀 transcript 取證，每條結論帶 `path:line`，可整理成 issue |
 | **請求程式碼審查** (requesting-code-review) | 派遣審查 agent 檢查程式碼品質 |
 | **接收程式碼審查** (receiving-code-review) | 技術嚴謹地處理審查回饋，拒絕敷衍 |
 | **完成前驗證** (verification-before-completion) | 證據先行——聲稱完成前必須跑驗證 |
@@ -230,7 +231,7 @@ AI：在開始實作之前，我需要了解幾個關鍵問題：
 > ⚠️ **下表前 4 個 chinese-\* 為「手動呼叫」skill**——不會自動觸發，需在對話中顯式輸入 `/chinese-xxx` 才會載入。
 > 設計為參考資料而非工作流，避免污染上游 skill 的自動排程（如 `requesting-code-review`、`brainstorming` 等）。
 >
-> ⚠️ **表格最後兩個（mcp-builder / workflow-runner）不是中國原創** —— 它們來自上游，上游後來移除了，本 fork 保留下來繼續維護。全倉 20 個 skill = 14 翻譯 + 4 中國原創 + 2 上游歷史保留。
+> ⚠️ **表格最後兩個（mcp-builder / workflow-runner）不是中國原創** —— 它們來自上游，上游後來移除了，本 fork 保留下來繼續維護。全倉 21 個 skill = 15 翻譯 + 4 中國原創 + 2 上游歷史保留。
 
 | Skill | 用途 | 呼叫方式 | 上游有嗎？ |
 |-------|------|---------|:---:|
@@ -306,7 +307,7 @@ claude plugin uninstall superpowers-zh@superpowers-zh    # 卸載
 
 > ⚠️ **手動 `cp -r skills` 是低保版安裝，不等同於完整 plugin。**
 >
-> superpowers-zh 是一個完整 plugin，包含：`skills/`（20 個能力）+ `hooks/`（SessionStart 鉤子，讓 skill 在合適時機自動觸發）+ `CLAUDE.md` / `GEMINI.md` 等 bootstrap 引導檔案 + 4 套 plugin manifest（Claude Code / Cursor / Codex / Marketplace）。
+> superpowers-zh 是一個完整 plugin，包含：`skills/`（21 個能力）+ `hooks/`（SessionStart 鉤子，讓 skill 在合適時機自動觸發）+ `CLAUDE.md` / `GEMINI.md` 等 bootstrap 引導檔案 + 4 套 plugin manifest（Claude Code / Cursor / Codex / Marketplace）。
 >
 > **下面的 `cp -r skills` 命令只複製 skills 目錄**，不會自動設定 hooks、不會產生 bootstrap 引導。結果：skills 物理上存在，但 AI 不會在合適時機自動呼叫，需要你每次手動喊 "use brainstorming skill" 之類。
 >
@@ -434,7 +435,7 @@ npx superpowers-zh@latest --uninstall
 
 | 專案 | 定位 | 一句話 |
 |------|------|-------|
-| **[superpowers-zh](https://github.com/jnMetaCode/superpowers-zh)**（本專案） ![](https://img.shields.io/github/stars/jnMetaCode/superpowers-zh?style=flat&label=⭐) | 🧠 工作方法論 | 20 個 skills 教 AI 怎麼幹活（TDD / 除錯 / 程式碼審查等） |
+| **[superpowers-zh](https://github.com/jnMetaCode/superpowers-zh)**（本專案） ![](https://img.shields.io/github/stars/jnMetaCode/superpowers-zh?style=flat&label=⭐) | 🧠 工作方法論 | 21 個 skills 教 AI 怎麼幹活（TDD / 除錯 / 程式碼審查等） |
 | **[agency-agents-zh](https://github.com/jnMetaCode/agency-agents-zh)** ![](https://img.shields.io/github/stars/jnMetaCode/agency-agents-zh?style=flat&label=⭐) | 🎭 專家角色庫 | 277 個**即插即用** AI 專家，含 64 中國原創（小紅書 / 抖音 / 飛書 / 釘釘 / Qt 上位機 / 機械設計） |
 | **[agency-orchestrator](https://github.com/jnMetaCode/agency-orchestrator)** ![](https://img.shields.io/github/stars/jnMetaCode/agency-orchestrator?style=flat&label=%E2%AD%90) | 🚀 編排引擎 | 一句話 → 276 專家協作，**幾分鐘出方案**（15 種大模型 / 11 種免 key） |
 | **[ai-coding-guide](https://github.com/jnMetaCode/ai-coding-guide)** | 📖 實戰教程 | 66 個 Claude Code 技巧 + 10 款工具最佳實踐 + 設定範本 |

@@ -24,7 +24,7 @@ npx superpowers-zh --global --tool zcode
 
 ZCode 里技能通过 `$skill-name` 调用：在输入框输入 `$`，选择需要的技能。也可以在 **设置 → 技能** 里查看列表、按名称搜索、用开关启用/停用。
 
-装完后建议先确认：设置 → 技能 里能看到这 20 个 skill，且处于启用状态。
+装完后建议先确认：设置 → 技能 里能看到这 21 个 skill，且处于启用状态。
 
 ## 手动安装
 
@@ -42,7 +42,7 @@ cp -r superpowers-zh/skills/* ~/.zcode/skills/
 npx superpowers-zh --global --uninstall
 ```
 
-只移除我们装的那 20 个技能目录，你自建的技能不受影响（已在 verify-release 里有断言守着）。
+只移除我们装的那 21 个技能目录，你自建的技能不受影响（已在 verify-release 里有断言守着）。
 
 ## 关于 AGENTS.md
 

@@ -120,12 +120,13 @@ const SKILL_META = {
   'using-superpowers':            { group: 'meta',    title: '使用 Superpowers · 引导', titleEn: 'Using Superpowers · Bootstrap', descEn: 'The bootstrap skill — establishes how to discover and invoke skills at the start of every conversation.' },
   'brainstorming':                { group: 'flow',    title: '头脑风暴',           titleEn: 'Brainstorming',            descEn: 'Explore intent, requirements and design before any creative work — feature, component or behavior change.' },
   'writing-plans':                { group: 'flow',    title: '编写实现计划',       titleEn: 'Writing Plans',            descEn: 'Turn a spec into a step-by-step implementation plan before writing any code.' },
-  'executing-plans':              { group: 'flow',    title: '执行计划',           titleEn: 'Executing Plans',          descEn: 'Execute a written plan in a separate session with review checkpoints.' },
+  'executing-plans':              { group: 'flow',    title: '执行计划',           titleEn: 'Executing Plans',          descEn: 'Execute a plan yourself in the current session — inline, with a ledger and one final review.' },
   'subagent-driven-development':  { group: 'flow',    title: '子代理驱动开发',     titleEn: 'Subagent-Driven Dev',      descEn: 'Run a plan of independent tasks within the current session via subagents.' },
   'dispatching-parallel-agents':  { group: 'flow',    title: '并行代理调度',       titleEn: 'Dispatching Parallel Agents', descEn: 'Fan out 2+ independent tasks with no shared state or ordering dependency.' },
   'workflow-runner':              { group: 'flow',    title: '工作流运行器',       titleEn: 'Workflow Runner',          descEn: 'Run agency-orchestrator YAML workflows directly using the current session LLM — no API key.' },
   'test-driven-development':      { group: 'quality', title: '测试驱动开发 · TDD', titleEn: 'Test-Driven Development',   descEn: 'Write the test before the implementation, for every feature and bug fix.' },
   'systematic-debugging':         { group: 'quality', title: '系统化调试',         titleEn: 'Systematic Debugging',     descEn: 'Reproduce and locate the root cause before proposing any fix.' },
+  'diagnosing-superpowers':       { group: 'quality', title: '诊断 Superpowers',   titleEn: 'Diagnosing Superpowers',   descEn: 'When a session went wrong, read its transcripts and report what happened with path:line evidence — optionally as an issue.' },
   'verification-before-completion':{ group: 'quality', title: '完成前验证',        titleEn: 'Verification Before Completion', descEn: 'Run verification and back every claim with evidence before saying it is done.' },
   'requesting-code-review':       { group: 'review',  title: '发起代码审查',       titleEn: 'Requesting Code Review',   descEn: 'Validate work against requirements before merging or shipping.' },
   'receiving-code-review':        { group: 'review',  title: '接收代码审查',       titleEn: 'Receiving Code Review',    descEn: 'Apply review feedback with technical rigor — verify, don\'t blindly comply.' },
@@ -550,7 +551,7 @@ const T = {
     detailInstall: '安装此 skill',
     detailSource: '在 GitHub 查看源文件 ↗',
     features: [
-      { icon: '🧠', t: '20 个实战方法论', d: '不是 prompt 模板，是经过跨会话对抗式压力测试调优的工作方法论 —— 从头脑风暴到 TDD、调试、代码审查。' },
+      { icon: '🧠', t: '21 个实战方法论', d: '不是 prompt 模板，是经过跨会话对抗式压力测试调优的工作方法论 —— 从头脑风暴到 TDD、调试、代码审查。' },
       { icon: '🔌', t: '26 款工具通用', d: '一套 skill，Claude Code / Cursor / Codex / Gemini CLI / Windsurf… 全适配，换工具不用换习惯。' },
       { icon: '⚡', t: '一条命令安装', d: 'npx superpowers-zh 自动识别项目里用的是哪款工具并安装，零配置，装完重启即生效。' },
       { icon: '🇨🇳', t: '中国原创 Skills', d: '中文代码审查话术、中文提交规范、中文文档排版、国内 Git 平台（Gitee/Coding/极狐）配置 —— 上游没有。' },
@@ -1254,7 +1255,7 @@ ${flagSection}${moreSection}
 }
 
 // ---- JSON-LD 结构化数据 ----
-// 站上有 7 条 FAQ、完整的软件信息与 20 个 skill 文档页，却没有任何结构化标记：
+// 站上有 7 条 FAQ、完整的软件信息与 21 个 skill 文档页，却没有任何结构化标记：
 // 搜索引擎拿不到富摘要，AI 抓取时只能从正文里猜。
 //
 // 关于 CSP：ld+json 是**数据块不是可执行脚本**，浏览器不会执行它，爬虫读的也是
@@ -1449,7 +1450,7 @@ function build() {
   // 问「superpowers-zh 是什么、怎么装」，助手就来抓。它现在得爬 66 个页面才能拼出
   // 全貌，多数情况下只抓首页就走，于是回答里缺一半信息。
   // llms.txt（llmstxt.org 约定）给它一份「一次读完就懂」的索引；llms-full.txt 直接
-  // 把 20 个 SKILL.md 正文拼全，让它不用逐页爬。
+  // 把 21 个 SKILL.md 正文拼全，让它不用逐页爬。
   // Cloudflare 的「面向代理的 Markdown」是同一件事的付费版（Pro 套餐），这里自己做。
   // 注意：robots.txt 必须放行这两个文件 —— 上面那份是 Allow: / ，已覆盖。
   const skillLine = s => `- [${s.title}](${SITE_URL}/skills/${s.name}): ${s.desc.replace(/\s+/g, ' ').slice(0, 180)}`;
@@ -1457,7 +1458,7 @@ function build() {
   const llms = [
     '# superpowers-zh',
     '',
-    '> Anthropic superpowers 的中文增强 fork：20 个塑造 AI 编程助手行为的 skill（15 个译自上游 + 5 个本 fork 新增，其中 4 个为中国特色），一条 npx 命令适配 26 款 IDE / CLI。',
+    '> Anthropic superpowers 的中文增强 fork：21 个塑造 AI 编程助手行为的 skill（16 个译自上游 + 5 个本 fork 新增，其中 4 个为中国特色），一条 npx 命令适配 26 款 IDE / CLI。',
     '',
     '安装（自动检测当前项目使用的工具）：',
     '',
