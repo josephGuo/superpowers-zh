@@ -203,47 +203,33 @@ const SPONSORS = [
     // 旗舰位：赞助商页顶部整块大图 + 两版 README 顶部优先展示。
     // 旗舰卡读 img（大 banner），不读 logo —— 见下方 assertSponsors 的校验。
     tier: 'flagship',
-    img: 'infistar.jpg', w: 1269, h: 337, code: '',
-    url: 'https://www.infistar.cc/register?aff=PDVTM2VS&ref_source=link',
-    name: { zh: 'Infistar.cc 无限星河', en: 'Infistar.cc', zht: 'Infistar.cc 無限星河' },
+    img: 'apinebula.png', w: 1269, h: 337, code: 'agent',
+    url: 'https://apinebula.ai/1Axi9F',
+    name: { zh: 'APINEBULA', en: 'APINEBULA', zht: 'APINEBULA' },
     tagline: {
-      zh: '全模型 API · 一个 Key 接入 Claude / GPT / Gemini，低至官方 1 折',
-      en: 'All-model API · one key for Claude / GPT / Gemini, from 10% of list price',
-      zht: '全模型 API · 一個 Key 接入 Claude / GPT / Gemini，低至官方 1 折',
+      zh: '一个接口，接入全球顶尖 AI 模型',
+      en: 'One API for the world\u2019s leading AI models',
+      zht: '一個介面，接入全球頂尖 AI 模型',
     },
     alt: {
-      zh: 'Infistar.cc 无限星河 —— 全模型 API 服务，一个 API Key 接入 Claude、ChatGPT、Gemini、Kimi、GLM、DeepSeek，价格低至官方渠道 1 折',
-      en: 'Infistar.cc — all-model API service: one API key for Claude, ChatGPT, Gemini, Kimi, GLM and DeepSeek, from 10% of official pricing',
-      zht: 'Infistar.cc 無限星河 —— 全模型 API 服務，一個 API Key 接入 Claude、ChatGPT、Gemini、Kimi、GLM、DeepSeek，價格低至官方渠道 1 折',
+      zh: 'APINEBULA —— 企业级 AI 聚合平台，一个接口接入 Claude、GPT、Gemini 等全球顶尖模型，价格低至 1 折',
+      en: 'APINEBULA — enterprise AI aggregation platform with one API for Claude, GPT, Gemini and other leading models, from 10% of list price',
+      zht: 'APINEBULA —— 企業級 AI 聚合平台，一個介面接入 Claude、GPT、Gemini 等全球頂尖模型，價格低至 1 折',
     },
-    // 旗舰卡按赞助商原文的三条要点分段展示（常规卡才用整段 desc）。
-    // 压成一整段会把人家文案的骨架揉掉，也不好扫读 —— 付费展位按原结构呈现。
-    points: {
-      zh: [
-        { icon: '⚡', t: '稳定承载复杂开发任务', d: '高可用模型通道与多节点冗余，价格低至官方渠道 1 折，稳定支持需求分析、方案规划、TDD、调试及代码审查等长任务。' },
-        { icon: '🧠', t: '一个 API Key 接入主流模型', d: '全面支持 Claude、ChatGPT、Gemini、Kimi、GLM、DeepSeek 等模型，适配 Claude Code、Codex、Cursor、Windsurf、Kiro 等 AI 编程工具。' },
-        { icon: '🛠️', t: '赋能完整开发工作流', d: '结合 superpowers-zh 的系统化 Skills，让 AI 更好地完成头脑风暴、计划执行、问题排查和质量检查。' },
-      ],
-      en: [
-        { icon: '⚡', t: 'Built for long-running dev tasks', d: 'High-availability model channels with multi-node redundancy, from 10% of official pricing — steady across requirements analysis, planning, TDD, debugging and code review.' },
-        { icon: '🧠', t: 'One API key, every major model', d: 'Full support for Claude, ChatGPT, Gemini, Kimi, GLM and DeepSeek, wired for Claude Code, Codex, Cursor, Windsurf and Kiro.' },
-        { icon: '🛠️', t: 'Powers the whole workflow', d: 'Paired with the systematic skills in superpowers-zh, so the AI holds up through brainstorming, plan execution, troubleshooting and quality checks.' },
-      ],
-      zht: [
-        { icon: '⚡', t: '穩定承載複雜開發任務', d: '高可用模型通道與多節點冗餘，價格低至官方渠道 1 折，穩定支援需求分析、方案規劃、TDD、除錯及程式碼審查等長任務。' },
-        { icon: '🧠', t: '一個 API Key 接入主流模型', d: '全面支援 Claude、ChatGPT、Gemini、Kimi、GLM、DeepSeek 等模型，適配 Claude Code、Codex、Cursor、Windsurf、Kiro 等 AI 編程工具。' },
-        { icon: '🛠️', t: '賦能完整開發工作流', d: '結合 superpowers-zh 的系統化 Skills，讓 AI 更好地完成頭腦風暴、計畫執行、問題排查和品質檢查。' },
-      ],
+    desc: {
+      zh: '感谢 APINEBULA 大屏赞助本项目！APINEBULA 是银河录像局旗下的企业级 AI 聚合平台，背靠大平台资源，面向开发者、团队与企业用户提供稳定、高性价比的大模型 API 接入服务。平台聚合 Claude、GPT、Gemini 等主流满血模型，一个接口接入全球顶尖 AI 大模型，各大模型价格低至 1 折起，支持企业级高并发、正式合同、对公打款与开票服务，适合 AI 编程、Agent 开发、业务系统集成等多种场景！',
+      en: 'Thanks to APINEBULA for its banner sponsorship of this project. APINEBULA is an enterprise AI aggregation platform from Galaxy Video Bureau. Backed by large-platform resources, it gives developers, teams and enterprises stable, cost-effective large-model API access. The platform aggregates full-capability Claude, GPT, Gemini and other leading models through one API, with pricing from 10% of list price. It supports enterprise concurrency, formal contracts, corporate payments and invoicing for AI coding, agent development, business-system integration and more.',
+      zht: '感謝 APINEBULA 大屏贊助本專案！APINEBULA 是銀河錄像局旗下的企業級 AI 聚合平台，背靠大型平台資源，面向開發者、團隊與企業使用者提供穩定、高性價比的大型模型 API 接入服務。平台聚合 Claude、GPT、Gemini 等主流滿血模型，一個介面接入全球頂尖 AI 大型模型，各大模型價格低至 1 折起，支援企業級高併發、正式合約、對公付款與開票服務，適合 AI 編程、Agent 開發、業務系統整合等多種場景！',
     },
     perk: {
-      zh: '🎁 通过本页链接注册并完成首次调用，即可领取 5 美元等值测试额度',
-      en: '🎁 Sign up via this link and make your first call to claim $5 in test credit',
-      zht: '🎁 透過本頁連結註冊並完成首次呼叫，即可領取 5 美元等值測試額度',
+      zh: '🎁 通过本页链接注册并在充值时填写优惠码 agent，可享 9 折优惠',
+      en: '🎁 Sign up via this link and enter code agent when topping up for 10% off',
+      zht: '🎁 透過本頁連結註冊並在儲值時填寫優惠碼 agent，可享 9 折優惠',
     },
     perkShort: {
-      zh: '注册并完成首次调用领 5 美元等值测试额度',
-      en: '$5 test credit after your first call',
-      zht: '註冊並完成首次呼叫領 5 美元等值測試額度',
+      zh: '充值时使用优惠码 agent 享 9 折',
+      en: '10% off top-ups with code agent',
+      zht: '儲值時使用優惠碼 agent 享 9 折',
     },
   },
   {
@@ -417,6 +403,33 @@ const SPONSORS = [
     },
     perkShort: { zh: '新用户注册立得 5 元平台体验金', en: '¥5 free platform credit on sign-up', zht: '新使用者註冊立得 5 元平台體驗金' },
   },
+  {
+    tier: 'standard',
+    img: 'infistar.jpg', w: 1269, h: 337, code: '',
+    logo: 'logo-infistar-icon.png',
+    url: 'https://www.infistar.cc/register?aff=PDVTM2VS&ref_source=link',
+    name: { zh: 'Infistar.cc 无限星河', en: 'Infistar.cc', zht: 'Infistar.cc 無限星河' },
+    alt: {
+      zh: 'Infistar.cc 无限星河 —— 全模型 API 服务，一个 API Key 接入 Claude、ChatGPT、Gemini、Kimi、GLM、DeepSeek，价格低至官方渠道 1 折',
+      en: 'Infistar.cc — all-model API service: one API key for Claude, ChatGPT, Gemini, Kimi, GLM and DeepSeek, from 10% of official pricing',
+      zht: 'Infistar.cc 無限星河 —— 全模型 API 服務，一個 API Key 接入 Claude、ChatGPT、Gemini、Kimi、GLM、DeepSeek，價格低至官方渠道 1 折',
+    },
+    desc: {
+      zh: '提供高可用模型通道与多节点冗余，一个 API Key 接入 Claude、ChatGPT、Gemini、Kimi、GLM、DeepSeek 等模型，价格低至官方渠道 1 折；适配 Claude Code、Codex、Cursor、Windsurf、Kiro 等 AI 编程工具。',
+      en: 'High-availability model channels with multi-node redundancy. One API key provides access to Claude, ChatGPT, Gemini, Kimi, GLM, DeepSeek and more from 10% of official pricing, with support for Claude Code, Codex, Cursor, Windsurf and Kiro.',
+      zht: '提供高可用模型通道與多節點冗餘，一個 API Key 接入 Claude、ChatGPT、Gemini、Kimi、GLM、DeepSeek 等模型，價格低至官方渠道 1 折；適配 Claude Code、Codex、Cursor、Windsurf、Kiro 等 AI 編程工具。',
+    },
+    perk: {
+      zh: '🎁 通过本页链接注册并完成首次调用，即可领取 5 美元等值测试额度',
+      en: '🎁 Sign up via this link and make your first call to claim $5 in test credit',
+      zht: '🎁 透過本頁連結註冊並完成首次呼叫，即可領取 5 美元等值測試額度',
+    },
+    perkShort: {
+      zh: '注册并完成首次调用领 5 美元等值测试额度',
+      en: '$5 test credit after your first call',
+      zht: '註冊並完成首次呼叫領 5 美元等值測試額度',
+    },
+  },
 ];
 
 // 赞助位是付费展示位，图挂了就是事故。旗舰卡读 img、常规卡读 logo，两条路径
@@ -435,7 +448,7 @@ assertToolDocs();
 
 function assertSponsors() {
   for (const s of SPONSORS) {
-    const need = s.tier === 'flagship' ? ['img', 'w', 'h', 'points'] : ['logo', 'desc'];
+    const need = s.tier === 'flagship' ? ['img', 'w', 'h', 'desc'] : ['logo', 'desc'];
     const missing = need.filter(k => !s[k]);
     if (missing.length) {
       throw new Error(`赞助商 ${s.name?.zh || '?'}（tier: ${s.tier}）缺字段：${missing.join(', ')}`);
@@ -453,23 +466,11 @@ function assertSponsors() {
       }
     }
     const textKeys = s.tier === 'flagship'
-      ? ['name', 'tagline', 'alt', 'perk', 'perkShort']
+      ? ['name', 'tagline', 'alt', 'desc', 'perk', 'perkShort']
       : ['name', 'alt', 'desc', 'perk', 'perkShort'];   // 常规卡不展示 tagline
     for (const k of textKeys) {
       for (const lang of ['zh', 'en', 'zht']) {
         if (!s[k]?.[lang]) throw new Error(`赞助商 ${s.name?.zh || '?'} 的 ${k} 缺 ${lang} 文案`);
-      }
-    }
-    // 旗舰的要点分段：三语条数必须一致，少一条就是某个语言漏翻了
-    if (s.tier === 'flagship') {
-      const counts = ['zh', 'en', 'zht'].map(l => s.points?.[l]?.length || 0);
-      if (counts.some(n => n === 0) || new Set(counts).size > 1) {
-        throw new Error(`赞助商 ${s.name?.zh || '?'} 的 points 三语条数不一致：zh/en/zht = ${counts.join('/')}`);
-      }
-      for (const l of ['zh', 'en', 'zht']) {
-        for (const pt of s.points[l]) {
-          if (!pt.icon || !pt.t || !pt.d) throw new Error(`赞助商 ${s.name?.zh || '?'} 的 ${l} 要点缺 icon/t/d`);
-        }
       }
     }
   }
@@ -1179,9 +1180,7 @@ function renderSponsors(lang) {
       <div class="flag-body">
         <h3>${esc(s.name[lang])}</h3>
         <p class="flag-tag">${esc(s.tagline[lang])}</p>
-        <ul class="flag-points">${s.points[lang].map(pt => `
-          <li><span class="fp-icon" aria-hidden="true">${pt.icon}</span><div><b>${esc(pt.t)}</b><span>${esc(pt.d)}</span></div></li>`).join('')}
-        </ul>
+        <p class="flag-desc">${esc(s.desc[lang])}</p>
         <div class="flag-foot">
           <span class="sponsor-perk">${esc(s.perk[lang])}</span>
           <a class="btn btn-primary" href="${esc(s.url)}" target="_blank" rel="sponsored nofollow noopener">${esc(sp.visitFlag)}</a>

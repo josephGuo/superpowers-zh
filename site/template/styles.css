@@ -409,6 +409,7 @@ footer { border-top: 1px solid var(--border-soft); margin-top: 40px; padding: 40
 .flag-foot { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-top: 16px; }
 .flag-foot .sponsor-perk { margin: 0; flex: 1 1 320px; }
 .flag-foot .btn { flex: 0 0 auto; padding: 10px 20px; font-size: 14px; }
+.flag-desc { margin: 0; font-size: 13.5px; color: var(--text-dim); line-height: 1.8; }
 
 /* 常规位：紧凑卡（logo + 名 + 截断简介 + 福利），不放 banner —— banner 只给旗舰位 */
 .sponsor-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); gap: 16px; }
