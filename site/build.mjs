@@ -350,18 +350,18 @@ const SPONSORS = [
   {
     tier: 'standard',
     code: '',
-    logo: 'logo-fluxionai-icon.png',
-    url: 'https://fluxionai.space/register?source=github&campaign=superpowers&promo=SUPERPOWERS',
-    name: { zh: 'Fluxion AI', en: 'Fluxion AI', zht: 'Fluxion AI' },
+    logo: 'logo-sidrune-ai.png',
+    url: 'https://sidrune.ai/register?source=github&campaign=superpowers&promo=superpowers&aff=RQHWKAMQLX2S',
+    name: { zh: 'Sidrune AI', en: 'Sidrune AI', zht: 'Sidrune AI' },
     tagline: {
       zh: '一个入口，接入并管理全球主流 AI 模型',
       en: 'One entry point to access and manage the world’s mainstream AI models',
       zht: '一個入口，接入並管理全球主流 AI 模型',
     },
     alt: {
-      zh: 'Fluxion AI —— 一个入口，接入并管理全球主流 AI 模型',
-      en: 'Fluxion AI — one entry point to access and manage the world’s mainstream AI models',
-      zht: 'Fluxion AI —— 一個入口，接入並管理全球主流 AI 模型',
+      zh: 'Sidrune AI —— 一个入口，接入并管理全球主流 AI 模型',
+      en: 'Sidrune AI — one entry point to access and manage the world’s mainstream AI models',
+      zht: 'Sidrune AI —— 一個入口，接入並管理全球主流 AI 模型',
     },
     desc: {
       zh: '面向个人开发者、技术团队与企业，通过统一 API 接入并管理全球主流 AI 模型；通过多线路动态调度提升可用性，模型表现、响应时间与费用透明可查。根据不同模型与线路，API 调用成本较官方或基准价格可降低 40%—98%。',
