@@ -107,13 +107,50 @@ PLAN
         fail "task-done keeps the full test output in the workspace"
     fi
 
+    # --- task-done: successful commands need not print a result ---
+    local mode quiet_ledger quiet_log
+    for mode in silent whitespace; do
+        cp "$repo/plan.md" "$repo/$mode.md"
+        rc=0
+        if [[ "$mode" == silent ]]; then
+            out="$(cd "$repo" && "$EP_SCRIPTS/task-done" "$mode.md" 1 "$base" -- true 2>&1)" || rc=$?
+        else
+            out="$(cd "$repo" && "$EP_SCRIPTS/task-done" "$mode.md" 1 "$base" -- sh -c 'printf " \t\n\n"' 2>&1)" || rc=$?
+        fi
+        quiet_ledger="$repo/.superpowers/sdd/$mode/progress.md"
+        quiet_log="$repo/.superpowers/sdd/$mode/task-1-tests.log"
+        if [[ "$rc" -eq 0 ]]; then
+            pass "task-done succeeds for $mode test output"
+        else
+            fail "task-done succeeds for $mode test output (got $rc)"
+        fi
+        if [[ -f "$quiet_ledger" ]] &&
+            grep -qF "Task 1: complete (commits ${base:0:7}..${head:0:7}, tests:" "$quiet_ledger" &&
+            grep -qF ' → (no output))' "$quiet_ledger"; then
+            pass "task-done creates a completion ledger for $mode test output"
+        else
+            fail "task-done creates a completion ledger for $mode test output"
+        fi
+        if [[ "$mode" == silent ]]; then
+            if [[ -f "$quiet_log" && ! -s "$quiet_log" ]]; then
+                pass "task-done preserves the empty test log"
+            else
+                fail "task-done preserves the empty test log"
+            fi
+        elif printf ' \t\n\n' | cmp -s - "$quiet_log"; then
+            pass "task-done preserves whitespace-only test output verbatim"
+        else
+            fail "task-done preserves whitespace-only test output verbatim"
+        fi
+    done
+
     # --- task-done: refuses to record a failing task ---
     rc=0
-    out="$(cd "$repo" && "$EP_SCRIPTS/task-done" plan.md 2 "$head" -- sh -c 'echo "FAILED (errors=1)"; exit 1' 2>&1)" || rc=$?
-    if [[ "$rc" -ne 0 ]]; then
-        pass "task-done exits non-zero when the test command fails"
+    out="$(cd "$repo" && "$EP_SCRIPTS/task-done" plan.md 2 "$head" -- sh -c 'echo "FAILED (errors=1)"; exit 7' 2>&1)" || rc=$?
+    if [[ "$rc" -eq 7 ]]; then
+        pass "task-done preserves the failing test command's exit status"
     else
-        fail "task-done exits non-zero when the test command fails"
+        fail "task-done preserves the failing test command's exit status (got $rc)"
     fi
     if ! grep -q "Task 2: complete" "$ledger"; then
         pass "task-done does not record a failing task as complete"

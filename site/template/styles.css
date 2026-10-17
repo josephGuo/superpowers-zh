@@ -570,6 +570,17 @@ a.card:hover .card-more { color: var(--accent); }
 .foot-col a { font-size: 14px; color: var(--text-dim); transition: color .2s; }
 .foot-col a:hover { color: var(--accent-2); }
 
+/* ========== 404 页 ==========
+   CSP 是 style-src 'self'，style="" 属性会被浏览器拦下，所以样式必须写在这里。 */
+.doc.nf { max-width: 640px; padding: 80px 20px; text-align: center; }
+.nf-code { font-size: 64px; font-weight: 800; letter-spacing: 2px; opacity: .85; }
+.nf h1 { margin: 12px 0 8px; }
+.nf-lead { opacity: .75; margin: 0 0 28px; }
+.nf-links { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin: 0; }
+.nf-alt { opacity: .75; margin: 0 0 4px; }
+.nf-links + .nf-alt { margin-top: 28px; }
+.nf-alt a { color: var(--accent); }
+
 /* ========== Skill 详情(操作文档)页 ========== */
 .doc { max-width: 820px; margin: 0 auto; padding: 36px 24px 0; }
 .doc-back { display: inline-block; font-size: 14px; color: var(--text-dim); margin: 8px 0 24px; transition: color .2s; }

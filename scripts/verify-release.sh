@@ -6,6 +6,7 @@
 # 卸载有没有留垃圾它都不查。本脚本补上这些断言，发 npm 之前跑一次。
 #
 #   bash scripts/verify-release.sh
+#   bash scripts/verify-release.sh --offline  # PR 检查：只验证本地行为，不探测外链
 #
 # 覆盖：
 #   I. Windows 专属全局路径（platform 打桩跑真实代码）
@@ -17,6 +18,13 @@
 #   E. rules 型工具（Cline / Kilo Code）的 bootstrap 索引内容断言
 #   F. PATH 探测在 PATH 为空 / 畸形 / 未定义时的健壮性
 set -uo pipefail
+OFFLINE=0
+for arg in "$@"; do
+  case "$arg" in
+    --offline) OFFLINE=1 ;;
+    *) echo "Usage: bash scripts/verify-release.sh [--offline]" >&2; exit 2 ;;
+  esac
+done
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 INS="$REPO/bin/superpowers-zh.js"
 NODE=$(command -v node)   # 绝对路径：F 段要清空 PATH，用裸 node 会 127
@@ -278,7 +286,9 @@ echo "─── H. 外链验活：docs / README 里引用的官方文档必须�
 # 串行跑 45 条链接（每条最多 12s）会把整个脚本拖到分钟级并撞上超时 —— 第一版就是
 # 这么写的，直接把 verify-release 跑挂了。改成 xargs -P 并行 + 8s 上限，结果写进
 # 临时文件后再回到主 shell 计数（bad 是函数，在子进程里加不上计数）。
-if curl -sS -o /dev/null --max-time 5 https://github.com 2>/dev/null; then
+if [ "$OFFLINE" -eq 1 ]; then
+  echo "  (--offline：跳过外链验活)"
+elif curl -sS -o /dev/null --max-time 5 https://github.com 2>/dev/null; then
   LINKTMP=$(mktemp)
   # 第一遍并行快扫。注意这一遍**会误报** —— 实测 docs.codeium.com 在 8s 上限下
   # 偶发超时，而它其实活着。一个会误报的门禁比没有门禁更糟：人会学会忽略它。

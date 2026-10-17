@@ -460,11 +460,13 @@ check_count .claude-plugin/marketplace.json '等 [0-9]+ 款工具'      'marketp
 check_count .cursor-plugin/plugin.json      '等 [0-9]+ 款工具'      'cursor manifest'
 
 # ── 官网（三语言） ──
-check_count site/build.mjs '[0-9]+ 款 AI 编程工具装上'   '官网简体标语'
-check_count site/build.mjs '[0-9]+ 款 AI 編程工具裝上'   '官网繁體標語'
-check_count site/build.mjs '共 [0-9]+ 款：'              '官网 FAQ 枚举'
-check_count site/build.mjs 'into [0-9]+ AI coding tools' '官网英文标语'
-check_count site/build.mjs '^      \{ q: .Which AI coding tools are supported.*[0-9]+ tools:' '官网英文 FAQ'
+# 官网文案的工具数由 {toolCount} = TOOLS 条目数生成（下方结构性检查卡死条目数），
+# FAQ 枚举清单的条数由 build.mjs 构建期断言。这里只防有人重新手写数字。
+# bookDesc 是三卷书的介绍（书中教程覆盖的工具数），不是本项目支持的工具数，排除。
+site_literal=$(grep -nE "[0-9]+ (款 AI 编程工具|款 AI 編程工具|款工具通用|AI coding tools|tools'|tools: )|共 [0-9]+ 款：" site/build.mjs | grep -v 'bookDesc:' || true)
+if [ -z "$site_literal" ]; then ok; else
+  bad "官网文案手写了工具数，应改用 {toolCount}：$(echo "$site_literal" | head -1 | cut -c1-80)"
+fi
 
 # ── 结构性检查：README 工具表的实际行数 ──
 rows=$(awk '/^### 🤖 支持 [0-9]+ 款主流/,/^> 运行 `npx/' README.md | grep -cE '^\| \[')

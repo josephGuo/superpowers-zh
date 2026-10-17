@@ -13,6 +13,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
       - name: Count skills
         run: |
           TOTAL=$(ls -d skills/*/ 2>/dev/null | wc -l)
@@ -53,6 +57,16 @@ jobs:
           fi
           echo "All skills validated successfully"
 
+      - name: Check skill bodies for argument placeholders
+        run: |
+          # Claude Code 带参数调用 skill 时，会把 SKILL.md 正文里的 $0-$9 / $ARGUMENTS
+          # 替换成参数（如 awk '{print $1}' 变成 awk '{print 2}'）。示例改用 ${1}、cut、? 占位符等。
+          if grep -nE '\$([0-9]|ARGUMENTS)' skills/*/SKILL.md; then
+            echo "::error::SKILL.md 正文含会被参数替换的占位符（见上）"
+            exit 1
+          fi
+          echo "No argument placeholders in skill bodies"
+
       - name: Check package.json
         run: |
           node -e "
@@ -68,3 +82,59 @@ jobs:
 
       - name: Validate install script
         run: node bin/superpowers-zh.js --help
+
+      - name: Test plan bookkeeping and workspace protection
+        run: |
+          bash tests/claude-code/test-executing-plans-scripts.sh
+          bash tests/claude-code/test-sdd-workspace.sh
+
+      - name: Test SessionStart hook
+        run: bash tests/hooks/test-session-start.sh
+
+      - name: Test brainstorm server
+        working-directory: tests/brainstorm-server
+        run: |
+          npm ci
+          npm test
+
+      - name: Verify installer lifecycle
+        run: bash scripts/verify-release.sh --offline
+
+      - name: Build site
+        run: node site/build.mjs
+
+  hooks-windows:
+    # run-hook.cmd 的 cmd 半边只能在 Windows 上验证：查找 bash 的顺序、跳过 WSL 启动器、
+    # 不执行当前目录下的同名程序、hook 退出码不丢失。runner 自带 Program Files 下的
+    # Git for Windows，正好满足测试前提；shell: bash 即 Git Bash。
+    name: Hooks on Windows
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # runner 默认 TEMP 是 8.3 短路径（C:\Users\RUNNER~1\...），测试把 LOCALAPPDATA 指到
+      # mktemp 目录下，where 返回的长路径与短路径字符串比较对不上，会误报 WindowsApps 用例。
+      # 真实机器上 PATH 里的 WindowsApps 由同一个 LOCALAPPDATA 展开，不存在这种不一致。
+      - name: Test run-hook.cmd (cmd half)
+        shell: bash
+        env:
+          TMPDIR: ${{ runner.temp }}
+        run: |
+          echo "default TEMP: $(cmd //c echo %TEMP%)  TMPDIR: $TMPDIR"
+          bash tests/hooks/test-run-hook-cmd-windows.sh
+
+      - name: Test SessionStart hook
+        shell: bash
+        env:
+          TMPDIR: ${{ runner.temp }}
+        run: bash tests/hooks/test-session-start.sh
+
+      - name: Test SDD workspace
+        shell: bash
+        env:
+          TMPDIR: ${{ runner.temp }}
+        run: bash tests/claude-code/test-sdd-workspace.sh
