@@ -6,6 +6,41 @@
 
 ---
 
+## 未发布
+
+**同步上游 v7.0.0。** brainstorming 按上游从头重写，另有一批 hook、脚本和示例修复。
+
+### 🔁 brainstorming 重写：先弄清你想要什么
+
+- 先判断"我到底知道多少"：要紧的信息都在请求里（"把图标改成矢车菊蓝"），就直接做；缺了东西才开始对话
+- 第一条消息只有两件事：告诉你可以跳过提问让它直接开始，以及一个让你开始描述的开放问题
+- 每条消息只问一个问题，先让你描述，只在你卡住时才给选项；你说"你猜一个吧""你觉得呢"，它就直接提方案
+- 理解一部分就复述一部分（约 200-300 字），标明哪些是它的猜测，请你纠正
+- 意图清楚后再定规模：快速明确的任务 / 小改动（对话里定）/ 需要书面设计的项目，你可以推翻
+- 书面设计交给你之前，先由一个扮演该领域建造者的子代理检查（builder check），只把必须由你回答的问题一次性带回来；取代原来的 spec 审查（`spec-document-reviewer-prompt.md` 已删除，新增 `builder-check-prompt.md`）
+- 不再限于软件：一场分享、一门生意、一次装修也适用
+- 硬门槛保留：完整描述获批之前不构建；唯一例外是你同意的一次性 spike，要保留它的代码算新需求
+
+**本 fork 的补充（上游没有）：** 中文里"你看着办""你定吧"是请它拿主意，不是让它跳过提问直接动手。eval 中未加这句说明时，智能体两次把"反正你看着办吧"当成跳过流程、未经批准就开始写代码；补充后复测未再出现。
+
+**eval 摘要：** 8 个场景（含非软件、施压、spike、"你看着办"），对比旧中文版、新中文版和上游英文原文，被测模型 claude-opus-5-5。新中文版与英文原文表现一致，都明显优于旧版：旧版普遍先给 A–E 选项菜单、一条消息问多个问题；新版一次一个开放问题并分块复述。受账号额度限制，每组样本为 1–2 次。
+
+### 🐛 修复
+
+- **SessionStart hook**：Claude Code 以空 PATH 启动 hook 时，不再因找不到 `dirname`/`cat` 而丢失 bootstrap；Windows 上不再误选 WSL 启动器或执行当前目录下的同名程序，hook 退出码不再丢失（同步上游 v7）
+- **executing-plans**：测试成功但没有输出时，`task-done` 也会记账（此前返回 1 且不记账）
+- **subagent-driven-development**：`sdd-workspace` 不再覆盖你自己的 `.superpowers/sdd/.gitignore`；Windows Git Bash 下计划标记改为仓库相对路径
+- **视觉伴侣**：内容里的 `$&`、`$'` 等不再被当作替换模式篡改
+- **带参数调用 skill**：Claude Code 会把正文里的 `$1` 等替换成参数。requesting-code-review 的 BASE_SHA 示例（同步上游），以及本 fork 的 chinese-code-review（参数化查询示例）、chinese-commit-conventions（husky 命令）都已改写；CI 新增检查防止再出现
+- **systematic-debugging**：诊断示例只报告变量是否设置，不再把凭据值打印到日志
+
+### 🌐 官网
+
+- 繁体界面的分类标签与简介修正；skill 数、工具数、中国原创数改为构建时自动生成
+- 404 页的样式此前被 CSP 拦截而错位，已修复，并加上英文与繁体提示
+
+---
+
 ## v1.7.14 (2026-09-26)
 
 **同步上游 v6.4.2（含 v6.4.1），OpenCode 用户尤其建议更新。** 对应 [#133](https://github.com/jnMetaCode/superpowers-zh/issues/133)、[#131](https://github.com/jnMetaCode/superpowers-zh/issues/131)。

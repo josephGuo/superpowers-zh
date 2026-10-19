@@ -1,96 +1,84 @@
 #!/usr/bin/env bash
-# Integration Test: Document Review System
-# Actually runs spec/plan review and verifies reviewers catch issues
+# Integration Test: Builder Check
+# Actually runs the brainstorming builder-check prompt against a design with a
+# deliberate gap, and verifies the builder asks about the gap but not about
+# what the document explicitly leaves to the builder.
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 source "$SCRIPT_DIR/test-helpers.sh"
 
 echo "========================================"
-echo " Integration Test: Document Review System"
+echo " Integration Test: Builder Check"
 echo "========================================"
 echo ""
-echo "This test verifies the document review system by:"
-echo "  1. Creating a spec with intentional errors"
-echo "  2. Running the spec document reviewer"
-echo "  3. Verifying the reviewer catches the errors"
+echo "This test verifies the builder check by:"
+echo "  1. Creating a design document with a gap that changes the plan"
+echo "  2. Running the builder-check prompt from skills/brainstorming/"
+echo "  3. Verifying the builder asks about the gap and skips delegated details"
 echo ""
 
-# Create test project
 TEST_PROJECT=$(create_test_project)
 echo "Test project: $TEST_PROJECT"
-
-# Trap to cleanup
 trap "cleanup_test_project $TEST_PROJECT" EXIT
 
 cd "$TEST_PROJECT"
-
-# Create directory structure
 mkdir -p docs/superpowers/specs
 
-# Create a spec document WITH INTENTIONAL ERRORS for the reviewer to catch
-cat > docs/superpowers/specs/test-feature-design.md <<'EOF'
-# Test Feature Design
+# 缺口：只说"大家点餐、汇总下单"，没说谁付钱、怎么结算 —— 这会改变数据模型和流程。
+# 委托项：CSS 框架明确留给建造者，不应被当成问题提出。
+cat > docs/superpowers/specs/team-lunch-design.md <<'EOF'
+# 团队午餐点单 —— 设计
 
-## Overview
+## 意图
+我们组 12 个人每天中午点外卖，现在靠群聊接龙，经常漏单、重复。希望有个内部网页，
+每天上午 11 点前大家各自选菜，11 点由值日的人一键汇总，下单给固定合作的那家餐厅。
 
-This is a test feature that does something useful.
+## 目标
+- 每人一天只能提交一份，截止前可修改
+- 11 点自动锁单，值日的人看到汇总清单（按菜品合计份数）
+- 菜单由值日的人每周一更新一次
 
-## Requirements
+## 非目标
+- 不对接外卖平台 API，汇总清单由值日的人手动发给餐厅
+- 不做移动端 App，手机浏览器能用即可
 
-1. The feature should work correctly
-2. It should be fast
-3. TODO: Add more requirements here
+## 约束
+- 只在公司内网使用，用公司邮箱登录（已有 SSO）
+- 部署在组里现有的那台 Linux 服务器上
 
-## Architecture
-
-The feature will use a simple architecture with:
-- A frontend component
-- A backend service
-- Error handling will be specified later once we understand the failure modes better
-
-## Data Flow
-
-Data flows from the frontend to the backend.
-
-## Testing Strategy
-
-Tests will be written to cover the main functionality.
+## 留给建造者
+- 前端用什么 CSS 框架、页面配色，由建造者决定
 EOF
 
-# Initialize git repo
 git init --quiet
 git config user.email "test@test.com"
 git config user.name "Test User"
 git add .
-git commit -m "Initial commit with test spec" --quiet
+git commit -m "Initial commit with design" --quiet
 
 echo ""
-echo "Created test spec with intentional errors:"
-echo "  - TODO placeholder in Requirements section"
-echo "  - 'specified later' deferral in Architecture section"
+echo "Design gap: who pays and how costs are settled is never stated."
+echo "Delegated: CSS framework / colors are explicitly left to the builder."
 echo ""
-echo "Running spec document reviewer..."
+echo "Running builder check..."
 echo ""
 
-# Run Claude to review the spec
 OUTPUT_FILE="$TEST_PROJECT/claude-output.txt"
 
-PROMPT="You are testing the spec document reviewer.
+PROMPT="Read $REPO_ROOT/skills/brainstorming/builder-check-prompt.md. Act as the subagent that prompt describes: use 软件工程师 as the domain and $TEST_PROJECT/docs/superpowers/specs/team-lunch-design.md as the document path, and give exactly the report the prompt asks for."
 
-Read the spec-document-reviewer-prompt.md template in skills/brainstorming/ to understand the review format.
-
-Then review the spec at $TEST_PROJECT/docs/superpowers/specs/test-feature-design.md using the criteria from that template.
-
-Look for:
-- TODOs, placeholders, 'TBD', incomplete sections
-- Sections saying 'to be defined later' or 'will spec when X is done'
-- Sections noticeably less detailed than others
-
-Output your review in the format specified in the template."
+run_claude() {
+    if command -v timeout >/dev/null 2>&1; then
+        timeout 180 claude -p "$PROMPT" --permission-mode bypassPermissions
+    else
+        claude -p "$PROMPT" --permission-mode bypassPermissions
+    fi
+}
 
 echo "================================================================================"
-cd "$SCRIPT_DIR/../.." && timeout 120 claude -p "$PROMPT" --permission-mode bypassPermissions 2>&1 | tee "$OUTPUT_FILE" || {
+cd "$REPO_ROOT" && run_claude 2>&1 | tee "$OUTPUT_FILE" || {
     echo ""
     echo "================================================================================"
     echo "EXECUTION FAILED (exit code: $?)"
@@ -99,58 +87,44 @@ cd "$SCRIPT_DIR/../.." && timeout 120 claude -p "$PROMPT" --permission-mode bypa
 echo "================================================================================"
 
 echo ""
-echo "Analyzing reviewer output..."
+echo "Analyzing builder output..."
 echo ""
 
-# Verification tests
 FAILED=0
 
 echo "=== Verification Tests ==="
 echo ""
 
-# Test 1: Reviewer found the TODO
-echo "Test 1: Reviewer found TODO..."
-if grep -qi "TODO" "$OUTPUT_FILE" && grep -qi "requirements\|Requirements" "$OUTPUT_FILE"; then
-    echo "  [PASS] Reviewer identified TODO in Requirements section"
+# Test 1: 问到了谁付钱/怎么结算
+echo "Test 1: Builder asks about payment / settlement..."
+if grep -qiE "付钱|付款|支付|结算|费用|报销|AA|谁买单|谁出钱|记账|pay|cost|settle" "$OUTPUT_FILE"; then
+    echo "  [PASS] Builder raised the payment/settlement gap"
 else
-    echo "  [FAIL] Reviewer did not identify TODO"
+    echo "  [FAIL] Builder did not raise the payment/settlement gap"
     FAILED=$((FAILED + 1))
 fi
 echo ""
 
-# Test 2: Reviewer found the "specified later" deferral
-echo "Test 2: Reviewer found 'specified later' deferral..."
-if grep -qi "specified later\|later\|defer\|incomplete\|error handling" "$OUTPUT_FILE"; then
-    echo "  [PASS] Reviewer identified deferred content"
-else
-    echo "  [FAIL] Reviewer did not identify deferred content"
+# Test 2: 没有把委托给建造者的 CSS 框架当成问题
+echo "Test 2: Builder skips delegated details..."
+if grep -qiE "CSS|配色|Tailwind|Bootstrap" "$OUTPUT_FILE"; then
+    echo "  [FAIL] Builder asked about the CSS framework, which the document delegates"
     FAILED=$((FAILED + 1))
+else
+    echo "  [PASS] Builder did not ask about delegated styling choices"
 fi
 echo ""
 
-# Test 3: Reviewer output includes Issues section
-echo "Test 3: Review output format..."
-if grep -qi "issues\|Issues" "$OUTPUT_FILE"; then
-    echo "  [PASS] Review includes Issues section"
-else
-    echo "  [FAIL] Review missing Issues section"
+# Test 3: 有问题时不应宣称"没有剩下重要的问题"
+echo "Test 3: Builder does not claim nothing is left..."
+if grep -qiE "没有剩下重要的问题|nothing important left" "$OUTPUT_FILE"; then
+    echo "  [FAIL] Builder claimed nothing important is left for a document with a gap"
     FAILED=$((FAILED + 1))
+else
+    echo "  [PASS] Builder reported open questions"
 fi
 echo ""
 
-# Test 4: Reviewer did NOT approve (found issues)
-echo "Test 4: Reviewer verdict..."
-if grep -qi "Issues Found\|❌\|not approved\|issues found" "$OUTPUT_FILE"; then
-    echo "  [PASS] Reviewer correctly found issues (not approved)"
-elif grep -qi "Approved\|✅" "$OUTPUT_FILE" && ! grep -qi "Issues Found\|❌" "$OUTPUT_FILE"; then
-    echo "  [FAIL] Reviewer incorrectly approved spec with errors"
-    FAILED=$((FAILED + 1))
-else
-    echo "  [PASS] Reviewer identified problems (ambiguous format but found issues)"
-fi
-echo ""
-
-# Summary
 echo "========================================"
 echo " Test Summary"
 echo "========================================"
@@ -158,20 +132,10 @@ echo ""
 
 if [ $FAILED -eq 0 ]; then
     echo "STATUS: PASSED"
-    echo "All verification tests passed!"
-    echo ""
-    echo "The spec document reviewer correctly:"
-    echo "  ✓ Found TODO placeholder"
-    echo "  ✓ Found 'specified later' deferral"
-    echo "  ✓ Produced properly formatted review"
-    echo "  ✓ Did not approve spec with errors"
     exit 0
 else
     echo "STATUS: FAILED"
     echo "Failed $FAILED verification tests"
-    echo ""
     echo "Output saved to: $OUTPUT_FILE"
-    echo ""
-    echo "Review the output to see what went wrong."
     exit 1
 fi

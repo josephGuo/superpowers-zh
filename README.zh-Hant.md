@@ -2,7 +2,7 @@
 
 🌐 [简体中文](README.md) | **繁體中文** | [English (upstream)](https://github.com/obra/superpowers)
 
-> 🦸 **superpowers（250k+ ⭐）完整漢化 + 4 個中國原創 skills** — 讓 Claude Code / Copilot CLI / Hermes Agent / Cursor / Windsurf / Kiro / Gemini CLI / Qoder 等 **26 款 AI 編程工具**真正會幹活。從頭腦風暴到程式碼審查，從 TDD 到除錯，每個 skill 都是經過實戰驗證的工作方法論。
+> 🦸 **superpowers（300k+ ⭐）完整漢化 + 4 個中國原創 skills** — 讓 Claude Code / Copilot CLI / Hermes Agent / Cursor / Windsurf / Kiro / Gemini CLI / Qoder 等 **26 款 AI 編程工具**真正會幹活。從頭腦風暴到程式碼審查，從 TDD 到除錯，每個 skill 都是經過實戰驗證的工作方法論。
 
 Chinese community edition of [superpowers](https://github.com/obra/superpowers) — 21 skills across 26 AI coding tools, including full translations and China-specific development skills.
 
@@ -118,7 +118,7 @@ Chinese community edition of [superpowers](https://github.com/obra/superpowers) 
 
 ## 這是什麼？
 
-[superpowers](https://github.com/obra/superpowers) 是目前最火的 AI 編程 skills 框架（250k+ stars），為 AI 編程工具提供**系統化的工作方法論**。
+[superpowers](https://github.com/obra/superpowers) 是目前最火的 AI 編程 skills 框架（300k+ stars），為 AI 編程工具提供**系統化的工作方法論**。
 
 **superpowers-zh** 在完整翻譯的基礎上，新增了面向中國開發者的特色 skills。
 
@@ -153,7 +153,7 @@ AI：在開始實作之前，我需要了解幾個關鍵問題：
 
 | 維度 | superpowers（英文上游） | superpowers-zh（中文增強版） |
 |------|----------------------|---------------------------|
-| ⭐ Star 數 | 250k+ | — |
+| ⭐ Star 數 | 300k+ | — |
 | 📦 Skills 總數 | 15 | **21**（15 翻譯 + 4 國產原創 + 2 上游歷史保留） |
 | 🌐 語言 | 英文 | 中文（技術術語保留英文） |
 | 🤖 **支援工具** | **6 款**：Claude Code / Cursor / Codex / OpenCode / Copilot CLI / Gemini CLI | **26 款**：上述 6 款 + Hermes Agent / Trae / Kiro / Qwen Code / OpenClaw / Claw Code / Antigravity / DeerFlow / VS Code / Windsurf / Aider / Qoder / CodeBuddy（騰訊） / CodeArts（華為雲碼道） / Cline / Kilo Code / Crush / ZCode（智譜）/ DeepSeek Harness / Reasonix |

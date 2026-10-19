@@ -57,8 +57,18 @@ if (LATEST.version !== PKG.version) {
   throw new Error(`版本漂移：package.json 是 ${PKG.version}，RELEASE-NOTES.zh.md 最新条目是 v${LATEST.version} —— 发版时漏改了一边`);
 }
 
-// 本版需要重装的工具（三语共用；产品名不翻译）。改这里时同步改 release notes 正文。
-const REINSTALL_TOOLS = ['Claude Code 插件市场安装', 'Crush（Windows）'];
+// 首页发布提示条：一句话说清"这一版谁该更新、为什么"，内容摘自 release notes 该版本条目。
+// version 必须等于 release notes 最新条目：版本号是自动读的，文案却要手写 ——
+// v1.7.13、v1.7.14 发版时都没改，站上一直挂着 v1.7.12 的「技能之间互相调用会失败」。
+const RELEASE_BANNER = {
+  version: '1.7.14',
+  zh: 'OpenCode 用户请更新 —— 此前版本让模型用它调不了的方式派子代理，子代理派发会失败。同步上游 v6.4.2。查看完整更新说明',
+  en: 'Using OpenCode? Update — earlier versions told the model to dispatch subagents in a way it cannot call. Also syncs upstream v6.4.2. Read the full release notes',
+  zht: 'OpenCode 使用者請更新 —— 此前版本讓模型用它呼叫不了的方式派子代理，子代理派發會失敗。同步上游 v6.4.2。檢視完整更新說明',
+};
+if (RELEASE_BANNER.version !== LATEST.version) {
+  throw new Error(`首页发布提示条还是 v${RELEASE_BANNER.version} 的文案，release notes 最新是 v${LATEST.version} —— 发版时更新 site/build.mjs 的 RELEASE_BANNER`);
+}
 
 // 页脚二维码的真实像素尺寸，构建时从文件读取（见 imageSize 的注释）
 const QR = {
@@ -118,7 +128,7 @@ function parseFrontmatter(md) {
 // ---- skill 展示元数据：中/英标题 + 英文简介 + 分组 ----
 const SKILL_META = {
   'using-superpowers':            { group: 'meta',    title: '使用 Superpowers · 引导', titleEn: 'Using Superpowers · Bootstrap', descEn: 'The bootstrap skill — establishes how to discover and invoke skills at the start of every conversation.' },
-  'brainstorming':                { group: 'flow',    title: '头脑风暴',           titleEn: 'Brainstorming',            descEn: 'Explore intent, requirements and design before any creative work — feature, component or behavior change.' },
+  'brainstorming':                { group: 'flow',    title: '头脑风暴',           titleEn: 'Brainstorming',            descEn: 'Find out what your human partner actually wants, and why, before building anything — features, behavior changes, or new work outside software.' },
   'writing-plans':                { group: 'flow',    title: '编写实现计划',       titleEn: 'Writing Plans',            descEn: 'Turn a spec into a step-by-step implementation plan before writing any code.' },
   'executing-plans':              { group: 'flow',    title: '执行计划',           titleEn: 'Executing Plans',          descEn: 'Execute a plan yourself in the current session — inline, with a ledger and one final review.' },
   'subagent-driven-development':  { group: 'flow',    title: '子代理驱动开发',     titleEn: 'Subagent-Driven Dev',      descEn: 'Run a plan of independent tasks within the current session via subagents.' },
@@ -426,9 +436,9 @@ const T = {
   zh: {
     htmlLang: 'zh-CN',
     title: 'superpowers-zh · AI 编程超能力中文增强版',
-    desc: 'superpowers（250k+ ⭐）完整汉化 + {cnCount} 个中国原创 skills，一条 npx 命令为 {toolCount} 款 AI 编程工具装上系统化工作方法论。',
+    desc: 'superpowers（300k+ ⭐）完整汉化 + {cnCount} 个中国原创 skills，一条 npx 命令为 {toolCount} 款 AI 编程工具装上系统化工作方法论。',
     nav: { why: '特性', install: '安装', skills: 'Skills', tools: '支持工具', faq: 'FAQ', sponsors: '赞助商', learn: '学习 ↗', github: 'GitHub ↗' },
-    heroBadge: 'superpowers 250k+ ⭐ · 完整汉化 + 中国原创',
+    heroBadge: 'superpowers 300k+ ⭐ · 完整汉化 + 中国原创',
     heroH1: '给你的 AI 编程工具<br>装上<span class="grad">真正会干活</span>的超能力',
     heroLead: '{n} 个经过实战验证的工作方法论 skill —— 从头脑风暴到 TDD，从系统化调试到代码审查。<br>一条命令，自动识别项目里的工具并安装。',
     heroBtn1: '查看安装命令', heroBtn2: 'GitHub 源码',
@@ -436,7 +446,6 @@ const T = {
     skipToMain: '跳到主要内容',
     ogAlt: 'superpowers-zh —— AI 编程超能力中文增强版，一条 npx 命令为 {toolCount} 款 AI 编程工具装上系统化工作方法论',
     ogLocale: 'zh_CN',
-    releaseNote: '{tools} 的用户请更新 —— 此前版本里技能之间互相调用会失败。查看完整更新说明',
     toolDocHint: '{name} 的专属安装指南',
     whyTitle: '为什么选择 superpowers-zh？',
     whySub: '不是又一套提示词模板 —— 是让 AI 真正按工程方法干活的系统化能力。',
@@ -445,7 +454,7 @@ const T = {
     cmpTitle: '装上之后，AI 不再"上来就写"',
     cmpBad: '❌ 没装', cmpGood: '✅ 装了 superpowers-zh',
     cmpBadPre: '你：给用户模块加个批量导出功能\nAI：好的，我来实现……（直接开写）\n    export async function exportUsers() { … }\n你：等等，格式不对，没分页，\n    大数据量会 OOM……',
-    cmpGoodPre: '你：给用户模块加个批量导出功能\nAI：先理清需求 —— 导出格式？数据量级？\n    要分页/流式吗？要权限校验吗？\n    （触发 brainstorming）\n    → 写计划 → TDD → 验证 → 审查',
+    cmpGoodPre: '你：给用户模块加个批量导出功能\nAI：（触发 brainstorming）先问一句：\n    上次要导出用户数据，是谁、拿去做什么？\n你：运营每周导一次，几十万行，给 BI 用\nAI：我复述一下理解，你确认了再动手\n    → 写计划 → TDD → 验证 → 审查',
     instTitle: '选你的工具，拿到安装命令',
     instSub: '大多数工具 <code>npx superpowers-zh</code> 会自动识别项目目录并安装；识别不出的用 <code>--tool</code> 指定。',
     instLabel: '我用的是',
@@ -533,7 +542,7 @@ const T = {
       { icon: '🔌', t: '{toolCount} 款工具通用', d: '一套 skill，Claude Code / Cursor / Codex / Gemini CLI / Windsurf… 全适配，换工具不用换习惯。' },
       { icon: '⚡', t: '一条命令安装', d: 'npx superpowers-zh 自动识别项目里用的是哪款工具并安装，零配置，装完重启即生效。' },
       { icon: '🇨🇳', t: '中国原创 Skills', d: '中文代码审查话术、中文提交规范、中文文档排版、国内 Git 平台（Gitee/Coding/极狐）配置 —— 上游没有。' },
-      { icon: '📖', t: '完整汉化上游', d: '同步 obra/superpowers（250k+ ⭐），核心 skill 全部中文母语化，不是机翻，是逐条校准。' },
+      { icon: '📖', t: '完整汉化上游', d: '同步 obra/superpowers（300k+ ⭐），核心 skill 全部中文母语化，不是机翻，是逐条校准。' },
       { icon: '🔓', t: '零依赖 · MIT 开源', d: '纯 Markdown skill，不引入任何外部依赖、不联网、不上传代码，按需触发零运行时开销。' },
     ],
     pipeline: [
@@ -554,18 +563,19 @@ const T = {
       { q: 'superpowers-zh 是免费的吗？', a: '完全免费。MIT 协议开源，永久免费，不含任何付费墙或订阅。' },
       { q: '支持哪些 AI 编程工具？', a: '共 {toolCount} 款：Claude Code、Cursor、Windsurf、Codex CLI、Gemini CLI、Kiro、Trae、Qoder、CodeBuddy（腾讯）、CodeArts（华为云码道）、Aider、OpenCode、Qwen Code、Antigravity、DeerFlow、VS Code(Copilot)、Copilot CLI、Hermes Agent、Claw Code、OpenClaw、Cline、Kilo Code、Crush、ZCode（智谱）、DeepSeek Harness、Reasonix。' },
       { q: 'superpowers-zh 有哪些独特价值？', a: '一套完整中文化的系统工作方法论：从头脑风暴、规划、TDD 到调试、代码审查，每个 skill 都是实战验证的工作流；并叠加 {cnCount} 个面向中国开发者的原创 skill（中文代码审查 / Git 工作流 / 文档规范 / 提交规范），适配 {toolCount} 款 AI 编程工具。MIT 协议开源，永久免费。' },
-      { q: '安装后怎么生效？', a: 'npx 会把 skill 文件装到你项目对应工具的目录（如 .claude/skills/），重启 AI 工具后，它会在恰当时机自动触发相应 skill —— 无需你每次手动调用。' },
+      { q: '安装后怎么生效？怎么确认装好了？', a: '重启 AI 工具，开一个新会话。npx 会把 skill 和引导文件装进工具对应的目录（如 .claude/skills/），工具启动时加载引导，之后会在恰当时机自动触发相应 skill，无需你每次手动调用。确认方法：在新会话里说「我想做个记账小程序」，装好的话它会先问你问题、弄清你想要什么，而不是直接开始写代码。' },
       { q: '能一次装好、所有项目都用吗？（全局安装）', a: '能。npx superpowers-zh --global 装到工具的用户级目录（如 ~/.claude/skills），所有项目自动共享，更新时只需重装一次。项目级优先、全局兜底，二者可共存。支持全局的工具（15 款，均为各工具文档确认的加载路径）：Claude Code / Codex CLI / Qoder / Windsurf / Qwen Code / OpenClaw / OpenCode / Hermes Agent / CodeBuddy / CodeArts / Crush / ZCode / DeepSeek Harness / Reasonix / TRAE CN；其余工具（含 Gemini / Antigravity，有各自专属全局方式）请在项目内安装或参考对应文档。' },
       { q: '会拖慢我的 AI 吗？会上传代码吗？', a: '不会。skill 是按需触发的纯 Markdown，零运行时、不联网、不上传任何代码或数据，全程在本地。' },
-      { q: '怎么更新或卸载？', a: '更新：重新运行 npx superpowers-zh 覆盖即可。卸载：npx superpowers-zh --uninstall 清理当前项目；全局安装用 npx superpowers-zh --global --uninstall 清理。' },
+      { q: '怎么更新或卸载？', a: '按你当初的安装方式来，更新后都要重启工具。npx 项目级：在项目里重新运行 npx superpowers-zh 即更新到最新，npx superpowers-zh --uninstall 卸载。npx 全局：npx superpowers-zh --global 更新，npx superpowers-zh --global --uninstall 卸载。Claude Code 插件市场：先 claude plugin marketplace update superpowers-zh，再 claude plugin update superpowers-zh@superpowers-zh；卸载用 claude plugin uninstall superpowers-zh@superpowers-zh。Codex 插件、Gemini 扩展等工具自带的安装方式，按下方「支持工具」里对应工具的文档操作。' },
+      { q: '装了没生效怎么办？', a: '先确认三件事：用的是哪种安装方式；是否最新（npx 安装直接重跑一次即可，插件市场用 claude plugin list 看版本）；装完是否重启并开了新会话。同一个项目里不要用插件市场和 npx 给 Claude Code 各装一份。仍然不行，可以让 diagnosing-superpowers 技能分析出问题的那次会话，它会整理成报告。到 GitHub 提 issue 时请附上：工具名和版本、安装命令、操作系统、你输入了什么、它实际做了什么。' },
     ],
   },
   en: {
     htmlLang: 'en',
     title: 'superpowers-zh · Battle-tested AI coding skills (CN-enhanced)',
-    desc: 'Full Chinese localization of superpowers (250k+ ⭐) plus {cnCount} China-native skills. One npx command installs systematic workflow methodology into {toolCount} AI coding tools.',
+    desc: 'Full Chinese localization of superpowers (300k+ ⭐) plus {cnCount} China-native skills. One npx command installs systematic workflow methodology into {toolCount} AI coding tools.',
     nav: { why: 'Features', install: 'Install', skills: 'Skills', tools: 'Tools', faq: 'FAQ', sponsors: 'Sponsors', learn: 'Learn ↗', github: 'GitHub ↗' },
-    heroBadge: 'superpowers 250k+ ⭐ · Full CN localization + China-native skills',
+    heroBadge: 'superpowers 300k+ ⭐ · Full CN localization + China-native skills',
     heroH1: 'Give your AI coding tools<br>superpowers that <span class="grad">actually ship</span>',
     heroLead: '{n} battle-tested workflow skills — from brainstorming to TDD, systematic debugging to code review.<br>One command auto-detects your tool and installs.',
     heroBtn1: 'Get the command', heroBtn2: 'GitHub',
@@ -573,7 +583,6 @@ const T = {
     skipToMain: 'Skip to main content',
     ogAlt: 'superpowers-zh — battle-tested AI coding skills, Chinese-enhanced; one npx command for {toolCount} AI coding tools',
     ogLocale: 'en_US',
-    releaseNote: 'Using {tools}? Update — in earlier versions skills could not invoke one another. Read the full release notes',
     toolDocHint: 'Install guide for {name}',
     whyTitle: 'Why superpowers-zh?',
     whySub: 'Not another prompt-template pack — real engineering methodology that makes AI work properly.',
@@ -582,7 +591,7 @@ const T = {
     cmpTitle: 'After install, AI stops "coding before thinking"',
     cmpBad: '❌ Without', cmpGood: '✅ With superpowers-zh',
     cmpBadPre: 'You: Add bulk export to the users module\nAI: Sure, implementing… (starts coding)\n    export async function exportUsers() { … }\nYou: Wait — wrong format, no paging,\n    it OOMs on large data…',
-    cmpGoodPre: 'You: Add bulk export to the users module\nAI: First, the requirements — what format?\n    What data volume? Paging/streaming?\n    Permission checks? (triggers brainstorming)\n    → plan → TDD → verify → review',
+    cmpGoodPre: 'You: Add bulk export to the users module\nAI: (triggers brainstorming) One question:\n    who exported user data last time, and why?\nYou: Ops, weekly, ~300k rows, for BI\nAI: Here is what I understand — confirm first\n    → plan → TDD → verify → review',
     instTitle: 'Pick your tool, get the command',
     instSub: 'For most tools <code>npx superpowers-zh</code> auto-detects the project and installs; otherwise pass <code>--tool</code>.',
     instLabel: "I'm using",
@@ -670,7 +679,7 @@ const T = {
       { icon: '🔌', t: 'Works in {toolCount} tools', d: 'One skill set for Claude Code / Cursor / Codex / Gemini CLI / Windsurf and more. Switch tools, keep your habits.' },
       { icon: '⚡', t: 'One-command install', d: 'npx superpowers-zh auto-detects your tool and installs. Zero config; restart to take effect.' },
       { icon: '🇨🇳', t: 'China-native skills', d: 'Chinese code-review phrasing, commit conventions, doc typography, and domestic Git platforms (Gitee/Coding/JiHu) — not in upstream.' },
-      { icon: '📖', t: 'Fully localized upstream', d: 'Tracks obra/superpowers (250k+ ⭐); every core skill localized into native Chinese — calibrated, not machine-translated.' },
+      { icon: '📖', t: 'Fully localized upstream', d: 'Tracks obra/superpowers (300k+ ⭐); every core skill localized into native Chinese — calibrated, not machine-translated.' },
       { icon: '🔓', t: 'Zero-dep · MIT', d: 'Pure Markdown skills. No external deps, no network, no code upload. Triggered on demand with zero runtime cost.' },
     ],
     pipeline: [
@@ -691,18 +700,19 @@ const T = {
       { q: 'Is superpowers-zh free?', a: 'Completely free. MIT-licensed open source, forever, with no paywall or subscription.' },
       { q: 'Which AI coding tools are supported?', a: '{toolCount} tools: Claude Code, Cursor, Windsurf, Codex CLI, Gemini CLI, Kiro, Trae, Qoder, CodeBuddy (Tencent), CodeArts (Huawei), Aider, OpenCode, Qwen Code, Antigravity, DeerFlow, VS Code (Copilot), Copilot CLI, Hermes Agent, Claw Code, OpenClaw, Cline, Kilo Code, Crush, ZCode (Zhipu), DeepSeek Harness, Reasonix.' },
       { q: 'What makes superpowers-zh unique?', a: 'A fully localized, battle-tested methodology framework for Chinese developers: brainstorming, planning, TDD, debugging, and code-review skills, plus {cnCount} China-native skills (code review / Git workflow / docs / commit conventions), adapted for {toolCount} AI coding tools. MIT-licensed and free forever.' },
-      { q: 'How does it take effect after install?', a: 'npx installs skill files into your tool\'s directory (e.g. .claude/skills/). After restarting your AI tool, it auto-triggers the right skill at the right moment — no manual invocation needed.' },
+      { q: 'How does it take effect, and how do I check it works?', a: 'Restart your AI tool and open a new session. npx installs the skills and bootstrap files into your tool\'s directory (e.g. .claude/skills/); the tool loads the bootstrap at startup and then triggers the right skill at the right moment, with no manual invocation. To check: in a new session, say "Let\'s make a react todo list". If it is installed, it asks you questions to work out what you want before writing any code.' },
       { q: 'Can I install once for all projects? (global install)', a: 'Yes. npx superpowers-zh --global installs into the tool\'s user-level directory (e.g. ~/.claude/skills), shared across all projects; you only re-install once to update. Project-level takes precedence, global is the fallback — they coexist. Tools with global support (15 in total, all verified load paths per each tool\'s docs): Claude Code / Codex CLI / Qoder / Windsurf / Qwen Code / OpenClaw / OpenCode / Hermes Agent / CodeBuddy / CodeArts / Crush / ZCode / DeepSeek Harness / Reasonix / TRAE CN; other tools (incl. Gemini / Antigravity, which have their own global methods) should be installed per-project or via their docs.' },
       { q: 'Will it slow my AI down or upload my code?', a: 'No. Skills are on-demand Markdown: zero runtime, no network, no code or data upload — everything stays local.' },
-      { q: 'How do I update or uninstall?', a: 'Update: re-run npx superpowers-zh to overwrite. Uninstall: npx superpowers-zh --uninstall for the current project; npx superpowers-zh --global --uninstall for a global install.' },
+      { q: 'How do I update or uninstall?', a: 'Use the same channel you installed with, and restart the tool afterwards. npx (project): re-run npx superpowers-zh in the project to get the latest; npx superpowers-zh --uninstall to remove. npx (global): npx superpowers-zh --global to update; npx superpowers-zh --global --uninstall to remove. Claude Code plugin marketplace: claude plugin marketplace update superpowers-zh, then claude plugin update superpowers-zh@superpowers-zh; remove with claude plugin uninstall superpowers-zh@superpowers-zh. For a tool\'s own channel (Codex plugin, Gemini extension, and so on), follow that tool\'s guide under Tools below.' },
+      { q: 'It is installed but nothing happens. What now?', a: 'Check three things: which channel you installed with; that it is current (for npx, just re-run it; for the plugin marketplace, check the version in claude plugin list); and that you restarted and opened a new session. Don\'t install it for Claude Code twice in one project (marketplace plus npx). If it still fails, ask the diagnosing-superpowers skill to analyze the session that went wrong; it writes up a report. When opening a GitHub issue, include: tool and version, install command, OS, what you typed, and what it actually did.' },
     ],
   },
   zht: {
     htmlLang: 'zh-Hant',
     title: 'superpowers-zh · AI 編程超能力中文增強版',
-    desc: 'superpowers（250k+ ⭐）完整漢化 + {cnCount} 個中國原創 skills，一條 npx 命令為 {toolCount} 款 AI 編程工具裝上系統化工作方法論。',
+    desc: 'superpowers（300k+ ⭐）完整漢化 + {cnCount} 個中國原創 skills，一條 npx 命令為 {toolCount} 款 AI 編程工具裝上系統化工作方法論。',
     nav: { why: '特性', install: '安裝', skills: 'Skills', tools: '支援工具', faq: 'FAQ', sponsors: '贊助商', learn: '學習 ↗', github: 'GitHub ↗' },
-    heroBadge: 'superpowers 250k+ ⭐ · 完整漢化 + 中國原創',
+    heroBadge: 'superpowers 300k+ ⭐ · 完整漢化 + 中國原創',
     heroH1: '給你的 AI 編程工具<br>裝上<span class="grad">真正會幹活</span>的超能力',
     heroLead: '{n} 個經過實戰驗證的工作方法論 skill —— 從頭腦風暴到 TDD，從系統化除錯到程式碼審查。<br>一條命令，自動識別專案裡的工具並安裝。',
     heroBtn1: '查看安裝命令', heroBtn2: 'GitHub 原始碼',
@@ -710,7 +720,6 @@ const T = {
     skipToMain: '跳到主要內容',
     ogAlt: 'superpowers-zh —— AI 編程超能力中文增強版，一條 npx 命令為 {toolCount} 款 AI 編程工具裝上系統化工作方法論',
     ogLocale: 'zh_TW',
-    releaseNote: '{tools} 的使用者請更新 —— 此前版本裡技能之間互相呼叫會失敗。檢視完整更新說明',
     toolDocHint: '{name} 的專屬安裝指南',
     whyTitle: '為什麼選擇 superpowers-zh？',
     whySub: '不是又一套提示詞範本 —— 是讓 AI 真正按工程方法幹活的系統化能力。',
@@ -719,7 +728,7 @@ const T = {
     cmpTitle: '裝上之後，AI 不再「上來就寫」',
     cmpBad: '❌ 沒裝', cmpGood: '✅ 裝了 superpowers-zh',
     cmpBadPre: '你：給使用者模組加個批次匯出功能\nAI：好的，我來實作……（直接開寫）\n    export async function exportUsers() { … }\n你：等等，格式不對，沒分頁，\n    大量資料會 OOM……',
-    cmpGoodPre: '你：給使用者模組加個批次匯出功能\nAI：先理清需求 —— 匯出格式？資料量級？\n    要分頁/串流嗎？要權限校驗嗎？\n    （觸發 brainstorming）\n    → 寫計畫 → TDD → 驗證 → 審查',
+    cmpGoodPre: '你：給使用者模組加個批次匯出功能\nAI：（觸發 brainstorming）先問一句：\n    上次要匯出使用者資料，是誰、拿去做什麼？\n你：營運每週匯一次，幾十萬行，給 BI 用\nAI：我複述一下理解，你確認了再動手\n    → 寫計畫 → TDD → 驗證 → 審查',
     instTitle: '選你的工具，拿到安裝命令',
     instSub: '大多數工具 <code>npx superpowers-zh</code> 會自動識別專案目錄並安裝；識別不出的用 <code>--tool</code> 指定。',
     instLabel: '我用的是',
@@ -807,7 +816,7 @@ const T = {
       { icon: '🔌', t: '{toolCount} 款工具通用', d: '一套 skill，Claude Code / Cursor / Codex / Gemini CLI / Windsurf… 全適配，換工具不用換習慣。' },
       { icon: '⚡', t: '一條命令安裝', d: 'npx superpowers-zh 自動識別專案裡用的是哪款工具並安裝，零設定，裝完重啟即生效。' },
       { icon: '🇨🇳', t: '中國原創 Skills', d: '中文程式碼審查話術、中文提交規範、中文文件排版、國內 Git 平台（Gitee/Coding/極狐）設定 —— 上游沒有。' },
-      { icon: '📖', t: '完整漢化上游', d: '同步 obra/superpowers（250k+ ⭐），核心 skill 全部中文母語化，不是機翻，是逐條校準。' },
+      { icon: '📖', t: '完整漢化上游', d: '同步 obra/superpowers（300k+ ⭐），核心 skill 全部中文母語化，不是機翻，是逐條校準。' },
       { icon: '🔓', t: '零依賴 · MIT 開源', d: '純 Markdown skill，不引入任何外部依賴、不連網、不上傳程式碼，按需觸發零執行時開銷。' },
     ],
     pipeline: [
@@ -828,10 +837,11 @@ const T = {
       { q: 'superpowers-zh 是免費的嗎？', a: '完全免費。MIT 協議開源，永久免費，不含任何付費牆或訂閱。' },
       { q: '支援哪些 AI 編程工具？', a: '共 {toolCount} 款：Claude Code、Cursor、Windsurf、Codex CLI、Gemini CLI、Kiro、Trae、Qoder、CodeBuddy（騰訊）、CodeArts（華為雲碼道）、Aider、OpenCode、Qwen Code、Antigravity、DeerFlow、VS Code(Copilot)、Copilot CLI、Hermes Agent、Claw Code、OpenClaw、Cline、Kilo Code、Crush、ZCode（智谱）、DeepSeek Harness、Reasonix。' },
       { q: 'superpowers-zh 有哪些獨特價值？', a: '一套完整中文化的系統工作方法論：從頭腦風暴、規劃、TDD 到除錯、程式碼審查，每個 skill 都是實戰驗證的工作流；並疊加 {cnCount} 個面向中國開發者的原創 skill（中文程式碼審查 / Git 工作流 / 文件規範 / 提交規範），適配 {toolCount} 款 AI 編程工具。MIT 協議開源，永久免費。' },
-      { q: '安裝後怎麼生效？', a: 'npx 會把 skill 檔案裝到你專案對應工具的目錄（如 .claude/skills/），重啟 AI 工具後，它會在恰當時機自動觸發相應 skill —— 無需你每次手動呼叫。' },
+      { q: '安裝後怎麼生效？怎麼確認裝好了？', a: '重啟 AI 工具，開一個新會話。npx 會把 skill 和引導檔案裝進工具對應的目錄（如 .claude/skills/），工具啟動時載入引導，之後會在恰當時機自動觸發相應 skill，無需你每次手動呼叫。確認方法：在新會話裡說「我想做個記帳小程式」，裝好的話它會先問你問題、弄清你想要什麼，而不是直接開始寫程式碼。' },
       { q: '能一次裝好、所有專案都用嗎？（全域安裝）', a: '能。npx superpowers-zh --global 裝到工具的使用者級目錄（如 ~/.claude/skills），所有專案自動共享，更新時只需重裝一次。專案級優先、全域兜底，二者可共存。支援全域的工具（15 款，均為各工具文件確認的載入路徑）：Claude Code / Codex CLI / Qoder / Windsurf / Qwen Code / OpenClaw / OpenCode / Hermes Agent / CodeBuddy / CodeArts / Crush / ZCode / DeepSeek Harness / Reasonix / TRAE CN；其餘工具（含 Gemini / Antigravity，有各自專屬全域方式）請在專案內安裝或參考對應文件。' },
       { q: '會拖慢我的 AI 嗎？會上傳程式碼嗎？', a: '不會。skill 是按需觸發的純 Markdown，零執行時、不連網、不上傳任何程式碼或資料，全程在本機。' },
-      { q: '怎麼更新或解除安裝？', a: '更新：重新執行 npx superpowers-zh 覆蓋即可。解除安裝：npx superpowers-zh --uninstall 清理目前專案；全域安裝用 npx superpowers-zh --global --uninstall 清理。' },
+      { q: '怎麼更新或解除安裝？', a: '按你當初的安裝方式來，更新後都要重啟工具。npx 專案級：在專案裡重新執行 npx superpowers-zh 即更新到最新，npx superpowers-zh --uninstall 解除安裝。npx 全域：npx superpowers-zh --global 更新，npx superpowers-zh --global --uninstall 解除安裝。Claude Code 外掛市集：先 claude plugin marketplace update superpowers-zh，再 claude plugin update superpowers-zh@superpowers-zh；解除安裝用 claude plugin uninstall superpowers-zh@superpowers-zh。Codex 外掛、Gemini 擴充等工具自帶的安裝方式，按下方「支援工具」裡對應工具的文件操作。' },
+      { q: '裝了沒生效怎麼辦？', a: '先確認三件事：用的是哪種安裝方式；是否最新（npx 安裝直接重跑一次即可，外掛市集用 claude plugin list 看版本）；裝完是否重啟並開了新會話。同一個專案裡不要用外掛市集和 npx 給 Claude Code 各裝一份。仍然不行，可以讓 diagnosing-superpowers 技能分析出問題的那次會話，它會整理成報告。到 GitHub 提 issue 時請附上：工具名和版本、安裝指令、作業系統、你輸入了什麼、它實際做了什麼。' },
     ],
   },
 };
@@ -1048,7 +1058,7 @@ function renderLanding(skills, lang) {
     </div>
     <a class="release-note" href="${GH_BLOB}/RELEASE-NOTES.zh.md" target="_blank" rel="noopener">
       <span class="rn-ver">v${LATEST.version}</span>
-      <span class="rn-text">${fill(t.releaseNote, { tools: REINSTALL_TOOLS.join(' / ') })}</span>
+      <span class="rn-text">${esc(RELEASE_BANNER[lang])}</span>
       <span class="rn-go" aria-hidden="true">→</span>
     </a>
     <div class="stats">

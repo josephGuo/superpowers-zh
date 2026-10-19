@@ -100,7 +100,7 @@ OpenCode 通过一个基于 git 的包说明（package spec）安装 Superpowers
 
 ```json
 {
-  "plugin": ["superpowers@git+https://github.com/jnMetaCode/superpowers-zh.git#v1.7.13"]
+  "plugin": ["superpowers@git+https://github.com/jnMetaCode/superpowers-zh.git#v1.7.14"]
 }
 ```
 

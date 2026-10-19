@@ -527,6 +527,21 @@ else
   warn "无法查询 npm（离线？）—— 跳过发布一致性检查"
 fi
 
+# 文档里「固定版本」示例引用的 tag 必须真实存在：v1.7.11–v1.7.13 发到了 npm 却没打 tag，
+# OpenCode 文档的示例一直写着 #v1.7.13，照抄就是 npm error。
+pinned_tags=$(grep -rhoE 'superpowers-zh\.git#v[0-9]+\.[0-9]+\.[0-9]+' "$ROOT/docs" "$ROOT/.opencode" "$ROOT/README.md" "$ROOT/README.zh-Hant.md" 2>/dev/null | sed 's/.*#//' | sort -u)
+if [ -n "$pinned_tags" ]; then
+  if remote_tags=$(git -C "$ROOT" ls-remote --tags origin 2>/dev/null); then
+    for t in $pinned_tags; do
+      if echo "$remote_tags" | grep -q "refs/tags/${t}$"; then ok; else
+        bad "文档引用的版本 tag ${t} 在 origin 上不存在 —— 照抄固定版本的写法会安装失败（改成已存在的 tag，或补打 git tag ${t}）"
+      fi
+    done
+  else
+    warn "无法访问 origin（离线？）—— 跳过文档 tag 引用检查"
+  fi
+fi
+
 hdr "dot 流程图节点/边一致性"
 
 DOT_OUT=$(python3 - "$ROOT" <<'PYEOF'
