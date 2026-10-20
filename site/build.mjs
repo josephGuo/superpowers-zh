@@ -61,10 +61,10 @@ if (LATEST.version !== PKG.version) {
 // version 必须等于 release notes 最新条目：版本号是自动读的，文案却要手写 ——
 // v1.7.13、v1.7.14 发版时都没改，站上一直挂着 v1.7.12 的「技能之间互相调用会失败」。
 const RELEASE_BANNER = {
-  version: '1.7.14',
-  zh: 'OpenCode 用户请更新 —— 此前版本让模型用它调不了的方式派子代理，子代理派发会失败。同步上游 v6.4.2。查看完整更新说明',
-  en: 'Using OpenCode? Update — earlier versions told the model to dispatch subagents in a way it cannot call. Also syncs upstream v6.4.2. Read the full release notes',
-  zht: 'OpenCode 使用者請更新 —— 此前版本讓模型用它呼叫不了的方式派子代理，子代理派發會失敗。同步上游 v6.4.2。檢視完整更新說明',
+  version: '1.8.0',
+  zh: '所有用户建议更新 —— brainstorming 按上游 v7 重写：先弄清你想要什么，一次只问一个问题。另修复 SessionStart hook 在空 PATH 下丢失引导等问题。查看完整更新说明',
+  en: 'Update recommended for everyone — brainstorming is rebuilt from upstream v7: it works out what you want first, one question at a time. Also fixes the SessionStart hook losing its bootstrap under an empty PATH, and more. Read the full release notes',
+  zht: '所有使用者建議更新 —— brainstorming 按上游 v7 重寫：先弄清你想要什麼，一次只問一個問題。另修復 SessionStart hook 在空 PATH 下遺失引導等問題。檢視完整更新說明',
 };
 if (RELEASE_BANNER.version !== LATEST.version) {
   throw new Error(`首页发布提示条还是 v${RELEASE_BANNER.version} 的文案，release notes 最新是 v${LATEST.version} —— 发版时更新 site/build.mjs 的 RELEASE_BANNER`);
