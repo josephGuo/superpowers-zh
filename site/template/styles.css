@@ -195,7 +195,7 @@ section { max-width: var(--maxw); margin: 0 auto; padding: 80px 24px; }
 .chip:hover { color: var(--text); }
 .chip.active { background: var(--accent); border-color: var(--accent); color: #0a0b10; font-weight: 600; }
 
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 16px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(290px, 100%), 1fr)); gap: 16px; }
 .card {
   background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
   padding: 22px; transition: all .2s; position: relative;
@@ -210,7 +210,7 @@ section { max-width: var(--maxw); margin: 0 auto; padding: 80px 24px; }
 .empty { text-align: center; color: var(--text-faint); padding: 40px; }
 
 /* ---------- 工具墙 ---------- */
-.tool-wall { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
+.tool-wall { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(180px, 100%), 1fr)); gap: 12px; }
 .tool-pill {
   display: flex; align-items: center; justify-content: space-between;
   padding: 14px 18px; background: var(--bg-card);
@@ -275,7 +275,7 @@ footer { border-top: 1px solid var(--border-soft); margin-top: 40px; padding: 40
 /* ========== 扩充板块 ========== */
 
 /* 为什么选择 — 卖点网格 */
-.feat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 18px; }
+.feat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr)); gap: 18px; }
 .feat {
   background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
   padding: 28px; transition: all .2s;
@@ -311,7 +311,7 @@ footer { border-top: 1px solid var(--border-soft); margin-top: 40px; padding: 40
 .pl-arrow { display: flex; align-items: center; color: var(--accent); font-size: 20px; font-weight: 700; }
 
 /* 使用场景 */
-.uc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
+.uc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr)); gap: 16px; }
 .usecase {
   background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
   padding: 24px; transition: border-color .2s;
@@ -383,7 +383,7 @@ footer { border-top: 1px solid var(--border-soft); margin-top: 40px; padding: 40
 /* hero 下方的版本提示条：本版最重要的一句话（谁该重装）此前官网完全没有 */
 .release-note { display: inline-flex; align-items: center; gap: 10px; flex-wrap: wrap;
   max-width: 720px; margin: 20px auto 0; padding: 9px 16px; border-radius: 999px;
-  background: var(--card); border: 1px solid var(--border-soft);
+  background: var(--bg-card); border: 1px solid var(--border-soft);
   color: var(--text-dim); font-size: 13.5px; line-height: 1.6; text-decoration: none;
   transition: border-color .18s, color .18s; }
 .release-note:hover { border-color: var(--accent-2); color: var(--text); }
@@ -412,7 +412,7 @@ footer { border-top: 1px solid var(--border-soft); margin-top: 40px; padding: 40
 .flag-desc { margin: 0; font-size: 13.5px; color: var(--text-dim); line-height: 1.8; }
 
 /* 常规位：紧凑卡（logo + 名 + 截断简介 + 福利），不放 banner —— banner 只给旗舰位 */
-.sponsor-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); gap: 16px; }
+.sponsor-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(310px, 100%), 1fr)); gap: 16px; }
 .sponsor-card {
   position: relative; display: flex; flex-direction: column;
   background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
@@ -463,7 +463,7 @@ footer { border-top: 1px solid var(--border-soft); margin-top: 40px; padding: 40
 .flag-empty p { font-size: 14px; color: var(--text-dim); line-height: 1.75; max-width: 620px; margin: 0 auto 20px; }
 
 /* 赞助权益：4 张卡一行（首页的 feat-grid 是 3 列，这里单独收窄） */
-.sp-benefits .feat-grid { grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); }
+.sp-benefits .feat-grid { grid-template-columns: repeat(auto-fit, minmax(min(215px, 100%), 1fr)); }
 
 /* 福利汇总表 */
 .sp-table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg-card); }
@@ -487,7 +487,7 @@ footer { border-top: 1px solid var(--border-soft); margin-top: 40px; padding: 40
 
 /* 赞助商 —— 完整卡片（赞助商页） */
 /* 赞助商 —— 完整卡片（赞助商页） */
-.sponsor-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 18px; }
+.sponsor-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(400px, 100%), 1fr)); gap: 18px; }
 .sponsor {
   display: flex; flex-direction: column;
   background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
@@ -536,8 +536,18 @@ html[data-theme="light"] {
   --border-soft: #eaecf3;
   --text: #1a1d2b;
   --text-dim: #545a70;
-  --text-faint: #8b91a6;
+  /* 下面几项在深色主题里是亮色，直接放到浅色背景上对比度只有 1.6–3（青绿链接、行内代码、
+     中国原创标签、页脚）。浅色主题换成同色系的深色版本，在 bg/card/soft 上均 ≥ 4.5:1。 */
+  --text-faint: #646a80;
+  --accent-2: #0f766e;
+  --good: #166534;
+  --bad: #c53030;
 }
+/* 版本徽标以 accent-2 为底：浅色主题下底色变深，文字改白 */
+html[data-theme="light"] .rn-ver { color: #ffffff; }
+/* 代码块是为深色设计的（深底浅字）；浅色主题只换了底色、没换字色，代码几乎看不见 */
+html[data-theme="light"] .doc-body pre code { color: var(--text); }
+html[data-theme="light"] .tag-cn { color: var(--bad); }
 html[data-theme="light"] body::before { background: radial-gradient(circle, rgba(124,108,255,0.10), transparent 60%); }
 html[data-theme="light"] .nav::after { background: rgba(247,248,252,0.7); }
 html[data-theme="light"] .cmd-hero, html[data-theme="light"] .cmd-out,
@@ -599,6 +609,22 @@ a.card:hover .card-more { color: var(--accent); }
 
 /* Markdown 正文排版 */
 .doc-body { font-size: 15.5px; line-height: 1.8; color: var(--text); }
+/* 正文里的长英文串（如 cleanup/teardown/afterEach、长 URL）在手机上没有断点会撑宽整页；
+   允许在词内换行。代码块和表格各有自己的横向滚动容器，不受影响。 */
+.doc-body p, .doc-body li, .doc-body blockquote, .doc-body h2, .doc-body h3, .doc-body h4 { overflow-wrap: anywhere; }
+/* SKILL.md 的标签块（<HARD-GATE>、<Good>/<Bad> 等）：技能里最要紧的规则与正反例，单独框出来 */
+.doc-body .md-tag {
+  border: 1px solid var(--border); border-left: 3px solid var(--accent);
+  background: var(--bg-soft); border-radius: 10px; padding: 4px 18px 6px; margin: 20px 0;
+}
+.doc-body .md-tag[data-tag="Good"] { border-left-color: var(--good); }
+.doc-body .md-tag[data-tag="Good"] .md-tag-label { color: var(--good); }
+.doc-body .md-tag[data-tag="Bad"] { border-left-color: var(--bad); }
+.doc-body .md-tag[data-tag="Bad"] .md-tag-label { color: var(--bad); }
+.doc-body .md-tag-label {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; font-weight: 700;
+  letter-spacing: .5px; color: var(--accent); margin: 10px 0 2px;
+}
 .doc-body h1, .doc-body h2, .doc-body h3, .doc-body h4 { font-weight: 700; line-height: 1.35; margin: 1.8em 0 .7em; letter-spacing: -0.01em; }
 .doc-body h1 { font-size: 26px; } .doc-body h2 { font-size: 22px; padding-bottom: .3em; border-bottom: 1px solid var(--border-soft); }
 .doc-body h3 { font-size: 18px; } .doc-body h4 { font-size: 16px; color: var(--text-dim); }
@@ -628,7 +654,7 @@ a.card:hover .card-more { color: var(--accent); }
 .doc-body th { background: var(--bg-soft); font-weight: 600; }
 
 @media (max-width: 720px) {
-  .sponsor-grid, .sponsor-cards { grid-template-columns: 1fr; }
+  .sponsor-grid, .sponsor-cards { grid-template-columns: minmax(0, 1fr); }
   .flag-foot .btn { width: 100%; text-align: center; }
   .nav nav { gap: 12px; }
   .foot-cols { flex-direction: row; flex-wrap: wrap; gap: 32px; }
