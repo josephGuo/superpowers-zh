@@ -73,20 +73,6 @@ Chinese community edition of [superpowers](https://github.com/obra/superpowers) 
 </table>
 <table>
 <tr>
-<td width="25%" align="center">
-  <a href="https://sidrune.ai/register?source=github&campaign=superpowers&promo=superpowers&aff=RQHWKAMQLX2S">
-    <img src="assets/sponsors/logo-sidrune-ai.png" alt="Sidrune AI —— 一個入口，接入並管理全球主流 AI 模型" width="100%">
-  </a>
-</td>
-<td width="75%" valign="middle">
-
-感謝 [Sidrune AI](https://sidrune.ai/register?source=github&campaign=superpowers&promo=superpowers&aff=RQHWKAMQLX2S) 贊助本專案！一個入口，接入並管理全球主流 AI 模型。Sidrune AI 面向個人開發者、技術團隊與企業，透過統一 API 接入並管理全球主流 AI 模型；透過多線路動態調度提升可用性，模型表現、回應時間與費用透明可查。依不同模型與線路，API 呼叫成本較官方或基準價格可降低 **40%—98%**。🎁 **透過[此連結](https://sidrune.ai/register?source=github&campaign=superpowers&promo=superpowers&aff=RQHWKAMQLX2S)註冊即可獲得 $3 API 額度！**
-
-</td>
-</tr>
-</table>
-<table>
-<tr>
 <td width="25%">
   <a href="https://www.volcengine.com/activity/ai618?utm_source=OWO&utm_medium=devrel-1&utm_campaign=hw&utm_term=superpowers-zh&utm_content=hw">
     <img src="assets/sponsors/volcengine.png" alt="字節火山引擎 —— 火山方舟 Agent/Coding Plan 國模套餐首購 9.9，註冊免費領 2500w Token" width="100%">
@@ -165,7 +151,7 @@ AI：在開始實作之前，我需要了解幾個關鍵問題：
 | 🇨🇳 中文文件規範 | 無 | 中文排版 + 中英混排規則 + 告別機翻味 |
 | ➕ MCP 伺服器建置 | 無 | 獨立 `mcp-builder` skill |
 | ➕ 工作流執行器 | 無 | 獨立 `workflow-runner` skill（多角色 YAML 編排） |
-| ➕ 翻譯 skill 內的增量 | — | 僅 2 處，均在正文顯式標註「本節是 superpowers-zh 的增量內容」：`executing-plans` 的「常見異常處理」、`using-superpowers` 的「中國特色技能路由」。**上游各節均為逐節翻譯，不被改動**；audit 會強制未標註的增量報錯 |
+| ➕ 翻譯 skill 內的增量 | — | `using-superpowers` 保留明確標註的「中國特色技能路由」；`brainstorming` 補充「你看著辦 / 你定吧」不等於跳過流程的中文語境說明，依據與 eval 範圍見 v1.8.0 更新日誌。`executing-plans` 原有「常見異常處理」已於 v1.7.14 刪除，避免與上游內聯執行流程衝突。 |
 | 🔄 版本跟進 | 獨立迭代 | **同步上游 + 國產增量疊加** |
 | 🤝 接受新 skill PR | 一般不接受（原文：*"we don't generally accept contributions of new skills"*） | 歡迎 PR（中國開發者痛點優先） |
 | 💬 社群 | Discord | 微信公眾號「AI不止語」+ 微信群 + QQ 群 |
@@ -387,6 +373,8 @@ npx superpowers-zh@latest --uninstall
 | `--force` | 允許在主目錄(~)安裝（預設拒絕，**不建議**） |
 | `--uninstall` | 解除安裝目前目錄下的 superpowers-zh |
 | `--help` / `--version` | 說明 / 版本 |
+
+> **怎麼看版本號？** skill 檔案裡的 `version: "1.0.0"` 目前不會隨發版更新；`npx superpowers-zh --version` 顯示本次執行的安裝器版本，也不代表專案先前安裝的技能版本。依安裝方式核對與更新，見[版本號與安裝內容核對](docs/VERSIONING.md)（簡體中文）。
 
 ---
 
