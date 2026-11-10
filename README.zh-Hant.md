@@ -74,6 +74,20 @@ Chinese community edition of [superpowers](https://github.com/obra/superpowers) 
 <table>
 <tr>
 <td width="25%">
+  <a href="https://apixo.ai/?utm_source=github&utm_medium=sponsorship&utm_campaign=github_readme&utm_content=jnmetacode_superpowers-zh">
+    <img src="assets/sponsors/apixo-ai-zh.jpg" alt="APIXO：AI 图片与视频创作｜黑五特惠" width="100%">
+  </a>
+</td>
+<td width="75%" valign="middle">
+
+感謝 [APIXO](https://apixo.ai/?utm_source=github&utm_medium=sponsorship&utm_campaign=github_readme&utm_content=jnmetacode_superpowers-zh) 贊助本專案！無需編程，在 APIXO 網頁端即可生成 AI 圖片與影片，也可透過 API 接入自己的應用與自動化工作流程。黑五期間，[seedream5.5](https://apixo.ai/models/seedream-5-5?utm_source=github&utm_medium=sponsorship&utm_campaign=github_readme&utm_content=jnmetacode_superpowers-zh)僅 **$0.014/張**，原價 $0.02/張，限時 7 折。指定模型與規格較活動頁列示的市場參考價最高省 66%，優惠自動生效，無需優惠碼。**活動截至北京時間 2026 年 12 月 31 日 23:59**。 [查看 APIXO 黑五優惠 →](https://apixo.ai/models/seedream-5-5?utm_source=github&utm_medium=sponsorship&utm_campaign=github_readme&utm_content=jnmetacode_superpowers-zh)
+
+</td>
+</tr>
+</table>
+<table>
+<tr>
+<td width="25%">
   <a href="https://www.volcengine.com/activity/ai618?utm_source=OWO&utm_medium=devrel-1&utm_campaign=hw&utm_term=superpowers-zh&utm_content=hw">
     <img src="assets/sponsors/volcengine.png" alt="字節火山引擎 —— 火山方舟 Agent/Coding Plan 國模套餐首購 9.9，註冊免費領 2500w Token" width="100%">
   </a>
@@ -295,32 +309,32 @@ claude plugin uninstall superpowers-zh@superpowers-zh    # 卸載
 >
 > superpowers-zh 是一個完整 plugin，包含：`skills/`（21 個能力）+ `hooks/`（SessionStart 鉤子，讓 skill 在合適時機自動觸發）+ `CLAUDE.md` / `GEMINI.md` 等 bootstrap 引導檔案 + 4 套 plugin manifest（Claude Code / Cursor / Codex / Marketplace）。
 >
-> **下面的 `cp -r skills` 命令只複製 skills 目錄**，不會自動設定 hooks、不會產生 bootstrap 引導。結果：skills 物理上存在，但 AI 不會在合適時機自動呼叫，需要你每次手動喊 "use brainstorming skill" 之類。
+> **下面的命令只複製 skill 檔案**，不會自動設定 hooks 或產生 bootstrap。是否原生發現 skill、是否還需引導或設定，取決於工具；請依下方專屬指南完成設定並在新會話驗收，不能僅憑檔案存在就判斷已生效。
 >
-> **強烈推薦用方式一 `npx superpowers-zh`** —— 它會一鍵處理 skills 複製 + bootstrap 產生 + hooks 設定 + 工具特定適配。僅在 npx 不可用（極端無網路環境）時才退到手動。
+> **強烈推薦用方式一 `npx superpowers-zh`** —— 它會依工具處理 skills 複製、所需的 bootstrap / hooks 和工具特定適配。僅在 npx 不可用（極端無網路環境）時才退到手動。
 
 ```bash
 # 複製倉庫
 git clone https://github.com/jnMetaCode/superpowers-zh.git
 
 # 複製 skills 到你的專案（選擇你使用的工具）
-cp -r superpowers-zh/skills /your/project/.claude/skills      # Claude Code / Copilot CLI
-cp -r superpowers-zh/skills /your/project/.hermes/skills      # Hermes Agent
-cp -r superpowers-zh/skills /your/project/.cursor/skills      # Cursor
-cp -r superpowers-zh/skills /your/project/.codex/skills       # Codex CLI
-cp -r superpowers-zh/skills /your/project/.kiro/skills        # Kiro
-cp -r superpowers-zh/skills /your/project/skills/custom       # DeerFlow 2.0
-cp -r superpowers-zh/skills /your/project/.trae/rules         # Trae
-cp -r superpowers-zh/skills /your/project/.agents        # Antigravity
-cp -r superpowers-zh/skills /your/project/.github/superpowers # VS Code (Copilot)
-cp -r superpowers-zh/skills /your/project/skills              # OpenClaw
-cp -r superpowers-zh/skills /your/project/.windsurf/skills   # Windsurf
-cp -r superpowers-zh/skills /your/project/.gemini/skills     # Gemini CLI
-cp -r superpowers-zh/skills /your/project/.aider/skills      # Aider
-cp -r superpowers-zh/skills /your/project/.opencode/skills   # OpenCode
-cp -r superpowers-zh/skills /your/project/.qwen/skills       # Qwen Code
-cp -r superpowers-zh/skills /your/project/.claw/skills       # Claw Code（Rust 版）
-cp -r superpowers-zh/skills /your/project/.qoder/skills      # Qoder（阿里 AI IDE）
+mkdir -p /your/project/.claude/skills && cp -R superpowers-zh/skills/. /your/project/.claude/skills/ # Claude Code / Copilot CLI
+mkdir -p /your/project/.hermes/skills && cp -R superpowers-zh/skills/. /your/project/.hermes/skills/ # Hermes Agent
+mkdir -p /your/project/.cursor/skills && cp -R superpowers-zh/skills/. /your/project/.cursor/skills/ # Cursor
+mkdir -p /your/project/.agents/skills && cp -R superpowers-zh/skills/. /your/project/.agents/skills/ # Codex CLI
+mkdir -p /your/project/.kiro/skills && cp -R superpowers-zh/skills/. /your/project/.kiro/skills/ # Kiro
+mkdir -p /your/project/skills/custom && cp -R superpowers-zh/skills/. /your/project/skills/custom/ # DeerFlow 2.0
+mkdir -p /your/project/.trae/skills && cp -R superpowers-zh/skills/. /your/project/.trae/skills/ # Trae
+mkdir -p /your/project/.agents/skills && cp -R superpowers-zh/skills/. /your/project/.agents/skills/ # Antigravity
+mkdir -p /your/project/.github/superpowers && cp -R superpowers-zh/skills/. /your/project/.github/superpowers/ # VS Code (Copilot)
+mkdir -p /your/project/skills && cp -R superpowers-zh/skills/. /your/project/skills/ # OpenClaw
+mkdir -p /your/project/.windsurf/skills && cp -R superpowers-zh/skills/. /your/project/.windsurf/skills/ # Windsurf
+mkdir -p /your/project/.gemini/skills && cp -R superpowers-zh/skills/. /your/project/.gemini/skills/ # Gemini CLI
+mkdir -p /your/project/.aider/skills && cp -R superpowers-zh/skills/. /your/project/.aider/skills/ # Aider
+mkdir -p /your/project/.opencode/skills && cp -R superpowers-zh/skills/. /your/project/.opencode/skills/ # OpenCode
+mkdir -p /your/project/.qwen/skills && cp -R superpowers-zh/skills/. /your/project/.qwen/skills/ # Qwen Code
+mkdir -p /your/project/.claw/skills && cp -R superpowers-zh/skills/. /your/project/.claw/skills/ # Claw Code（Rust 版）
+mkdir -p /your/project/.qoder/skills && cp -R superpowers-zh/skills/. /your/project/.qoder/skills/ # Qoder（阿里 AI IDE）
 ```
 
 ### 方式四：在設定檔中引用
@@ -331,11 +345,11 @@ cp -r superpowers-zh/skills /your/project/.qoder/skills      # Qoder（阿里 AI
 |------|---------|------|
 | Claude Code | `CLAUDE.md` | 專案根目錄 |
 | Copilot CLI | `CLAUDE.md` | 與 Claude Code 共用外掛格式 |
-| Hermes Agent | `HERMES.md` 或 `.hermes.md` | 專案根目錄，安裝時自動產生 |
+| Hermes Agent | `AGENTS.md` + `.hermes/skills/` | 專案級產生 AGENTS.md；還需登記 skills.external_dirs，全域安裝及詳情見 [Hermes 指南](docs/README.hermes.md) |
 | Kiro | `.kiro/steering/superpowers-zh.md`（索引，`inclusion: always`）+ `.kiro/skills/` | steering 每輪常駐，故只放索引 |
 | DeerFlow 2.0 | `skills/custom/*/SKILL.md` | 位元組跳動開源 SuperAgent，自動發現自訂 skills |
-| Trae | `.trae/rules/project_rules.md` | 專案級規則 |
-| Antigravity | `GEMINI.md` 或 `AGENTS.md` | 專案根目錄 |
+| Trae | `.trae/rules/superpowers-zh.md` + `.trae/skills/` | 安裝器產生專案級 bootstrap，skill 檔案獨立存放 |
+| Antigravity | `.agents/rules.md` + `.agents/skills/` | 安裝器產生引導規則，不覆蓋既有 GEMINI.md / AGENTS.md |
 | VS Code | `.github/copilot-instructions.md` | Copilot 自訂指令 |
 | Cursor | `.cursor/rules/*.md` | 專案級規則目錄 |
 | OpenClaw | `skills/*/SKILL.md` | 工作區級 skills 目錄，自動發現 |
@@ -343,7 +357,6 @@ cp -r superpowers-zh/skills /your/project/.qoder/skills      # Qoder（阿里 AI
 | Gemini CLI | `.gemini/skills/*/SKILL.md` | 專案級 skills 目錄 |
 | Aider | `.aider/skills/*/SKILL.md` | 專案級 skills 目錄 |
 | OpenCode | `.opencode/skills/*/SKILL.md` | 專案級 skills 目錄 |
-| Hermes Agent | `.hermes/skills/*/SKILL.md` | 專案級 skills 目錄 |
 | Qwen Code | `.qwen/skills/*/SKILL.md` | 專案級 skills 目錄 |
 | Claw Code | `.claw/skills/*/SKILL.md` | Rust 版 CLI agent，相容 Claude Code 的 SKILL.md 格式 |
 | Qoder | `.qoder/skills/*/SKILL.md` + `.qoder/rules/superpowers-zh.md` | 阿里 AI IDE，自動產生 `trigger: always_on` 的 bootstrap rule |
@@ -465,7 +478,17 @@ MIT License — 自由使用，商業或個人均可。
 
 ## 📌 最近更新
 
-> 🆕 **v1.7.12 更新亮點** —— **透過 Claude Code 外掛市集安裝的使用者請更新**（此前技能之間互相呼叫會失敗）：
+**已發布 v1.8.0：同步上游 v7.0.0。** 本版重寫 brainstorming，並修復 hook、執行帳本與官網顯示問題。
+
+- **需求釐清**：開放式提問、分塊複述；書面設計由 builder check 檢查。中文「你看著辦」不等於允許跳過流程。
+- **執行可靠性**：靜默成功的測試正常記帳，保留使用者既有的 workspace `.gitignore`，修正 Windows hook 和路徑處理。
+- **官網體驗**：修正繁體文案、提示區塊顯示、淺色主題程式碼區塊和手機橫向溢出。
+
+完整變更、eval 範圍及更新說明見 [v1.8.0 Release Notes](RELEASE-NOTES.zh.md)。技能檔案的 `1.0.0` 欄位不能用來判斷發行版，見[版本核對指南](docs/VERSIONING.md)（簡體中文）。
+
+### v1.7.12 歷史修復
+
+> 以下保留 v1.7.12 的歷史修復說明；相關修復已包含在後續版本中：
 >
 > - 🐛 **外掛模式下跨技能呼叫全部失敗**（[#124](https://github.com/jnMetaCode/superpowers-zh/issues/124)）—— 正文照抄了上游的 `superpowers:` 前綴，而本外掛叫 `superpowers-zh`，於是 `Skill("superpowers:systematic-debugging")` 回傳 Unknown skill。32 處已改為**裸技能名**（兩種分發模式都能解析）
 > - 🐛 **Crush 在 Windows 上裝錯目錄** —— 官方是 `%LOCALAPPDATA%\crush\skills`，我們兩個平台都裝 `~/.config`。文件早寫對了，程式碼沒跟上
